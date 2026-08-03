@@ -16,6 +16,10 @@ project:
   design_doc: "C:\\crypto\\wicked whiskers.docx"
   assets_source: "C:\\crypto\\world\\kenneys nature kit\\Models\\GLTF format"
   screenshot: "C:\\crypto\\wicked whiskers\\screenshot.png"
+  version_control: git repo at project_dir (init'd, 2 commits: baseline b402cdc + shed-scene
+    split ab95682). git NOT on PATH - use "C:\Program Files\Git\bin\git.exe" or add to
+    $env:Path per shell. Identity: Andy Lear <andy@andylear.co.uk>. Remote (meldrino GitHub)
+    not yet added - discuss with user. No gh CLI installed.
 
 # =============================================================================
 # GAME STRUCTURE
