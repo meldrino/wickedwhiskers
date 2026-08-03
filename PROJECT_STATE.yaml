@@ -17,13 +17,9 @@ project:
   assets_source: "C:\\crypto\\world\\kenneys nature kit\\Models\\GLTF format"
   screenshot: "C:\\crypto\\wicked whiskers\\screenshot.png"
   version_control: git repo at project_dir. Remote = git@github.com:meldrino/wickedwhiskers.git
-    (SSH, private, created 03-Aug-2026), master pushed (baseline b402cdc + shed-scene split
-    ab95682 + state note 02dcaa7). SSH key id_ed25519 registered on meldrino account only
-    (meldrinoworld account deleted - was empty). git NOT on PATH - use
-    "C:\Program Files\Git\bin\git.exe" or add to $env:Path per shell. Identity:
-    Andy Lear <andy@andylear.co.uk>. No gh CLI installed. NOTE: .ssh/config had a UTF-8 BOM
-    that broke OpenSSH - stripped it (must save config WITHOUT BOM, and only ever edit with
-    a BOM-free editor).
+    (repo is PUBLIC by choice), master pushed. Session history: worklog.md in project_dir.
+    Shared GitHub/SSH/website/tools info + the master project map live in
+    C:\crypto\PROJECTS.yaml - read that FIRST for anything cross-project.
 
 # =============================================================================
 # GAME STRUCTURE
