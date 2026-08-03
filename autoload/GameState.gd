@@ -32,6 +32,10 @@ var bird_caught := false
 var fish_caught := false
 var catfood_used := false
 
+var shed_string_taken := false
+var shed_key_taken := false
+var spawn_near_shed := false
+
 var quest := "meet"
 var first_dawn := false
 var chase_active := false
@@ -65,6 +69,9 @@ func new_game() -> void:
 	bird_caught = false
 	fish_caught = false
 	catfood_used = false
+	shed_string_taken = false
+	shed_key_taken = false
+	spawn_near_shed = false
 	quest = "meet"
 	first_dawn = false
 	chase_active = false

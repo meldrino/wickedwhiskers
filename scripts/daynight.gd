@@ -101,7 +101,11 @@ func _process_tiredness(delta: float) -> void:
 		GameState.tiredness = 0.0
 		var player := get_tree().get_first_node_in_group("player")
 		if player != null:
-			player.global_position = Vector3(0, 0.0, 12.0)
+			var scene := get_tree().current_scene
+			var pos := Vector3(0, 0.0, 12.0)
+			if scene != null and scene.name == "Shed":
+				pos = Vector3(0, 0.0, 0.0)
+			player.global_position = pos
 			if player.has_method("stop_walk"):
 				player.stop_walk()
 		if GameState.lose_life("Exhaustion caught up with you. You should have napped!"):

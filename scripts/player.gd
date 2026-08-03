@@ -31,11 +31,6 @@ const ANIM_BONES := [
 	"Tail01", "Tail02", "Tail03",
 ]
 
-# Shed interior volume (world-aligned) used to keep the camera inside the walls.
-const SHED_CENTER := Vector3(16, 0, -10)
-const SHED_HALF := Vector3(2.1, 0, 1.5)
-const SHED_WALL_CLEAR := 0.15
-
 @onready var camera: Camera3D = $CameraHolder/Camera
 @onready var camera_holder: Node3D = $CameraHolder
 @onready var mesh_root: Node3D = $MeshRoot
@@ -94,18 +89,18 @@ func _pitch_max() -> float:
 	return asin(clampf((height - 0.1) / camera_distance, -1.0, 1.0))
 
 
-func _clamp_camera_in_shed() -> void:
-	var p := global_position - SHED_CENTER
-	if absf(p.x) > SHED_HALF.x or absf(p.z) > SHED_HALF.z:
+func _clamp_camera_in_room() -> void:
+	var scene := get_tree().current_scene
+	if scene == null or scene.name != "Shed":
 		return
-	var cam_world := camera_holder.to_global(camera.position)
-	var c := cam_world - SHED_CENTER
+	var cam := camera_holder.to_global(camera.position)
+	var half := Vector3(2.25, 1.35, 1.65)
 	var clamped := Vector3(
-		clampf(c.x, -SHED_HALF.x + SHED_WALL_CLEAR, SHED_HALF.x - SHED_WALL_CLEAR),
-		clampf(c.y, 0.15, 3.0 - SHED_WALL_CLEAR),
-		clampf(c.z, -SHED_HALF.z + SHED_WALL_CLEAR, SHED_HALF.z - SHED_WALL_CLEAR))
-	if clamped != c:
-		camera.position = camera_holder.to_local(SHED_CENTER + clamped)
+		clampf(cam.x, -half.x, half.x),
+		clampf(cam.y, 0.25, half.y),
+		clampf(cam.z, -half.z, half.z))
+	if clamped != cam:
+		camera.position = camera_holder.to_local(clamped)
 
 
 func walk_to(pos: Vector3) -> void:
@@ -262,7 +257,7 @@ func _physics_process(delta: float) -> void:
 	if not camera_frozen:
 		pitch = clampf(pitch, -max_pitch, _pitch_max())
 		camera_holder.rotation = Vector3(pitch, yaw, 0.0)
-		_clamp_camera_in_shed()
+		_clamp_camera_in_room()
 
 	if Hud.is_dialogue_open():
 		Hud.set_prompt("")

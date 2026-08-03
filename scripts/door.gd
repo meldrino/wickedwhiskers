@@ -59,24 +59,9 @@ func _on_combo(val: int) -> void:
 			t.tween_property(_door_mesh, "rotation:y", 2.4, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		if _padlock != null:
 			_padlock.queue_free()
-		var block := get_parent().get_node_or_null("DoorBlock")
-		if block != null:
-			block.queue_free()
-		_spawn_shed_loot()
+		Hud.toast("Step inside to reach the string and the spare tractor keys.")
 	else:
 		Hud.toast("The padlock stays stubborn. (Hint: the number's on the tractor's plate.)")
-
-
-func _spawn_shed_loot() -> void:
-	var shed := get_parent()
-	var s := preload("res://scripts/pickup.gd").new()
-	s.kind = "string"
-	s.position = shed.global_position + Vector3(-1.1, 1.1, -1.1)
-	shed.add_child(s)
-	var k := preload("res://scripts/pickup.gd").new()
-	k.kind = "key"
-	k.position = shed.global_position + Vector3(1.1, 0.68, -1.1)
-	shed.add_child(k)
 
 
 func _build_padlock() -> void:

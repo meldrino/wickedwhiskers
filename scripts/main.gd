@@ -52,6 +52,8 @@ const MOUSE_POS := Vector3(2, 0, 6.5)
 
 var rng := RandomNumberGenerator.new()
 var trees: Array[Node3D] = []
+var _shed_portal: Area3D
+var _enter_shed_delay := -1.0
 
 
 func _ready() -> void:
@@ -73,7 +75,17 @@ func _ready() -> void:
 	_spawn_mouse()
 	_spawn_bird()
 	_spawn_fish()
+	_spawn_player()
 	_maybe_screenshot()
+
+
+func _spawn_player() -> void:
+	var pl := get_tree().get_first_node_in_group("player")
+	if pl == null:
+		return
+	if GameState.spawn_near_shed:
+		pl.global_position = Vector3(16, 0, -7.2)
+		GameState.spawn_near_shed = false
 
 
 func _maybe_screenshot() -> void:
@@ -186,124 +198,54 @@ func _build_shed(shed_pos: Vector3) -> void:
 	var half_w := 2.3
 	var half_d := 1.7
 	var wall_h := 3.0
-	var wall_t := 0.2
-	var gap := 0.8
 
-	# Hollow walls: back, left, right
-	_add_mesh(shed, "box", Vector3(half_w * 2.0, wall_h, wall_t), Vector3(0, wall_h / 2.0, -half_d + wall_t / 2.0), wood)
-	_add_collider(shed, Vector3(half_w * 2.0, wall_h, wall_t), Vector3(0, wall_h / 2.0, -half_d + wall_t / 2.0))
-	_add_mesh(shed, "box", Vector3(wall_t, wall_h, half_d * 2.0), Vector3(-half_w + wall_t / 2.0, wall_h / 2.0, 0), wood)
-	_add_collider(shed, Vector3(wall_t, wall_h, half_d * 2.0), Vector3(-half_w + wall_t / 2.0, wall_h / 2.0, 0))
-	_add_mesh(shed, "box", Vector3(wall_t, wall_h, half_d * 2.0), Vector3(half_w - wall_t / 2.0, wall_h / 2.0, 0), wood)
-	_add_collider(shed, Vector3(wall_t, wall_h, half_d * 2.0), Vector3(half_w - wall_t / 2.0, wall_h / 2.0, 0))
-
-	# Front wall with a doorway gap (x in [-gap, gap], up to y=2.2)
-	var front_z := half_d - wall_t / 2.0
-	var seg_w := half_w - wall_t / 2.0 - gap
-	var seg_cx := gap + seg_w / 2.0
-	_add_mesh(shed, "box", Vector3(seg_w, wall_h, wall_t), Vector3(-seg_cx, wall_h / 2.0, front_z), wood)
-	_add_collider(shed, Vector3(seg_w, wall_h, wall_t), Vector3(-seg_cx, wall_h / 2.0, front_z))
-	_add_mesh(shed, "box", Vector3(seg_w, wall_h, wall_t), Vector3(seg_cx, wall_h / 2.0, front_z), wood)
-	_add_collider(shed, Vector3(seg_w, wall_h, wall_t), Vector3(seg_cx, wall_h / 2.0, front_z))
-	# Lintel above the doorway
-	var lint_h := wall_h - 2.2
-	_add_mesh(shed, "box", Vector3(gap * 2.0 + wall_t, lint_h, wall_t), Vector3(0, 2.2 + lint_h / 2.0, front_z), wood_dark)
-	_add_collider(shed, Vector3(gap * 2.0 + wall_t, lint_h, wall_t), Vector3(0, 2.2 + lint_h / 2.0, front_z))
-	# Doorway jambs
-	_add_mesh(shed, "box", Vector3(wall_t * 0.8, 2.2, wall_t * 0.8), Vector3(-gap - 0.12, 1.1, half_d - 0.04), wood_dark)
-	_add_mesh(shed, "box", Vector3(wall_t * 0.8, 2.2, wall_t * 0.8), Vector3(gap + 0.12, 1.1, half_d - 0.04), wood_dark)
-
+	# Solid exterior box (the interior now lives in its own scene: scenes/shed.tscn)
+	_add_mesh(shed, "box", Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0), wood)
+	_add_collider(shed, Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0))
 	# Roof (overhang) + ridge cap
 	_add_mesh(shed, "box", Vector3(half_w * 2.0 + 0.5, 0.5, half_d * 2.0 + 0.5), Vector3(0, wall_h + 0.25, 0), roof_col)
 	_add_mesh(shed, "box", Vector3(half_w * 2.0 + 0.5, 0.3, 0.7), Vector3(0, wall_h + 0.65, 0), roof_col)
-
-	# Solid block in the doorway while the shed is locked (freed by door.gd on unlock)
-	var block := StaticBody3D.new()
-	block.name = "DoorBlock"
-	block.position = Vector3(0, 1.1, half_d - 0.08)
-	var block_col := CollisionShape3D.new()
-	var bshape := BoxShape3D.new()
-	bshape.size = Vector3(gap * 2.0 + 0.1, 2.2, wall_t)
-	block_col.shape = bshape
-	block.add_child(block_col)
-	shed.add_child(block)
-
-	# Door mesh (swings open on unlock)
-	var door_mesh := _mesh("box", Vector3(gap * 2.0, 2.2, 0.12), Color(0.1, 0.08, 0.06))
+	# Door frame + dark door (door mesh swings open on unlock)
+	_add_mesh(shed, "box", Vector3(1.9, 2.2, 0.15), Vector3(0, 1.1, half_d - 0.05), wood_dark)
+	var door_mesh := _mesh("box", Vector3(1.7, 2.0, 0.1), Color(0.1, 0.08, 0.06))
 	door_mesh.name = "Door"
 	door_mesh.position = Vector3(0, 1.1, half_d - 0.02)
 	shed.add_child(door_mesh)
-
-	# Warm interior light + props
-	var light := OmniLight3D.new()
-	light.position = Vector3(0, 2.2, 0)
-	light.light_color = Color(1.0, 0.9, 0.65)
-	light.light_energy = 1.6
-	light.omni_range = 7.0
-	shed.add_child(light)
-	_build_shed_props(shed)
 
 	var door := _make_door("shed")
 	door.position = Vector3(0, 1.0, half_d - 0.02)
 	shed.add_child(door)
 
+	_build_shed_portal(shed)
 
-func _build_shed_props(shed: Node3D) -> void:
-	var wood := Color(0.62, 0.48, 0.3)
-	var wood_dark := Color(0.45, 0.33, 0.2)
-	var hay := Color(0.85, 0.75, 0.4)
-	var brown := Color(0.42, 0.28, 0.17)
-	var green := Color(0.3, 0.55, 0.25)
-	var straw := Color(0.75, 0.65, 0.45)
 
-	# Loot crates (door.gd spawns string + keys on top of these)
-	_add_mesh(shed, "box", Vector3(0.6, 0.6, 0.6), Vector3(-1.1, 0.3, -1.1), wood)
-	_add_collider(shed, Vector3(0.6, 0.6, 0.6), Vector3(-1.1, 0.3, -1.1))
-	_add_mesh(shed, "box", Vector3(0.4, 0.4, 0.4), Vector3(-1.1, 0.85, -1.1), wood_dark)
-	_add_mesh(shed, "box", Vector3(0.6, 0.6, 0.6), Vector3(1.1, 0.3, -1.1), wood)
-	_add_collider(shed, Vector3(0.6, 0.6, 0.6), Vector3(1.1, 0.3, -1.1))
+func _build_shed_portal(shed: Node3D) -> void:
+	var portal := Area3D.new()
+	portal.name = "ShedPortal"
+	var col := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(1.7, 2.2, 0.7)
+	col.shape = box
+	portal.add_child(col)
+	portal.position = Vector3(0, 1.0, 2.0)
+	_shed_portal = portal
+	shed.add_child(portal)
 
-	# An old boot with a sprout growing out of it
-	_add_mesh(shed, "box", Vector3(0.3, 0.34, 0.58), Vector3(-1.7, 0.17, 1.0), brown, Vector3(0.15, 0, 0.3))
-	_add_mesh(shed, "cylinder", Vector3(0.16, 0.24, 0.16), Vector3(-1.66, 0.4, 1.04), brown)
-	_add_mesh(shed, "cylinder", Vector3(0.03, 0.3, 0.03), Vector3(-1.62, 0.62, 1.1), green)
-	_add_mesh(shed, "sphere", Vector3(0.1, 0.14, 0.1), Vector3(-1.62, 0.78, 1.1), green)
 
-	# Hay pile in the front-right corner
-	_add_mesh(shed, "box", Vector3(0.6, 0.3, 0.6), Vector3(1.55, 0.15, 1.25), hay, Vector3(0, 0.25, 0))
-	_add_mesh(shed, "box", Vector3(0.5, 0.3, 0.5), Vector3(1.2, 0.42, 1.05), hay, Vector3(0, -0.2, 0))
-	_add_mesh(shed, "box", Vector3(0.45, 0.28, 0.45), Vector3(1.5, 0.72, 1.15), hay, Vector3(0, 0.35, 0))
-
-	# Sprung mousetrap on the floor — the last mouse won
-	_add_mesh(shed, "box", Vector3(0.26, 0.03, 0.12), Vector3(0.35, 0.015, 0.8), wood)
-	_add_mesh(shed, "cylinder", Vector3(0.012, 0.14, 0.012), Vector3(0.42, 0.1, 0.8), Color(0.7, 0.7, 0.72))
-	_add_mesh(shed, "box", Vector3(0.09, 0.025, 0.09), Vector3(0.26, 0.03, 0.8), Color(0.95, 0.8, 0.3))
-
-	# Lantern hanging on the back wall (glows)
-	var lantern := MeshInstance3D.new()
-	var lm := CylinderMesh.new()
-	lm.top_radius = 0.13
-	lm.bottom_radius = 0.13
-	lm.height = 0.26
-	var lmat := StandardMaterial3D.new()
-	lmat.albedo_color = Color(1.0, 0.85, 0.55)
-	lmat.emission_enabled = true
-	lmat.emission = Color(1.0, 0.75, 0.4)
-	lmat.emission_energy_multiplier = 2.0
-	lm.material = lmat
-	lantern.mesh = lm
-	lantern.position = Vector3(0.5, 1.8, -1.5)
-	shed.add_child(lantern)
-	_add_mesh(shed, "box", Vector3(0.3, 0.05, 0.05), Vector3(0.5, 1.95, -1.5), wood_dark)
-	_add_mesh(shed, "box", Vector3(0.06, 0.3, 0.06), Vector3(0.5, 1.05, -1.5), wood_dark)
-
-	# Rake leaning against the wall
-	_add_mesh(shed, "cylinder", Vector3(0.03, 1.4, 0.03), Vector3(-0.7, 0.7, -1.45), wood, Vector3(0.2, 0, 0.6))
-	_add_mesh(shed, "box", Vector3(0.2, 0.05, 0.55), Vector3(-0.78, 0.2, -1.3), wood, Vector3(0, 0, 0.12))
-
-	# Coil of rope on a peg
-	_add_mesh(shed, "cylinder", Vector3(0.2, 0.07, 0.2), Vector3(1.7, 1.25, -1.5), straw)
-	_add_mesh(shed, "cylinder", Vector3(0.05, 0.12, 0.05), Vector3(1.7, 1.05, -1.5), wood_dark)
+func _physics_process(delta: float) -> void:
+	if _enter_shed_delay > 0.0:
+		_enter_shed_delay -= delta
+		if _enter_shed_delay <= 0.0:
+			get_tree().change_scene_to_file("res://scenes/shed.tscn")
+		return
+	if not GameState.shed_unlocked or _shed_portal == null:
+		return
+	# Poll overlaps every frame (self-healing - no body_entered can be missed).
+	for body in _shed_portal.get_overlapping_bodies():
+		if body.is_in_group("player"):
+			# Small beat so the padlock CLICK + door swing register before the cut.
+			_enter_shed_delay = 0.7
+			return
 
 
 func _make_door(kind: String) -> Node3D:

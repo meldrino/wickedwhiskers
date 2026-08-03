@@ -22,9 +22,14 @@ project:
 # =============================================================================
 sections:
   1_the_farm:
-    content: Scene 1 (S1) = the farm GARDEN, the only scene built so far. Gather string
-      (padlocked shed) + sticks (ground), craft a Heath-Robinson mousetrap / ladder / fishing
-      rod, catch the mouse / bird / fish, meet Dumbleclaw (quests + surplus-food trade).
+    content: Scene 1 (S1) = the farm GARDEN. Gather string (from the shed - its own scene,
+      S1.5) + sticks (ground), craft a Heath-Robinson mousetrap / ladder / fishing rod, catch
+      the mouse / bird / fish, meet Dumbleclaw (quests + surplus-food trade).
+  1_5_the_shed:
+    content: Scene 1.5 (S1.5) = the SHED INTERIOR, a completely separate scene
+      (scenes/shed.tscn). Enter via the shed doorway portal once the padlock combo is entered;
+      exit portal returns to the farm near the shed door. Holds the string + spare tractor
+      keys (loot spawns once, tracked so it can't be farmed).
   2_the_farmhouse:
     content: Scene 2 (S2) = inside the farmhouse. Not yet built. Farmhouse door currently
       only teases it (catfood once at day).
@@ -39,7 +44,8 @@ sections:
 design_rules:
   wise_old_cat: Dumbleclaw - a feline version of Albus Dumbledore (long grey beard,
     half-moon spectacles, pointy hat). Quest giver + trader, sits in the garden at (4,0,-14).
-  scenes: S1 farm garden (built), S2 inside farmhouse (future), S3 city Dick Whittington (future)
+  scenes: S1 farm garden (built), S1.5 shed interior (own scene, built), S2 inside farmhouse
+    (future), S3 city Dick Whittington (future)
   interaction_model: NOT a linear ABC quest chain - each NPC/object is its own state machine
     / decision tree with click-choices (E interact, then pick from a choice panel).
   controls: E interact, 1 craft trap, 2 craft ladder, 3 craft rod, F eat
@@ -56,8 +62,9 @@ design_rules:
     food: catfood from the farmhouse kitchen, ONCE per day at first light
     tractor_key: spare keys in the shed
   shed: padlocked. Combo = LAST 3 DIGITS of the tractor number plate. Combo randomizes on
-    every new game (randi 100-999). Unlock by entering digits (▲▼/◀▶/TRY LOCK). Contains
-    string + spare tractor keys.
+    every new game (randi 100-999). Unlock by entering digits (▲▼/◀▶/TRY LOCK). Interior is
+    its OWN scene (S1.5, scenes/shed.tscn) - walk through the doorway portal once unlocked.
+    Contains string + spare tractor keys (loot spawns in the shed scene, one-time).
   tractor: red tractor parked at (10,0,-20), plate reveals the combo (dialog "NUM %03d").
     Driving it to the bird tree requires the tractor key. Wheels rotate as it drives.
   farmhouse: night = locked ("can't get in till morning"). Day = once-only catfood +1
@@ -87,8 +94,9 @@ build_status:
   project_scaffolded: true
   assets_imported: true
   headless_smoke_test: true  # run: godot --path "C:\crypto\wicked whiskers" --headless -- --smoketest
-    verifies the whole scene-1 loop with a random combo (last run: 933, after whiskers +
-    walk-in-shed changes).
+    verifies the whole scene-1 loop with a random combo (last run: 440, after shed-scene split).
+    shed scene: godot --path "C:\crypto\wicked whiskers" --headless res://scenes/shed.tscn -- --smoketest
+    (last run: PASS - loot spawns 1 string + 1 key, exit portal present).
   screenshot_pipeline: true  # run: godot --path "C:\crypto\wicked whiskers" -- --screenshot
     overview shot: --screenshot --flyover -> screenshot_flyover.png (camera lifted above garden)
     close-up cat shot: --screenshot --catclose -> screenshot_catclose.png (freezes cam, aims at head)
@@ -96,11 +104,16 @@ build_status:
   scene1_layout:
     player start: (0,0,12), yaw 0.6, ground 60x60 + WorldBoundaryShape collision
     farmhouse: (0,0,-24), box build, gable roof, porch, door/windows on +Z, night-locked
-    shed: (16,0,-10), WALK-IN interior (hollow walls + doorway gap, DoorBlock collision freed
-      on unlock, swinging door, interior props: loot crates, boot-with-sprout, hay pile, sprung
-      mousetrap, glowing lantern, rake, rope coil; warm interior light), string + spare tractor
-      keys spawn on the crates. STILL part of the S1 scene - extracting it to its own scene is
-      PENDING (requested: "the shed should be a completely different scene")
+    shed: (16,0,-10), EXTERIOR ONLY (solid box + overhang roof, door frame, dark door that
+      swings open on unlock, padlock). Entry portal (ShedPortal, area in the doorway) switches
+      to the shed's own scene (S1.5) once unlocked, with a 0.7s beat so the door swing reads.
+      Return spawns the player near the shed door at (16,0,-7.2).
+    shed_interior: scenes/shed.tscn = own scene (S1.5). Interior walls (doorway gap on +Z),
+      floor, overhang roof, warm OmniLight, props: loot crates, boot-with-sprout, hay pile,
+      sprung mousetrap, glowing lantern, rake, rope coil. Player spawns inside at (0,0,0.6)
+      facing the door. Loot = string + spare tractor keys on the crates (one-time, tracked via
+      shed_string_taken/shed_key_taken so re-entering can't farm them). Exit portal
+      (ShedExitPortal) returns to the farm. DayNight runs here too so hunger/tiredness continue.
     tractor: (10,0,-20), red box build + 4 wheels + number plate
     pond: (-11,0,-16), rim + translucent water disc, one swimming fish
     bird tree: (20,0,-4), perched bird
@@ -110,20 +123,25 @@ build_status:
       fence perimeter; all PRIMITIVE placeholders (box/sphere/cylinder) pending beautify
   scripts:
     GameState.gd: new_game() (combo randi 100-999, 9 lives, day_time, hunger, tiredness,
-      food days, catches, keys, shed_unlocked, quest, totals, materials_status), eat_food,
-      lose_life, restart
+      food days, catches, keys, shed_unlocked, shed loot taken flags, spawn_near_shed, quest,
+      totals, materials_status), eat_food, lose_life, restart
     Hud.gd: hunger/energy bars, lives/food/gold/string/sticks counters, choice panel,
       padlock combo UI (▲▼ digits, ◀▶ nav, TRY LOCK/CANCEL), any_panel_open()
     DayNight.gd: sun + moon lights, moon mesh, 220-star field, ProceduralSkyMaterial
       tint (night/dusk/day, not too dark), is_day + first_dawn toast, hunger -1/day,
-      tiredness drain over 0.8 day, exhaustion = lose life + restart
-    main.gd: scene layout (incl. walk-in shed build + props) + _run_smoke() for --smoketest
-      + screenshot helpers (--screenshot / --flyover / --catclose)
-    interactable.gd: base NPC/object script - NEW box interaction volumes (interaction_box +
+      tiredness drain over 0.8 day, exhaustion = lose life + restart (exhaustion teleport is
+      shed-scene-aware: resets to the shed centre when inside the shed)
+    main.gd: scene layout (farm garden + exterior-only shed with entry portal) + _run_smoke()
+      for --smoketest + screenshot helpers (--screenshot / --flyover / --catclose) + spawn
+      placement (near the shed door when returning from the shed scene)
+    interactable.gd: base NPC/object script - box interaction volumes (interaction_box +
       interaction_center) with sphere-radius fallback; used by door, tractor, Dumbleclaw, mouse
-    door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes, DoorBlock freed so
-      you can walk in, loot spawns on the crates) / farmhouse night-locked then once-day
-      catfood + scene-2 tease; box interaction volume
+    door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes; loot now lives in
+      the shed scene) / farmhouse night-locked then once-day catfood + scene-2 tease; box
+      interaction volume
+    shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
+      spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,
+      plus a --smoketest check (loot counts + portal present)
     tractor.gd: plate reveals combo, drive-to-bird-tree requires has_keys, rotating wheels,
       calls bird.knocked_by_tractor(); box interaction volume
     fish.gd: pond + swimming fish (circle swim + bob), interaction radius 4.4, rod crafted
@@ -134,11 +152,12 @@ build_status:
     dumbleclaw.gd: quest state machine meet->advice, choices Ask advice / Trade surplus /
       Just passing, time-aware + missing-catch hints, 30-gold town gates tease
       (TOWN_GOLD_TARGET=30) + golden fish mention, surplus trade sells 1 food (food>2) for 10 gold
-    pickup.gd: kinds string/stick/food/key (key = gold cylinder -> has_keys)
+    pickup.gd: kinds string/stick/food/key (key = gold cylinder -> has_keys), loot_id
+      (shed_string/shed_key) so one-time shed loot is tracked in GameState
     player.gd: KEY_3 rod, KEY_F eat, chase hop (0.45s, 0.7 jump), stop_walk(),
       clicks blocked during chase/panels, TWO-PHASE raycast (areas/Interactables first so
-      buildings don't swallow clicks, then bodies for ground), _clamp_camera_in_shed() keeps
-      the camera inside the shed walls when walking in
+      buildings don't swallow clicks, then bodies for ground), _clamp_camera_in_room() keeps
+      the camera inside the walls while in the shed scene
     trap.gd / ladder.gd: craftable trap + ladder scenes
   player:
     status: working
@@ -188,6 +207,10 @@ todo:
   - [PARTIAL -> NEXT] shed walk-in interior is built but STILL lives inside the S1 scene -
     the requested "shed should be a completely different scene" is NOT done yet: extract the
     shed into its own scene (own .tscn, entry/exit, camera clamp, scene switching)
+  - [DONE] Shed is now a completely different scene: scenes/shed.tscn (S1.5) with its own
+    interior, one-time loot, exit portal; farm shed reduced to exterior + entry portal; both
+    scenes smoke-tested headless (farm + shed). NEXT: manual playtest the farm->shed->farm
+    transition + camera feel inside the shed.
   - USER REVIEW: look at screenshot.png / play the game (Play Wicked Whiskers.bat) once up,
     then beautify placeholder assets (Dumbleclaw, barn/shed, farmhouse, tree, bird, pond,
     fish, mouse, string, tractor key, tractor, padlock)

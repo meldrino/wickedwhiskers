@@ -2,6 +2,7 @@ extends Area3D
 
 @export var kind := "string"
 @export var amount := 1
+@export var loot_id := ""
 
 
 func _ready() -> void:
@@ -31,6 +32,10 @@ func _collect(body: Node3D) -> void:
 		"key":
 			GameState.has_keys = true
 			name = "the spare tractor keys"
+	if loot_id == "shed_string":
+		GameState.shed_string_taken = true
+	elif loot_id == "shed_key":
+		GameState.shed_key_taken = true
 	Hud.toast("Picked up %s" % name)
 	queue_free()
 
