@@ -19,7 +19,7 @@ project:
   version_control: git repo at project_dir. Remote = git@github.com:meldrino/wickedwhiskers.git
     (repo is PUBLIC by choice), master pushed. Session history: worklog.md in project_dir.
     Shared GitHub/SSH/website/tools info + the master project map live in
-    C:\crypto\PROJECTS.yaml - read that FIRST for anything cross-project.
+    C:\crypto\bigpickle\meldrino.yaml - read that FIRST for anything cross-project.
 
 # =============================================================================
 # GAME STRUCTURE
