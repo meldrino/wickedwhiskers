@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>meldrino // wicked whiskers reference</title>
+<style>
+  body { background: #1A1A2E; color: #c8d0e0; font-family: 'DM Sans', 'Segoe UI', sans-serif; max-width: 960px; margin: 0 auto; padding: 28px 24px; line-height: 1.75; font-size: 15px; }
+  h1 { color: #69FFDA; font-family: 'Space Mono', monospace; font-size: 1.5em; border-bottom: 1px solid #1e2a40; padding-bottom: 10px; margin-bottom: 6px; }
+  h2 { color: #4A90E2; font-size: 1.1em; margin-top: 2.2em; border-left: 3px solid #4A90E2; padding-left: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  h3 { color: #00BFA5; font-size: 0.95em; margin-top: 1.4em; }
+  a { color: #69FFDA; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: #0d0d20; color: #69FFDA; padding: 2px 7px; border-radius: 3px; font-size: 13px; font-family: 'Space Mono', monospace; }
+  pre { background: #0d0d20; color: #69FFDA; padding: 14px 18px; border-radius: 6px; overflow-x: auto; font-size: 13px; font-family: 'Space Mono', monospace; line-height: 1.6; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0 1.5em; }
+  th { background: #16213E; color: #69FFDA; padding: 9px 14px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; font-family: 'Space Mono', monospace; }
+  td { padding: 8px 14px; border-bottom: 1px solid #1e2a40; font-size: 14px; vertical-align: top; }
+  tr:hover td { background: #16213E55; }
+  .warn { background: #2a1010; border-left: 3px solid #ff5555; padding: 10px 16px; margin: 1em 0; border-radius: 4px; font-size: 14px; }
+  .note { background: #0d1f1a; border-left: 3px solid #00BFA5; padding: 10px 16px; margin: 1em 0; border-radius: 4px; font-size: 14px; }
+  .back { font-size: 13px; margin-bottom: 1.5em; display: block; }
+  p { margin: 0.6em 0 1em; }
+  ul { margin: 0.4em 0 1em; padding-left: 1.4em; }
+  li { margin-bottom: 0.3em; }
+</style>
+</head>
+<body>
+<a class="back" href="forai.html">← forai.html</a>
+<h1>meldrino // wicked whiskers reference</h1>
+<p>AI reference for <strong>Wicked Whiskers</strong> — a mischievous, chaotic, pun-filled 3D cat adventure set on a farm and nearby town. Built with Godot 4 (GDScript). Not linked from main navigation.</p>
+<div class="note"><strong>Source:</strong> converted from the design document <code>wicked whiskers.docx</code>. Includes the canonical additions: the wise old cat is <strong>Dumbleclaw</strong>, and all catching is craft-only (no manual catches).</div>
+
+<h2>Core Concept</h2>
+<p>Wicked Whiskers is a mischievous, chaotic, pun-filled cat adventure set on a farm and nearby town. The tone is humorous, cheeky, and full of feline wordplay. The player (or main cat) is clever, resourceful, and always up to trouble.</p>
+
+<h2>Setting</h2>
+<ul>
+<li>A working farm with a farmhouse, shed, fields, trees, and roaming wildlife.</li>
+<li>A nearby town inspired by Dick Whittington-style folklore.</li>
+<li>Day/night cycle affects access and danger.</li>
+</ul>
+
+<h2>Main Gameplay Themes</h2>
+<ul>
+<li>Mischief, chaos, cleverness, and feline ingenuity.</li>
+<li>Resource gathering (string, sticks, food).</li>
+<li>Crafting silly contraptions (ladders, convoluted mouse traps).</li>
+<li>Quests from the wise old cat.</li>
+<li>Trading caught animals for gold.</li>
+<li>Progression through 9 lives.</li>
+</ul>
+
+<h2>Dumbleclaw — The Wise Old Cat (Quest Giver &amp; Trader)</h2>
+<div class="note">The wise old cat is named <strong>Dumbleclaw</strong>. He looks like a feline version of Albus Dumbledore (headmaster of Hogwarts) — long grey beard, half-moon spectacles, and a robe-like air of calm authority. "The purr-ofound mentor with nine lifetimes of wisdom."</div>
+<ul>
+<li>Lives behind the farmhouse.</li>
+<li>Gives advice, quests, and challenges.</li>
+<li>Buys spare mice or birds for gold.</li>
+<li>Provides lore and hints.</li>
+</ul>
+
+<h2>Cat Behaviours &amp; Activities</h2>
+
+<h3>1. Catching Mice — convoluted mouse trap ONLY</h3>
+<p>Mice hide around the farm. They cannot be caught by chasing — you must build a <strong>convoluted mouse trap</strong> out of <strong>string</strong> and <strong>sticks</strong> (think the board game Mouse Trap: tipping buckets, running boots, rolling balls).</p>
+<p>"A fur-midable hunter with claw-some inventions."</p>
+
+<h3>2. Catching Birds — ladder ONLY</h3>
+<p>Birds perch in trees. They cannot be caught by climbing manually — you must build a <strong>ladder</strong>, also out of <strong>string</strong> and <strong>sticks</strong>, to reach them.</p>
+<p>"Purrfectly engineered chaos."</p>
+
+<h3>3. Gathering Materials</h3>
+<ul>
+<li><strong>String</strong> — found in the <strong>shed</strong>.</li>
+<li><strong>Sticks</strong> — found on the ground around the farm.</li>
+<li><strong>Food</strong> — scavenged from the farmhouse kitchen (daytime only).</li>
+</ul>
+<p>"Pawsitively resourceful."</p>
+
+<h3>4. Sleeping in the Shed</h3>
+<ul>
+<li>Shed acts as a safe zone.</li>
+<li>Restore health/lives.</li>
+<li>Store materials.</li>
+</ul>
+<p>"A whisker-twisting nap spot."</p>
+
+<h2>Crafting (core loop)</h2>
+<table>
+<tr><th>Craft</th><th>Materials</th><th>Purpose</th></tr>
+<tr><td>Ladder</td><td>String + sticks</td><td>Reach birds in trees</td></tr>
+<tr><td>Convoluted mouse trap</td><td>String + sticks</td><td>Catch mice</td></tr>
+</table>
+
+<h2>Farmhouse Rules</h2>
+<ul>
+<li>You can only enter during the <strong>day</strong>.</li>
+<li>Humans are active; stealth required.</li>
+<li>Nighttime = locked doors, dangerous predators outside.</li>
+</ul>
+
+<h2>9 Lives System</h2>
+<ul>
+<li>The player has <strong>nine lives</strong>, each representing:</li>
+<li>A chance to retry challenges.</li>
+<li>A progression milestone.</li>
+<li>A humorous "cat-astrophic" failure moment.</li>
+</ul>
+
+<h2>Dick Whittington Element</h2>
+<ul>
+<li>Eventually, the cat can travel to the town.</li>
+<li>Town offers: new quests, shops, more elaborate mischief.</li>
+<li>Tone references classic folklore but stays comedic.</li>
+</ul>
+
+<h2>Puns &amp; Humour</h2>
+<ul>
+<li>"Purrfectly wicked"</li>
+<li>"Feline fine but causing trouble"</li>
+<li>"Claw-fully mischievous"</li>
+<li>"Whisker-twisting plots"</li>
+<li>"Pawsitively chaotic"</li>
+<li>"Fur-midable troublemaker"</li>
+<li>"Cat-astrophic antics"</li>
+<li>"Purr-ofound wisdom"</li>
+<li>"Purrfectly engineered chaos"</li>
+<li>"A whisker-twisting nap spot"</li>
+</ul>
+
+<h2>Tone &amp; Style</h2>
+<ul>
+<li>Lighthearted, whimsical, mischievous.</li>
+<li>Encourages creativity and silly problem-solving.</li>
+<li>Built around exaggerated cat behaviour and playful chaos.</li>
+</ul>
+
+<h2>Game Sections (planned structure)</h2>
+<table>
+<tr><th>Section</th><th>Content</th></tr>
+<tr><td>1 — The Farm</td><td>Gather string (shed) + sticks (ground), craft ladders and convoluted mouse traps, catch birds and mice, quests from Dumbleclaw, unlock travel to town.</td></tr>
+<tr><td>2 — The Town</td><td>Travel from the farm to the nearby Dick Whittington-style town. Explore the town, shops, quests, and elaborate mischief. Receive the quest to catch the <strong>golden fish</strong>.</td></tr>
+<tr><td>3 — The Golden Fish</td><td>Pursue and catch the golden fish.</td></tr>
+<tr><td>4+</td><td>Not yet designed — open for future sections.</td></tr>
+</table>
+
+<h2>Design Goals</h2>
+<ul>
+<li>The game should take <strong>at least an hour</strong> to finish from the beginning.</li>
+<li>That hour is broken up into <strong>10 minute periods</strong> (acts) so that the timelines can be recombined.</li>
+</ul>
+
+<h2>Status</h2>
+<ul>
+<li>World foundations established.</li>
+<li>Characters, mechanics, and tone defined.</li>
+<li>Ready for expansion into: story arcs, character sheets, quest lines, crafting systems, town development.</li>
+  <li>3D prototype in progress in Godot 4 — <code>C:\crypto\wicked whiskers</code>.</li>
+</ul>
+
+<hr>
+<p><em>Note to AI: This is the reference page for the Wicked Whiskers game project. Design doc source: <code>wicked whiskers.docx</code>. Game code: <code>C:\crypto\wicked whiskers</code> (Godot 4).</em></p>
+</body>
+</html>

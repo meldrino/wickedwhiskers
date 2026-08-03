@@ -1,0 +1,216 @@
+# =============================================================================
+# Wicked Whiskers Project State
+# Mischievous 3D cat adventure - Godot 4 / GDScript
+# =============================================================================
+
+project:
+  name: Wicked Whiskers
+  description: Pun-filled cat adventure on a farm and nearby Dick Whittington-style town.
+    Mischief, chaos, cleverness, feline ingenuity. Craft-only catching (no manual catches).
+  engine: Godot 4.7.1 stable
+  editor_path: "C:\\crypto\\tools\\Godot_v4.7.1-stable_win64_console.exe"
+  launcher: "Play Wicked Whiskers.bat"  # kills stale Godot game processes then launches
+    windowed exe: C:\crypto\tools\Godot_v4.7.1-stable_win64.exe (no console window)
+  project_dir: "C:\\crypto\\wicked whiskers"
+  docs_site: https://meldrino.com/forai/ww.html
+  design_doc: "C:\\crypto\\wicked whiskers.docx"
+  assets_source: "C:\\crypto\\world\\kenneys nature kit\\Models\\GLTF format"
+  screenshot: "C:\\crypto\\wicked whiskers\\screenshot.png"
+
+# =============================================================================
+# GAME STRUCTURE
+# =============================================================================
+sections:
+  1_the_farm:
+    content: Scene 1 (S1) = the farm GARDEN, the only scene built so far. Gather string
+      (padlocked shed) + sticks (ground), craft a Heath-Robinson mousetrap / ladder / fishing
+      rod, catch the mouse / bird / fish, meet Dumbleclaw (quests + surplus-food trade).
+  2_the_farmhouse:
+    content: Scene 2 (S2) = inside the farmhouse. Not yet built. Farmhouse door currently
+      only teases it (catfood once at day).
+  3_the_town:
+    content: Scene 3 (S3) = the city (Dick Whittington style). Not yet built. The old
+      "golden fish / unlock town gates" content moves here.
+  plus: Not yet designed - open for future sections.
+
+# =============================================================================
+# DESIGN RULES (from conversation, canonical)
+# =============================================================================
+design_rules:
+  wise_old_cat: Dumbleclaw - a feline version of Albus Dumbledore (long grey beard,
+    half-moon spectacles, pointy hat). Quest giver + trader, sits in the garden at (4,0,-14).
+  scenes: S1 farm garden (built), S2 inside farmhouse (future), S3 city Dick Whittington (future)
+  interaction_model: NOT a linear ABC quest chain - each NPC/object is its own state machine
+    / decision tree with click-choices (E interact, then pick from a choice panel).
+  controls: E interact, 1 craft trap, 2 craft ladder, 3 craft rod, F eat
+  catching_mice: chase NEVER succeeds (comedy face-plant). Catch = convoluted Mouse Trap only
+    (board-game Mouse Trap / Heath-Robinson style), crafted from string + sticks, placed then
+    mouse is lured onto it.
+  catching_birds: perch on a tree. Catch = ladder (crafted) lean + climb, OR drive the tractor
+    into the tree to knock the bird out.
+  catching_fish: pond + one fish. Catch = rod ONLY (crafted from string + sticks). Paw attempt
+    always fails ("that's oFISHial" toast).
+  materials:
+    string: found in the shed (padlocked)
+    sticks: found on the ground (7 pickups)
+    food: catfood from the farmhouse kitchen, ONCE per day at first light
+    tractor_key: spare keys in the shed
+  shed: padlocked. Combo = LAST 3 DIGITS of the tractor number plate. Combo randomizes on
+    every new game (randi 100-999). Unlock by entering digits (▲▼/◀▶/TRY LOCK). Contains
+    string + spare tractor keys.
+  tractor: red tractor parked at (10,0,-20), plate reveals the combo (dialog "NUM %03d").
+    Driving it to the bird tree requires the tractor key. Wheels rotate as it drives.
+  farmhouse: night = locked ("can't get in till morning"). Day = once-only catfood +1
+    (farmer's wife), then a tease of Scene 2.
+  food_economy: food = 1 day. Food bar. Max 4 food total. Day = 2 real hours (7200 s).
+    Game starts at dusk. Catfood only counts once/day at first light (first_dawn flag).
+  tiredness: energy bar drains over 0.8 of a day. Sleep only allowed when actually tired
+    (else refuses). Sleep does NOT cost food - food is tied to the DAY, not to sleeping.
+  lives: 9 lives - retry challenges, progression milestones, humorous cat-astrophes.
+    Exhaustion = lose a life + restart. Game over restarts Scene 1 with a FRESH combo.
+  day_night: sun + moon + stars cross the sky; sky tinted (night/dusk/day), deliberately
+    NOT pitch dark at night so the player can still see the garden.
+  no_respawn: animals do not respawn once caught. Catchable in the daytime too (not night-only).
+  dumbleclaw_quests: quest state machine (meet -> advice); choices Ask advice / Trade surplus /
+    Just passing; hints depend on time of day + what's still missing; all 3 caught -> "30 gold
+    opens the gates to the town" + golden fish tease; TRADES surplus food (food > 2) selling
+    1 food for 10 gold per interaction (TRADE_GOLD=10).
+  tone: humorous, cheeky, pun-filled (Purrfectly wicked, Pawsitively chaotic, "that's
+    oFISHial", etc.)
+  pacing: at least 1 hour total, broken into 10-minute periods so timelines can be recombined
+
+# =============================================================================
+# BUILD STATUS
+# =============================================================================
+build_status:
+  godot_installed: true
+  project_scaffolded: true
+  assets_imported: true
+  headless_smoke_test: true  # run: godot --path "C:\crypto\wicked whiskers" --headless -- --smoketest
+    verifies the whole scene-1 loop with a random combo (last run: 933, after whiskers +
+    walk-in-shed changes).
+  screenshot_pipeline: true  # run: godot --path "C:\crypto\wicked whiskers" -- --screenshot
+    overview shot: --screenshot --flyover -> screenshot_flyover.png (camera lifted above garden)
+    close-up cat shot: --screenshot --catclose -> screenshot_catclose.png (freezes cam, aims at head)
+    base shot -> screenshot.png
+  scene1_layout:
+    player start: (0,0,12), yaw 0.6, ground 60x60 + WorldBoundaryShape collision
+    farmhouse: (0,0,-24), box build, gable roof, porch, door/windows on +Z, night-locked
+    shed: (16,0,-10), WALK-IN interior (hollow walls + doorway gap, DoorBlock collision freed
+      on unlock, swinging door, interior props: loot crates, boot-with-sprout, hay pile, sprung
+      mousetrap, glowing lantern, rake, rope coil; warm interior light), string + spare tractor
+      keys spawn on the crates. STILL part of the S1 scene - extracting it to its own scene is
+      PENDING (requested: "the shed should be a completely different scene")
+    tractor: (10,0,-20), red box build + 4 wheels + number plate
+    pond: (-11,0,-16), rim + translucent water disc, one swimming fish
+    bird tree: (20,0,-4), perched bird
+    dumbleclaw: (4,0,-14), wizard cat (barrel body, robe, beard, glasses, pointy hat)
+    mouse: (2,0,6.5), wander/flee AI + chase
+    filler: ~20 trees, 12 rocks, crop row, 5 logs, 35 grass tufts, 7 stick pickups,
+      fence perimeter; all PRIMITIVE placeholders (box/sphere/cylinder) pending beautify
+  scripts:
+    GameState.gd: new_game() (combo randi 100-999, 9 lives, day_time, hunger, tiredness,
+      food days, catches, keys, shed_unlocked, quest, totals, materials_status), eat_food,
+      lose_life, restart
+    Hud.gd: hunger/energy bars, lives/food/gold/string/sticks counters, choice panel,
+      padlock combo UI (▲▼ digits, ◀▶ nav, TRY LOCK/CANCEL), any_panel_open()
+    DayNight.gd: sun + moon lights, moon mesh, 220-star field, ProceduralSkyMaterial
+      tint (night/dusk/day, not too dark), is_day + first_dawn toast, hunger -1/day,
+      tiredness drain over 0.8 day, exhaustion = lose life + restart
+    main.gd: scene layout (incl. walk-in shed build + props) + _run_smoke() for --smoketest
+      + screenshot helpers (--screenshot / --flyover / --catclose)
+    interactable.gd: base NPC/object script - NEW box interaction volumes (interaction_box +
+      interaction_center) with sphere-radius fallback; used by door, tractor, Dumbleclaw, mouse
+    door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes, DoorBlock freed so
+      you can walk in, loot spawns on the crates) / farmhouse night-locked then once-day
+      catfood + scene-2 tease; box interaction volume
+    tractor.gd: plate reveals combo, drive-to-bird-tree requires has_keys, rotating wheels,
+      calls bird.knocked_by_tractor(); box interaction volume
+    fish.gd: pond + swimming fish (circle swim + bob), interaction radius 4.4, rod crafted
+      inline from the choice panel, catch adds food + advances quest
+    mouse.gd: wander/flee + chase comedy (never catches), choice Chase/trap/leave, trap
+      places trap scene + lures mouse to it (to_trap state), trap catch adds food; box volume
+    bird.gd: perched bird, choices Climb(fails)/ladder/craft tractor(drive)/leave
+    dumbleclaw.gd: quest state machine meet->advice, choices Ask advice / Trade surplus /
+      Just passing, time-aware + missing-catch hints, 30-gold town gates tease
+      (TOWN_GOLD_TARGET=30) + golden fish mention, surplus trade sells 1 food (food>2) for 10 gold
+    pickup.gd: kinds string/stick/food/key (key = gold cylinder -> has_keys)
+    player.gd: KEY_3 rod, KEY_F eat, chase hop (0.45s, 0.7 jump), stop_walk(),
+      clicks blocked during chase/panels, TWO-PHASE raycast (areas/Interactables first so
+      buildings don't swallow clicks, then bodies for ground), _clamp_camera_in_shed() keeps
+      the camera inside the shed walls when walking in
+    trap.gd / ladder.gd: craftable trap + ladder scenes
+  player:
+    status: working
+    controls: click-to-move (mouse-position raycast, NOT screen centre - fixed bug)
+      + drag-to-orbit camera + scroll zoom (clamped 0.9-4.5, default 1.8) + Space jump,
+      E interact, 1/2/3 craft trap/ladder/rod, F eat
+    model: WW.glb (procedural Blender cartoon cat v0.3, rigged 25 bones, subdiv 3,
+      ~164k verts, orange fur + cream muzzle/belly, eyes/nose/satchel, tapered-tube
+      tail, chunky paws, ACTUAL WHISKERS = 3 thin tapered strands fanning from each cheek
+      (Whisker material); ears = curved flattened blades + dark inner cup, bases sunk
+      into head), scaled 0.19 to ~0.47m (real-cat size), positioned y=-0.0021
+      so feet sit exactly on the ground, faces travel direction
+    camera: third-person orbit at FACE level (holder y=0.5, cam z=1.8), slight down
+      tilt (pitch 0.2), pitch clamped via _pitch_max() so camera can never go below
+      the ground plane; ground made double-sided so it never disappears
+    walk_animation: procedural bone cycle in player.gd _animate_cat() -
+      set_bone_pose_rotation with get_bone_rest() base (IDENTITY does NOT mean rest -
+      it points bones at the parent frame, a real bug we hit), diagonal trot
+      (LF+RH together), knees fold only on the SWINGING leg, body sinks to match
+      stance-leg arc so paws stay planted (no floating), phase advances by DISTANCE
+      travelled so short clicks still produce visible steps
+    idle_animation: breathing (Chest/Spine), head sway, tail swish, occasional ear twitch
+    art_plan: Blender procedural pipeline (tools/blender/gen_ww.py) selected over
+      AI gen (Meshy/Tripo) - user cannot download AI results; see docs/cat_prompts.md
+  asset_pipeline:
+    generator: Blender procedural (tools/blender/gen_ww.py, v0.3) -> WW.glb in assets/,
+      run headless: blender.exe --background --python gen_ww.py
+      NOTE: after re-running gen_ww.py, reimport in Godot editor so the .import cache
+      refreshes (deleting .godot/imported forces a full reimport)
+    blend_save: WW.blend saved OUTSIDE project (C:\crypto\wicked-whiskers-blender-out\)
+      because a .blend inside res:// blocks editor import without a configured Blender path
+    hero_cat: WW.glb (works - orange+cream + whiskers, verified via turntable viewer)
+    prompts: docs/cat_prompts.md (Meshy + Tripo prompts kept as fallback if needed)
+    licensing: free tiers = CC BY 4.0 public + attribution; Pro (~$20/mo) for private/commercial
+  graphics_verification: model cannot view images; verified via pixel sampling
+    (dusk sky, green ground, pond, buildings present) + user eyeballs screenshot.png
+
+# =============================================================================
+# TODO / NEXT STEPS
+# =============================================================================
+todo:
+  - [DONE] Scene-1 full gameplay loop: combo padlock shed, string + tractor keys, mouse trap,
+    fish rod, bird ladder/tractor, Dumbleclaw quests + surplus trade, day/night + food +
+    tiredness/sleep economy, 9 lives, restart, headless smoke test (combo 933) + screenshots
+  - [DONE] Wicked Whiskers actually has whiskers: gen_ww.py v0.3 adds 3 tapered whisker
+    strands per cheek (Whisker material), WW.glb re-exported + reimported
+  - [PARTIAL -> NEXT] shed walk-in interior is built but STILL lives inside the S1 scene -
+    the requested "shed should be a completely different scene" is NOT done yet: extract the
+    shed into its own scene (own .tscn, entry/exit, camera clamp, scene switching)
+  - USER REVIEW: look at screenshot.png / play the game (Play Wicked Whiskers.bat) once up,
+    then beautify placeholder assets (Dumbleclaw, barn/shed, farmhouse, tree, bird, pond,
+    fish, mouse, string, tractor key, tractor, padlock)
+  - manual playtest the interactive set-pieces (only programmatically tested so far):
+    mouse chase comedy, tractor-to-bird drive, padlock digit UI, farmhouse at dawn
+  - design + build Scene 2 (farmhouse interior)
+  - design + build Scene 3 (city / Dick Whittington)
+
+# =============================================================================
+# KNOWN ISSUES
+# =============================================================================
+known_issues:
+  - exit-time leaked resource (RID) warnings are normal Godot noise on quick quit (not errors)
+  - headless mode cannot render/view screenshots (get_image returns null) - windowed only
+  - keeping a .blend inside the project blocks editor import (needs Blender path configured);
+    .blend files must live outside res://
+  - stale/zombie Godot processes hold the OLD WW.glb import; killing them (launcher does
+    this) fixed inconsistent tuning behaviour
+  - set_bone_pose_rotation(IDENTITY) aligns a bone with its parent frame, NOT the rest pose;
+    must pass get_bone_rest(idx).basis rotation to return a bone to rest
+  - walk animation is a sine approximation - keyframed Blender walk cycle is the future
+    upgrade if the procedural gait isn't convincing enough
+  - trees have no canopy collision (only trunk) - can jump over/through tops
+  - Kenney GLB scale varies - some props may need per-model tuning
+  - interactive set-pieces (padlock UI, tractor drive, chase) verified via the programmatic
+    smoke test only, not yet by hand
