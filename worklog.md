@@ -27,6 +27,13 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
   passwordless sudo works for andy). Deploy pattern: edit local copy in /home/andy, sudo cp
   to /var/www/html/forai/. Added ww.html entry to the forai index (backup kept as
   index.html.bak.20260803091850). ww.html = stable design reference; do NOT update per-change.
+- Memory system reconciled: canonical per-project YAMLs live in C:\crypto\bigpickle\
+  (meldrino.yaml = overarching, vminer.yaml, wallet.yaml). Deleted the redundant
+  C:\crypto\PROJECTS.yaml master + project-dir stubs I'd created. ww PROJECT_STATE.yaml
+  now routes cross-project info to bigpickle\meldrino.yaml (commit aa69d58).
+  bigpickle\meldrino.yaml gained: shared GitHub/SSH/PAT/website-deploy info, project routing
+  map, and a SUBJECT-SWITCH ritual (dump current YAML+worklog, then load the new project's).
+  CRITICAL: bigpickle\*.yaml is LOCAL-ONLY (wallet.yaml holds a seed first word) — never push.
 
 ## In flight / next
 
