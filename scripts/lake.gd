@@ -110,6 +110,10 @@ func _physics_process(delta: float) -> void:
 
 
 func _spawn_ripple() -> void:
+	_make_ripple(_ripple_origin, 0.4)
+
+
+func _make_ripple(at: Vector2, start_a: float) -> void:
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(0.9, 0.97, 1.0)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -121,10 +125,43 @@ func _spawn_ripple() -> void:
 	tm.material = mat
 	var ring := MeshInstance3D.new()
 	ring.mesh = tm
-	ring.position = Vector3(_ripple_origin.x, water_level + 0.015, _ripple_origin.y)
+	ring.position = Vector3(at.x, water_level + 0.015, at.y)
 	add_child(ring)
-	mat.albedo_color.a = 0.4
-	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": RIPPLE_LIFE, "start_a": 0.4})
+	mat.albedo_color.a = start_a
+	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": RIPPLE_LIFE, "start_a": start_a})
+
+
+func splash(at: Vector3) -> void:
+	var pos := Vector2(at.x, at.z)
+	_make_ripple(pos, 0.7)
+	_make_ripple(pos, 0.6)
+	_make_droplets(at)
+
+
+func _make_droplets(at: Vector3) -> void:
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.92, 0.98, 1.0, 0.95)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var sm := SphereMesh.new()
+	sm.radius = 0.045
+	sm.height = 0.09
+	sm.material = mat
+	var p := CPUParticles3D.new()
+	p.mesh = sm
+	p.one_shot = true
+	p.emitting = true
+	p.amount = 26
+	p.lifetime = 0.85
+	p.direction = Vector3.UP
+	p.spread = 55.0
+	p.initial_velocity_min = 2.0
+	p.initial_velocity_max = 3.4
+	p.gravity = Vector3(0, -10.0, 0)
+	p.scale_amount_min = 0.8
+	p.scale_amount_max = 1.4
+	p.position = at
+	add_child(p)
+	get_tree().create_timer(p.lifetime + 1.0).timeout.connect(p.queue_free)
 
 
 func _build_shore_wall() -> void:

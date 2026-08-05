@@ -35,11 +35,6 @@ const LOG_SCENES := [
 	preload("res://assets/log_large.glb"),
 	preload("res://assets/log_stack.glb"),
 ]
-const GRASS_SCENES := [
-	preload("res://assets/grass.glb"),
-	preload("res://assets/grass_large.glb"),
-	preload("res://assets/grass_leafs.glb"),
-]
 
 const FARMHOUSE_POS := Vector3(0, 0, -38)
 const SHED_POS := Vector3(16, 0, -10)
@@ -67,7 +62,6 @@ func _ready() -> void:
 	_build_rocks()
 	_build_crops()
 	_build_logs()
-	_build_grass()
 	_build_distant_scenery()
 	_spawn_pickups()
 	_spawn_dumbleclaw()
@@ -416,19 +410,6 @@ func _build_logs() -> void:
 		log.position = Vector3(pos.x, Terrain.height_at(pos.x, pos.z), pos.z)
 		log.rotation = Vector3(0, rng.randf_range(0, TAU), 0)
 		add_child(log)
-
-
-func _build_grass() -> void:
-	for i in range(35):
-		var scene: PackedScene = GRASS_SCENES[rng.randi_range(0, GRASS_SCENES.size() - 1)]
-		var tuft: Node3D = scene.instantiate()
-		var pos := _random_pos(1.0)
-		if _too_close_to_landmarks(pos):
-			continue
-		tuft.position = Vector3(pos.x, Terrain.height_at(pos.x, pos.z), pos.z)
-		var scale := rng.randf_range(0.6, 1.5)
-		tuft.scale = Vector3(scale, scale, scale)
-		add_child(tuft)
 
 
 func _spawn_pickups() -> void:

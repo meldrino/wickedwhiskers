@@ -114,8 +114,8 @@ func _build_grass() -> void:
 			var pz := z + rng.randf_range(-spacing * 0.4, spacing * 0.4)
 			if _grass_ok(px, pz):
 				var y := height_at(px, pz)
-				var t := Transform3D(Basis(Vector3.UP, rng.randf_range(0.0, TAU)), Vector3(px, y - 0.01, pz))
-				placed.append(t.scaled(Vector3.ONE * rng.randf_range(0.9, 1.9)))
+				var t := Transform3D(Basis(Vector3.UP, rng.randf_range(0.0, TAU)), Vector3(px, y - 0.006, pz))
+				placed.append(t.scaled(Vector3.ONE * rng.randf_range(0.7, 1.15)))
 			z += spacing
 		x += spacing
 	mm.instance_count = placed.size()
@@ -136,7 +136,7 @@ func _grass_ok(px: float, pz: float) -> bool:
 		return false
 	if TerrainGenerator.slope_at(heights, config, px, pz) > 1.0:
 		return false
-	if in_water(px, pz):
+	if height_at(px, pz) < water_level + 0.06:
 		return false
 	return true
 
@@ -149,12 +149,12 @@ func _build_tuft_mesh() -> Mesh:
 	var base := Color(0.2, 0.33, 0.11)
 	var tip := Color(0.5, 0.68, 0.32)
 	var base_idx := 0
-	for b in range(8):
-		var len := rng.randf_range(0.16, 0.38)
-		var lean := rng.randf_range(-0.5, 0.5)
-		var bx := rng.randf_range(-0.05, 0.05)
-		var bz := rng.randf_range(-0.05, 0.05)
-		_add_blade(st, Vector3(bx, 0.0, bz), 0.03, len, lean, base, tip, base_idx)
+	for b in range(6):
+		var len := rng.randf_range(0.016, 0.038)
+		var lean := rng.randf_range(-0.06, 0.06)
+		var bx := rng.randf_range(-0.006, 0.006)
+		var bz := rng.randf_range(-0.006, 0.006)
+		_add_blade(st, Vector3(bx, 0.0, bz), 0.003, len, lean, base, tip, base_idx)
 		base_idx += 8
 	st.generate_normals()
 	return st.commit()

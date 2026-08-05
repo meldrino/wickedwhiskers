@@ -2,12 +2,14 @@ extends Node3D
 
 var fish := []
 var swim_t := 0.0
+var _taunting := {}
 
 const FISH_COUNT := 5
 const SWIM_BASE := 2.0
 const SWIM_VARY := 2.6
 const MIN_Y := 0.25
 const MAX_Y := 0.8
+const TAUNT_DUR := 1.6
 
 
 func _ready() -> void:
@@ -15,7 +17,12 @@ func _ready() -> void:
 		var f := _build_fish(i)
 		add_child(f)
 		f.add_to_group("fish")
+		f.set_meta("school", self)
 		fish.append(f)
+
+
+func taunt(f: Node3D) -> void:
+	_taunting[f] = TAUNT_DUR
 
 
 func _physics_process(delta: float) -> void:
@@ -30,6 +37,14 @@ func _physics_process(delta: float) -> void:
 		var px := cos(ang) * radius
 		var pz := sin(ang) * radius
 		var y := wl - (MIN_Y + (MAX_Y - MIN_Y) * (0.5 + 0.5 * sin(swim_t * 1.3 + phase)))
+		var tl: float = _taunting.get(f, 0.0)
+		if tl > 0.0:
+			tl -= delta
+			_taunting[f] = tl
+			var p := 1.0 - tl / TAUNT_DUR
+			y -= sin(p * PI) * 0.9
+		elif _taunting.has(f):
+			_taunting.erase(f)
 		f.position = Vector3(px, y, pz)
 		f.rotation.y = ang + PI * 0.5
 		f.rotation.z = sin(swim_t * 3.0 + phase) * 0.12
@@ -61,19 +76,6 @@ func _build_fish(i: int) -> Node3D:
 	tail.mesh = tm
 	tail.position = Vector3(0, 0, -0.24)
 	f.add_child(tail)
-
-	var hit := StaticBody3D.new()
-	hit.name = "FishHit"
-	hit.add_to_group("fish_hit")
-	hit.collision_layer = 1
-	hit.collision_mask = 0
-	var cs := CollisionShape3D.new()
-	var sh := SphereShape3D.new()
-	sh.radius = 0.3
-	cs.shape = sh
-	cs.position = Vector3(0, 0.1, 0)
-	hit.add_child(cs)
-	f.add_child(hit)
 
 	f.scale = Vector3.ONE * (0.85 + (i % 3) * 0.12)
 	return f

@@ -26,7 +26,6 @@ var ladder_placed := false
 
 var mouse_caught := false
 var bird_caught := false
-var fish_caught := false
 var catfood_used := false
 
 var shed_string_taken := false
@@ -63,7 +62,6 @@ func new_game() -> void:
 	ladder_placed = false
 	mouse_caught = false
 	bird_caught = false
-	fish_caught = false
 	catfood_used = false
 	shed_string_taken = false
 	shed_key_taken = false
@@ -83,8 +81,6 @@ func total_catches() -> int:
 	if mouse_caught:
 		n += 1
 	if bird_caught:
-		n += 1
-	if fish_caught:
 		n += 1
 	return n
 

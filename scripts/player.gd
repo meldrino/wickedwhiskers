@@ -31,9 +31,24 @@ var bone_idx := {}
 var walk_time := 0.0
 var idle_time := 0.0
 var hop_t := 0.0
-var fish_swipe_t := 0.0
 var _pending_fish := false
 var _fish_cd := 0
+var _pounce_t := -1.0
+var _pounce_phase := 0
+var _pounce_origin := Vector3.ZERO
+var _pounce_target := Vector3.ZERO
+var _clicked_fish: Node3D = null
+var _shake_t := 0.0
+var wet_time := 0.0
+var _wet_meshes: Array = []
+var _drip: CPUParticles3D = null
+
+const POUNCE_IN_DUR := 0.55
+const POUNCE_OUT_DUR := 0.7
+const POUNCE_WET_DUR := 0.9
+const POUNCE_HEIGHT := 1.6
+const POUNCE_DIST := 2.2
+const WET_TIME := 5.0
 
 const ANIM_BONES := [
 	"Thigh.L", "Thigh.R", "Shin.L", "Shin.R", "Foot.L", "Foot.R",
@@ -57,6 +72,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _pouncing():
+		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
@@ -235,6 +252,12 @@ func stop_walk() -> void:
 func _handle_click_at(screen_pos: Vector2) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
 		return
+	if _pouncing():
+		return
+	var fish := _pick_fish(screen_pos)
+	if fish != null:
+		_try_fish(fish)
+		return
 	if has_destination:
 		return
 	_waiting_cam = false
@@ -246,9 +269,6 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 		else:
 			_go_interact(item)
 		return
-	if _pick_fish(screen_pos) != null:
-		_try_fish()
-		return
 	var from := camera.project_ray_origin(screen_pos)
 	var dir := camera.project_ray_normal(screen_pos)
 	var qa := PhysicsRayQueryParameters3D.create(from, from + dir * 80.0)
@@ -258,13 +278,9 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 	var hit := get_world_3d().direct_space_state.intersect_ray(qa)
 	if hit.is_empty():
 		return
-	var collider: Object = hit.get("collider")
-	if collider != null and collider.is_in_group("fish_hit"):
-		_try_fish()
-		return
 	var gp: Vector3 = hit.get("position")
 	if Terrain.in_water(gp.x, gp.z):
-		_try_fish()
+		_try_fish(null)
 		return
 	_request_walk(Vector3(gp.x, 0, gp.z))
 
@@ -282,19 +298,20 @@ func _try_start_walk() -> void:
 	_walk_to_screen_point(get_viewport().get_mouse_position())
 
 
-func _request_walk(point: Vector3, keep_pending := false) -> void:
+func _request_walk(point: Vector3, keep_pending := false) -> bool:
 	if not keep_pending:
 		pending_interact = null
 	var to: Vector3 = point - global_position
 	to.y = 0.0
 	if to.length() < 0.35:
-		return
+		return false
 	var behind := atan2(to.x, to.z) + PI
 	if absf(angle_difference(yaw, behind)) > 0.6:
 		_waiting_cam = true
 		_wait_target = point
 	else:
 		walk_to(point)
+	return true
 
 
 func _go_interact(item: Interactable) -> void:
@@ -303,13 +320,15 @@ func _go_interact(item: Interactable) -> void:
 	_request_walk(Vector3(p.x, 0, p.z), true)
 
 
-func _try_fish() -> void:
+func _try_fish(fish: Node3D) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
 		return
-	if has_destination:
+	if _pouncing():
 		return
 	if Time.get_ticks_msec() < _fish_cd:
 		return
+	stop_walk()
+	_clicked_fish = fish
 	_waiting_cam = false
 	_wait_target = Vector3.ZERO
 	var to_lake: Vector2 = Vector2(
@@ -324,26 +343,108 @@ func _try_fish() -> void:
 		0,
 		Terrain.lake.center.y + dir.y * (r - 0.4))
 	_pending_fish = true
-	_request_walk(shore, true)
-
-
-func _do_fish_swipe() -> void:
-	if Time.get_ticks_msec() < _fish_cd:
+	if not _request_walk(shore, true):
 		_pending_fish = false
-		return
-	_fish_cd = Time.get_ticks_msec() + 3000
-	fish_swipe_t = 0.6
-	var rng := RandomNumberGenerator.new()
-	rng.randomize()
-	if rng.randf() < 0.5:
-		if not GameState.fish_caught:
-			GameState.fish_caught = true
-			if GameState.quest == "meet":
-				GameState.quest = "trade"
-		GameState.add_food(1)
-		Hud.toast("Paw-swipe! You flip a wriggling fish onto the bank. Food +1")
+		_start_pounce()
+
+
+func _pouncing() -> bool:
+	return _pounce_t >= 0.0
+
+
+func _start_pounce() -> void:
+	_fish_cd = Time.get_ticks_msec() + 8000
+	_pounce_phase = 0
+	_pounce_t = 0.0
+	_pounce_origin = global_position
+	var to_lake: Vector2 = Vector2(
+		Terrain.lake.center.x - global_position.x,
+		Terrain.lake.center.y - global_position.z)
+	var dir := to_lake.normalized()
+	cat_facing = atan2(dir.x, dir.y)
+	_pounce_target = _pounce_origin + Vector3(dir.x, 0.0, dir.y) * POUNCE_DIST
+	_pounce_target.y = Terrain.water_level
+	velocity = Vector3.ZERO
+	camera_frozen = true
+
+
+func _update_pounce(delta: float) -> void:
+	_pounce_t += delta
+	if _pounce_phase == 0:
+		var k := clampf(_pounce_t / POUNCE_IN_DUR, 0.0, 1.0)
+		var pos := _pounce_origin.lerp(_pounce_target, k)
+		pos.y = lerpf(_pounce_origin.y, _pounce_target.y, k) + sin(k * PI) * POUNCE_HEIGHT
+		global_position = pos
+		if _pounce_t >= POUNCE_IN_DUR:
+			_pounce_t = 0.0
+			_pounce_phase = 1
+			_do_splash()
+	elif _pounce_phase == 1:
+		var k := clampf(_pounce_t / POUNCE_WET_DUR, 0.0, 1.0)
+		global_position = _pounce_target + Vector3(0.0, -sin(k * PI) * 0.32, 0.0)
+		if _pounce_t >= POUNCE_WET_DUR:
+			_pounce_t = 0.0
+			_pounce_phase = 2
 	else:
-		Hud.toast("Splash! The fish darts away between your paws. So close!")
+		var k := clampf(_pounce_t / POUNCE_OUT_DUR, 0.0, 1.0)
+		var pos := _pounce_target.lerp(_pounce_origin, k)
+		pos.y = lerpf(_pounce_target.y, _pounce_origin.y, k) + sin(k * PI) * 0.9
+		global_position = pos
+		if _pounce_t >= POUNCE_OUT_DUR:
+			_finish_pounce()
+	mesh_root.rotation.y = cat_facing
+
+
+func _do_splash() -> void:
+	var lake_node := get_tree().current_scene.get_node_or_null("Lake")
+	if lake_node != null and lake_node.has_method("splash"):
+		lake_node.splash(global_position)
+	if _clicked_fish != null and is_instance_valid(_clicked_fish):
+		var school: Node = _clicked_fish.get_meta("school", null)
+		if school != null:
+			school.call("taunt", _clicked_fish)
+
+
+func _finish_pounce() -> void:
+	_pounce_t = -1.0
+	camera_frozen = false
+	wet_time = WET_TIME
+	_shake_t = 0.0
+	velocity = Vector3.ZERO
+	_wet_cat(true)
+	if _drip != null:
+		_drip.emitting = true
+	_clicked_fish = null
+	Hud.show_dialogue([
+		"Fish: Ha Ha Whiskers — you can't reach me and there is no-fin you can do about it!",
+		"Whiskers: (climbs back onto the bank, soaked and dripping, and glares at the smug goldfish.)",
+	])
+
+
+func _wet_cat(wet: bool) -> void:
+	for entry in _wet_meshes:
+		var mi: MeshInstance3D = entry["mesh"]
+		var orig: Dictionary = entry["orig"]
+		if wet:
+			for i in range(mi.mesh.get_surface_count()):
+				if i in orig:
+					continue
+				var src: Material = mi.surface_get_material(i)
+				orig[i] = src
+				if src is StandardMaterial3D:
+					var m: StandardMaterial3D = src.duplicate()
+					m.albedo_color = Color(
+						m.albedo_color.r * 0.55,
+						m.albedo_color.g * 0.6,
+						m.albedo_color.b * 0.75,
+						m.albedo_color.a)
+					m.metallic = maxf(m.metallic, 0.3)
+					m.roughness = 0.12
+					mi.set_surface_override_material(i, m)
+		else:
+			for i in orig.keys():
+				mi.set_surface_override_material(i, null)
+			orig.clear()
 
 
 func _within_interact_range(item: Interactable) -> bool:
@@ -426,6 +527,10 @@ func _try_eat() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _pounce_t >= 0.0:
+		_update_pounce(delta)
+		_animate_cat(delta)
+		return
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	if Input.is_key_pressed(KEY_SPACE) and is_on_floor():
@@ -485,7 +590,7 @@ func _physics_process(delta: float) -> void:
 			velocity.z = move_toward(velocity.z, 0.0, move_speed)
 			if _pending_fish:
 				_pending_fish = false
-				_do_fish_swipe()
+				_start_pounce()
 			if pending_interact != null:
 				var it := pending_interact
 				pending_interact = null
@@ -538,19 +643,19 @@ func _physics_process(delta: float) -> void:
 func _animate_cat(delta: float) -> void:
 	if skeleton == null or bone_idx.is_empty():
 		return
-	var poses := {}
-	if fish_swipe_t > 0.0:
-		fish_swipe_t -= delta
-		var k := 1.0 - fish_swipe_t / 0.6
-		var s := sin(k * PI)
-		poses["Chest"] = Vector3(0.25 * s, 0.0, 0.0)
-		poses["Spine"] = Vector3(-0.12 * s, 0.0, 0.0)
-		poses["Head"] = Vector3(0.35 * s, 0.0, 0.0)
-		poses["UpperArm.R"] = Vector3(-1.2 * s, 0.0, -0.4 * s)
-		poses["Forearm.R"] = Vector3(0.8 * s, 0.0, 0.0)
-		poses["Hand.R"] = Vector3(0.5 * s, 0.0, 0.0)
-		_apply_poses(poses)
+	if _pounce_t >= 0.0:
+		_animate_pounce()
 		return
+	if wet_time > 0.0:
+		wet_time -= delta
+		if _drip != null:
+			_drip.emitting = wet_time > 0.0
+		if wet_time <= 0.0:
+			_wet_cat(false)
+		else:
+			_animate_wet(delta)
+		return
+	var poses := {}
 	if walking:
 		walk_time += delta * velocity.length() * 5.2
 		var s := sin(walk_time)
@@ -597,6 +702,76 @@ func _animate_cat(delta: float) -> void:
 	_apply_poses(poses)
 
 
+func _animate_pounce() -> void:
+	var poses := {}
+	match _pounce_phase:
+		0:
+			var k := clampf(_pounce_t / POUNCE_IN_DUR, 0.0, 1.0)
+			var s := sin(k * PI)
+			poses["Spine"] = Vector3(0.18 * s, 0.0, 0.0)
+			poses["Chest"] = Vector3(0.22 * s, 0.0, 0.0)
+			poses["Head"] = Vector3(0.3 * s, -0.2 * s, 0.0)
+			poses["UpperArm.L"] = Vector3(-1.1, 0.0, -0.5)
+			poses["UpperArm.R"] = Vector3(-1.1, 0.0, -0.5)
+			poses["Forearm.L"] = Vector3(0.7, 0.0, 0.3)
+			poses["Forearm.R"] = Vector3(0.7, 0.0, 0.3)
+			poses["Thigh.L"] = Vector3(0.7, 0.0, 0.35)
+			poses["Thigh.R"] = Vector3(0.7, 0.0, 0.35)
+			poses["Shin.L"] = Vector3(-0.4, 0.0, 0.0)
+			poses["Shin.R"] = Vector3(-0.4, 0.0, 0.0)
+			poses["Tail01"] = Vector3(0.0, 0.0, 0.5)
+			poses["Tail02"] = Vector3(0.0, 0.0, 0.6)
+			poses["Tail03"] = Vector3(0.0, 0.0, 0.4)
+		1:
+			var s2 := sin(_pounce_t * 22.0)
+			poses["UpperArm.L"] = Vector3(0.9 * s2, 0.0, -0.4)
+			poses["UpperArm.R"] = Vector3(0.9 * -s2, 0.0, -0.4)
+			poses["Forearm.L"] = Vector3(-0.4, 0.0, 0.0)
+			poses["Forearm.R"] = Vector3(-0.4, 0.0, 0.0)
+			poses["Thigh.L"] = Vector3(0.9 * -s2, 0.0, 0.3)
+			poses["Thigh.R"] = Vector3(0.9 * s2, 0.0, 0.3)
+			poses["Shin.L"] = Vector3(0.3, 0.0, 0.0)
+			poses["Shin.R"] = Vector3(0.3, 0.0, 0.0)
+			poses["Head"] = Vector3(0.0, 0.1, -0.2)
+			poses["Spine"] = Vector3(0.0, 0.0, 0.0)
+			poses["Tail01"] = Vector3(0.0, 0.0, 0.5)
+		2:
+			var k2 := clampf(_pounce_t / POUNCE_OUT_DUR, 0.0, 1.0)
+			var s3 := sin(k2 * PI)
+			poses["Chest"] = Vector3(-0.15 * s3, 0.0, 0.0)
+			poses["Spine"] = Vector3(0.3 * s3, 0.0, 0.0)
+			poses["Head"] = Vector3(0.0, 0.2 * s3, -0.15 * s3)
+			poses["UpperArm.L"] = Vector3(-0.9, 0.0, 0.3)
+			poses["UpperArm.R"] = Vector3(-0.9, 0.0, 0.3)
+			poses["Forearm.L"] = Vector3(0.6, 0.0, 0.0)
+			poses["Forearm.R"] = Vector3(0.6, 0.0, 0.0)
+			poses["Thigh.L"] = Vector3(0.6, 0.0, -0.4)
+			poses["Thigh.R"] = Vector3(0.6, 0.0, -0.4)
+			poses["Shin.L"] = Vector3(-0.3, 0.0, 0.0)
+			poses["Shin.R"] = Vector3(-0.3, 0.0, 0.0)
+			poses["Tail01"] = Vector3(0.0, 0.0, -0.4)
+	_apply_poses(poses)
+
+
+func _animate_wet(delta: float) -> void:
+	_shake_t += delta
+	var poses := {}
+	poses["Spine"] = Vector3(0.35, 0.0, 0.0)
+	poses["Chest"] = Vector3(0.22, 0.0, 0.0)
+	poses["Head"] = Vector3(0.0, 0.35, 0.0)
+	poses["Ear.L"] = Vector3(-0.3, 0.0, 0.0)
+	poses["Ear.R"] = Vector3(0.3, 0.0, 0.0)
+	poses["Tail01"] = Vector3(0.0, 0.0, 0.3)
+	poses["Tail02"] = Vector3(0.0, 0.0, 0.35)
+	poses["Tail03"] = Vector3(0.0, 0.0, 0.2)
+	var shake := sin(_shake_t * 9.0)
+	if fmod(_shake_t, 1.4) < 0.25:
+		poses["Chest"] = Vector3(0.22 + 0.15 * shake, 0.0, 0.0)
+		poses["Spine"] = Vector3(0.35 - 0.2 * shake, 0.0, 0.0)
+		poses["Head"] = Vector3(0.25 * shake, 0.35, 0.0)
+	_apply_poses(poses)
+
+
 func _apply_poses(poses: Dictionary) -> void:
 	var axis_z := Vector3(0.0, 0.0, 1.0)
 	for bone_name in bone_idx:
@@ -614,21 +789,59 @@ func _build_cat() -> void:
 	if glb == null:
 		push_error("WW.glb failed to import — falling back to primitives")
 		_build_cat_primitive()
-		return
-	var model := glb.instantiate()
-	model.scale = Vector3.ONE * 0.19
-	model.position = Vector3(0, -0.0021, 0)
-	mesh_root.add_child(model)
-	mesh_root.scale = Vector3.ONE
-	cat_model = model
-	for child in model.find_children("*", "Skeleton3D", true, false):
-		skeleton = child
-		break
-	if skeleton != null:
-		for bone_name in ANIM_BONES:
-			var bi := skeleton.find_bone(bone_name)
-			if bi >= 0:
-				bone_idx[bone_name] = bi
+	else:
+		var model := glb.instantiate()
+		model.scale = Vector3.ONE * 0.19
+		model.position = Vector3(0, -0.0021, 0)
+		mesh_root.add_child(model)
+		mesh_root.scale = Vector3.ONE
+		cat_model = model
+		for child in model.find_children("*", "Skeleton3D", true, false):
+			skeleton = child
+			break
+		if skeleton != null:
+			for bone_name in ANIM_BONES:
+				var bi := skeleton.find_bone(bone_name)
+				if bi >= 0:
+					bone_idx[bone_name] = bi
+	_collect_wet_meshes()
+	_setup_drip()
+
+
+func _collect_wet_meshes() -> void:
+	_wet_meshes.clear()
+	for child in mesh_root.find_children("*", "MeshInstance3D", true, false):
+		var mi := child as MeshInstance3D
+		if mi != null and mi.mesh != null and mi.mesh.get_surface_count() > 0:
+			_wet_meshes.append({"mesh": mi, "orig": {}})
+
+
+func _setup_drip() -> void:
+	_drip = CPUParticles3D.new()
+	_drip.name = "Drip"
+	var dm := StandardMaterial3D.new()
+	dm.albedo_color = Color(0.8, 0.92, 1.0, 0.85)
+	dm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.03, 0.03, 0.03)
+	bm.material = dm
+	_drip.mesh = bm
+	_drip.amount = 20
+	_drip.lifetime = 0.7
+	_drip.one_shot = false
+	_drip.emitting = false
+	_drip.direction = Vector3(0, -1, 0)
+	_drip.spread = 30.0
+	_drip.gravity = Vector3(0, -4.0, 0)
+	_drip.initial_velocity_min = 0.3
+	_drip.initial_velocity_max = 0.8
+	_drip.scale_amount_min = 0.7
+	_drip.scale_amount_max = 1.3
+	_drip.position = Vector3(0, 0.42, 0)
+	if cat_model != null:
+		cat_model.add_child(_drip)
+	else:
+		mesh_root.add_child(_drip)
 
 
 func _build_cat_primitive() -> void:
