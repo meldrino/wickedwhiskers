@@ -7,3 +7,11 @@ export_presets.cfg
 # OS junk
 Thumbs.db
 .DS_Store
+~$*
+
+# Uncommitted asset inbox (keep laptop clean; recover from git history)
+assets/pending/
+
+# Redundant script.doc copies (script.txt is the tracked source)
+script.docx
+wicked_whiskers_script.txt
