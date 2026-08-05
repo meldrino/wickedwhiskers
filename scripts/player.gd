@@ -168,6 +168,33 @@ func _collect_rids(node: Node, rids: Array[RID]) -> void:
 		_collect_rids(child, rids)
 
 
+func _pick_fish(screen_pos: Vector2) -> Node3D:
+	var from := camera.project_ray_origin(screen_pos)
+	var best: Node3D = null
+	var best_d := INF
+	var vp_size := get_viewport().get_visible_rect().size
+	for f in get_tree().get_nodes_in_group("fish"):
+		var node := f as Node3D
+		if node == null:
+			continue
+		var wp := node.global_position
+		var to_item: Vector3 = wp - from
+		if to_item.length() > 50.0:
+			continue
+		if to_item.normalized().dot(camera.global_transform.basis.z) >= -0.05:
+			continue
+		var sp := camera.unproject_position(wp)
+		if sp.x < 0.0 or sp.y < 0.0 or sp.x > vp_size.x or sp.y > vp_size.y:
+			continue
+		var d := sp.distance_to(screen_pos)
+		if d < best_d:
+			best_d = d
+			best = node
+	if best == null or best_d > 40.0:
+		return null
+	return best
+
+
 func _pitch_min() -> float:
 	var d := camera_distance
 	var h := camera_holder.position.y
@@ -218,6 +245,9 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 			item.interact()
 		else:
 			_go_interact(item)
+		return
+	if _pick_fish(screen_pos) != null:
+		_try_fish()
 		return
 	var from := camera.project_ray_origin(screen_pos)
 	var dir := camera.project_ray_normal(screen_pos)

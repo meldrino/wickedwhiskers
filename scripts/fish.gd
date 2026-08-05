@@ -14,6 +14,7 @@ func _ready() -> void:
 	for i in range(FISH_COUNT):
 		var f := _build_fish(i)
 		add_child(f)
+		f.add_to_group("fish")
 		fish.append(f)
 
 
