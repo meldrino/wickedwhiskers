@@ -16,7 +16,6 @@ var destination := Vector3.ZERO
 var has_destination := false
 var walking := false
 var _left_held := false
-var _right_held := false
 var pending_interact: Interactable = null
 var _press_pos := Vector2.ZERO
 var _press_moved := false
@@ -65,16 +64,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				_left_held = false
 				if not _press_moved:
 					_handle_click_at(event.position)
-		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			if event.pressed:
-				if not Hud.any_panel_open():
-					_right_held = true
-					_waiting_cam = false
-					_wait_target = Vector3.ZERO
-					Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			else:
-				_right_held = false
-				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:
 				camera_distance -= 0.25 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -0.25
@@ -84,7 +73,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_last_look_time = Time.get_ticks_msec()
 		if _left_held and not _press_moved and event.position.distance_to(_press_pos) > 8.0:
 			_press_moved = true
-		if _right_held and not _look_suspended():
+		if not _look_suspended():
 			yaw -= event.relative.x * mouse_sensitivity
 			pitch -= event.relative.y * mouse_sensitivity
 			_clamp_pitch()
