@@ -1,6 +1,7 @@
 extends Node3D
 
-const RIPPLE_INTERVAL := 1.3
+const RIPPLE_INTERVAL := 0.5
+const RIPPLE_LIFE := 2.0
 const RIM := 1.4 * Terrain.CAT
 
 var water_level := 0.0
@@ -10,6 +11,8 @@ var _surface_r := 0.0
 var _swim_t := 0.0
 var _ripple_t := 0.0
 var _ripples: Array = []
+var _ripple_origin := Vector2.ZERO
+var _ripple_max_scale := 4.0
 var rng := RandomNumberGenerator.new()
 
 
@@ -20,6 +23,9 @@ func _ready() -> void:
 	var depth: float = lake.depth
 	water_level = Terrain.height_at(c.x, c.y) + depth - RIM
 	_build_water()
+	var src_dir := Vector2(0.45, -0.89).normalized()
+	_ripple_origin = c + src_dir * (_surface_r - 0.7)
+	_ripple_max_scale = (_surface_r * 1.1) / 0.6
 
 
 func _water_radius() -> float:
@@ -95,7 +101,7 @@ func _physics_process(delta: float) -> void:
 		var k: float = r["t"] / life
 		var ring: MeshInstance3D = r["mesh"]
 		var mat: StandardMaterial3D = r["mat"]
-		ring.scale = Vector3.ONE * (1.0 + k * 3.2)
+		ring.scale = Vector3.ONE * lerpf(0.35, _ripple_max_scale, k)
 		mat.albedo_color.a = r["start_a"] * (1.0 - k)
 		if k >= 1.0:
 			ring.queue_free()
@@ -114,9 +120,7 @@ func _spawn_ripple() -> void:
 	tm.material = mat
 	var ring := MeshInstance3D.new()
 	ring.mesh = tm
-	var a := rng.randf_range(0, TAU)
-	var rad := rng.randf_range(0.5, maxf(_surface_r - 0.5, 0.5))
-	ring.position = Vector3(cos(a) * rad, water_level + 0.015, sin(a) * rad)
+	ring.position = Vector3(_ripple_origin.x, water_level + 0.015, _ripple_origin.y)
 	add_child(ring)
-	mat.albedo_color.a = 0.45
-	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": 2.4, "start_a": 0.45})
+	mat.albedo_color.a = 0.4
+	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": RIPPLE_LIFE, "start_a": 0.4})

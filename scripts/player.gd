@@ -3,7 +3,7 @@ extends CharacterBody3D
 @export var move_speed := 3.0
 @export var jump_velocity := 4.5
 @export var mouse_sensitivity := 0.0035
-@export var max_pitch := 1.0
+@export var max_pitch := 1.4
 
 const INTERACT_RANGE := 1.8
 
@@ -16,6 +16,7 @@ var destination := Vector3.ZERO
 var has_destination := false
 var walking := false
 var _left_held := false
+var _right_held := false
 var pending_interact: Interactable = null
 var _press_pos := Vector2.ZERO
 var _press_moved := false
@@ -64,6 +65,16 @@ func _unhandled_input(event: InputEvent) -> void:
 				_left_held = false
 				if not _press_moved:
 					_handle_click_at(event.position)
+		elif event.button_index == MOUSE_BUTTON_RIGHT:
+			if event.pressed:
+				if not Hud.any_panel_open():
+					_right_held = true
+					_waiting_cam = false
+					_wait_target = Vector3.ZERO
+					Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			else:
+				_right_held = false
+				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:
 				camera_distance -= 0.25 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -0.25
@@ -73,11 +84,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_last_look_time = Time.get_ticks_msec()
 		if _left_held and not _press_moved and event.position.distance_to(_press_pos) > 8.0:
 			_press_moved = true
-		if _look_suspended():
-			return
-		yaw -= event.relative.x * mouse_sensitivity
-		pitch -= event.relative.y * mouse_sensitivity
-		pitch = clampf(pitch, -max_pitch, _pitch_max())
+		if _right_held and not _look_suspended():
+			yaw -= event.relative.x * mouse_sensitivity
+			pitch -= event.relative.y * mouse_sensitivity
+			pitch = clampf(pitch, -max_pitch, _pitch_max())
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_E:
@@ -187,6 +197,8 @@ func stop_walk() -> void:
 
 func _handle_click_at(screen_pos: Vector2) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
+		return
+	if has_destination:
 		return
 	_waiting_cam = false
 	_wait_target = Vector3.ZERO
@@ -337,9 +349,9 @@ func _physics_process(delta: float) -> void:
 	var move_dir := Vector3.ZERO
 	var wasd := Vector2.ZERO
 	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
-		wasd.y -= 1.0
-	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
 		wasd.y += 1.0
+	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
+		wasd.y -= 1.0
 	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
 		wasd.x -= 1.0
 	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
@@ -392,13 +404,17 @@ func _physics_process(delta: float) -> void:
 			velocity.x = dir.x * move_speed
 			velocity.z = dir.z * move_speed
 	elif _left_held and not GameState.chase_active and not Hud.any_panel_open():
-		if not _walk_to_screen_point(get_viewport().get_mouse_position()):
+		if _press_moved:
+			if not _walk_to_screen_point(get_viewport().get_mouse_position()):
+				velocity.x = move_toward(velocity.x, 0.0, move_speed)
+				velocity.z = move_toward(velocity.z, 0.0, move_speed)
+			else:
+				move_dir = (destination - global_position)
+				move_dir.y = 0.0
+				move_dir = move_dir.normalized()
+		else:
 			velocity.x = move_toward(velocity.x, 0.0, move_speed)
 			velocity.z = move_toward(velocity.z, 0.0, move_speed)
-		else:
-			move_dir = (destination - global_position)
-			move_dir.y = 0.0
-			move_dir = move_dir.normalized()
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, move_speed)
 		velocity.z = move_toward(velocity.z, 0.0, move_speed)
