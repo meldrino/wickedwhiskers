@@ -5,6 +5,7 @@ const CAT := TerrainConfig.CAT
 var config: TerrainConfig
 var heights := PackedFloat32Array()
 var lake := { "center": Vector2.ZERO, "radius": 0.0, "depth": 0.0 }
+var water_level := 0.0
 
 
 func _ready() -> void:
@@ -12,11 +13,31 @@ func _ready() -> void:
 	heights = TerrainGenerator.generate(config)
 	if not config.lakes.is_empty():
 		lake = config.lakes[0]
+		water_level = height_at(lake.center.x, lake.center.y) + lake.depth - 1.4 * CAT
 	_build_world()
 
 
 func height_at(x: float, z: float) -> float:
 	return TerrainGenerator.height_at(heights, config, x, z)
+
+
+func shore_distance(dir: Vector2) -> float:
+	var c: Vector2 = lake.center
+	var r := 0.25
+	while r < lake.radius + 4.0:
+		var p: Vector2 = c + dir * r
+		if height_at(p.x, p.y) >= water_level:
+			break
+		r += 0.25
+	return r
+
+
+func in_water(x: float, z: float) -> bool:
+	var c: Vector2 = lake.center
+	var d := Vector2(x - c.x, z - c.y)
+	if d.length() > lake.radius + 2.0:
+		return false
+	return height_at(x, z) < water_level
 
 
 func _build_world() -> void:

@@ -31,6 +31,9 @@ var bone_idx := {}
 var walk_time := 0.0
 var idle_time := 0.0
 var hop_t := 0.0
+var fish_swipe_t := 0.0
+var _pending_fish := false
+var _fish_cd := 0
 
 const ANIM_BONES := [
 	"Thigh.L", "Thigh.R", "Shin.L", "Shin.R", "Foot.L", "Foot.R",
@@ -226,6 +229,9 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 	if hit.is_empty():
 		return
 	var gp: Vector3 = hit.get("position")
+	if Terrain.in_water(gp.x, gp.z):
+		_try_fish()
+		return
 	_request_walk(Vector3(gp.x, 0, gp.z))
 
 
@@ -261,6 +267,49 @@ func _go_interact(item: Interactable) -> void:
 	pending_interact = item
 	var p := item.get_interaction_point()
 	_request_walk(Vector3(p.x, 0, p.z), true)
+
+
+func _try_fish() -> void:
+	if GameState.chase_active or Hud.any_panel_open():
+		return
+	if has_destination:
+		return
+	if Time.get_ticks_msec() < _fish_cd:
+		return
+	_waiting_cam = false
+	_wait_target = Vector3.ZERO
+	var to_lake: Vector2 = Vector2(
+		Terrain.lake.center.x - global_position.x,
+		Terrain.lake.center.y - global_position.z)
+	if to_lake.length() < 0.01:
+		return
+	var dir := to_lake.normalized()
+	var r := Terrain.shore_distance(dir)
+	var shore := Vector3(
+		Terrain.lake.center.x + dir.x * (r - 0.4),
+		0,
+		Terrain.lake.center.y + dir.y * (r - 0.4))
+	_pending_fish = true
+	_request_walk(shore, true)
+
+
+func _do_fish_swipe() -> void:
+	if Time.get_ticks_msec() < _fish_cd:
+		_pending_fish = false
+		return
+	_fish_cd = Time.get_ticks_msec() + 3000
+	fish_swipe_t = 0.6
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	if rng.randf() < 0.5:
+		if not GameState.fish_caught:
+			GameState.fish_caught = true
+			if GameState.quest == "meet":
+				GameState.quest = "trade"
+		GameState.add_food(1)
+		Hud.toast("Paw-swipe! You flip a wriggling fish onto the bank. Food +1")
+	else:
+		Hud.toast("Splash! The fish darts away between your paws. So close!")
 
 
 func _within_interact_range(item: Interactable) -> bool:
@@ -400,6 +449,9 @@ func _physics_process(delta: float) -> void:
 			walking = false
 			velocity.x = move_toward(velocity.x, 0.0, move_speed)
 			velocity.z = move_toward(velocity.z, 0.0, move_speed)
+			if _pending_fish:
+				_pending_fish = false
+				_do_fish_swipe()
 			if pending_interact != null:
 				var it := pending_interact
 				pending_interact = null
@@ -453,6 +505,18 @@ func _animate_cat(delta: float) -> void:
 	if skeleton == null or bone_idx.is_empty():
 		return
 	var poses := {}
+	if fish_swipe_t > 0.0:
+		fish_swipe_t -= delta
+		var k := 1.0 - fish_swipe_t / 0.6
+		var s := sin(k * PI)
+		poses["Chest"] = Vector3(0.25 * s, 0.0, 0.0)
+		poses["Spine"] = Vector3(-0.12 * s, 0.0, 0.0)
+		poses["Head"] = Vector3(0.35 * s, 0.0, 0.0)
+		poses["UpperArm.R"] = Vector3(-1.2 * s, 0.0, -0.4 * s)
+		poses["Forearm.R"] = Vector3(0.8 * s, 0.0, 0.0)
+		poses["Hand.R"] = Vector3(0.5 * s, 0.0, 0.0)
+		_apply_poses(poses)
+		return
 	if walking:
 		walk_time += delta * velocity.length() * 5.2
 		var s := sin(walk_time)

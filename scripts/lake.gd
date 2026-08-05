@@ -2,7 +2,6 @@ extends Node3D
 
 const RIPPLE_INTERVAL := 0.5
 const RIPPLE_LIFE := 2.0
-const RIM := 1.4 * Terrain.CAT
 
 var water_level := 0.0
 var _water: MeshInstance3D = null
@@ -21,8 +20,10 @@ func _ready() -> void:
 	var lake := Terrain.lake
 	var c: Vector2 = lake.center
 	var depth: float = lake.depth
-	water_level = Terrain.height_at(c.x, c.y) + depth - RIM
+	water_level = Terrain.water_level
 	_build_water()
+	_build_shore_wall()
+	_build_fish()
 	var src_dir := Vector2(0.45, -0.89).normalized()
 	_ripple_origin = c + src_dir * (_surface_r - 0.7)
 	_ripple_max_scale = (_surface_r * 1.1) / 0.6
@@ -124,3 +125,36 @@ func _spawn_ripple() -> void:
 	add_child(ring)
 	mat.albedo_color.a = 0.4
 	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": RIPPLE_LIFE, "start_a": 0.4})
+
+
+func _build_shore_wall() -> void:
+	var wall := StaticBody3D.new()
+	wall.name = "ShoreWall"
+	wall.collision_layer = 1
+	wall.collision_mask = 1
+	var n := 48
+	var segs: Array[Vector2] = []
+	for i in range(n):
+		var ang := i * TAU / n
+		var dir := Vector2(cos(ang), sin(ang))
+		var r := Terrain.shore_distance(dir)
+		segs.append(dir * r)
+	for i in range(n):
+		var a := segs[i]
+		var b := segs[(i + 1) % n]
+		var mid := (a + b) * 0.5
+		var len := a.distance_to(b)
+		var cs := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(0.4, 4.0, len + 0.2)
+		cs.shape = box
+		cs.position = Vector3(mid.x, water_level + 0.2, mid.y)
+		cs.rotation = Vector3(0, -atan2(b.x - a.x, b.y - a.y), 0)
+		wall.add_child(cs)
+	add_child(wall)
+
+
+func _build_fish() -> void:
+	var f: Node3D = preload("res://scripts/fish.gd").new()
+	f.name = "Fish"
+	add_child(f)
