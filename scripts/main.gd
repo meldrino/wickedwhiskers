@@ -314,8 +314,10 @@ func _build_bird_tree() -> void:
 
 func _build_fence_perimeter() -> void:
 	var dist := HALF - 2.0
-	var per_edge := int((dist * 2.0) / FENCE_PANEL_WIDTH)
-	var start := -((per_edge - 1) * FENCE_PANEL_WIDTH) / 2.0
+	var span := dist * 2.0
+	var per_edge := maxi(2, int(round(span / FENCE_PANEL_WIDTH)))
+	var spacing := span / per_edge
+	var start := -dist + spacing / 2.0
 
 	for edge in range(4):
 		for i in range(per_edge):
@@ -328,7 +330,7 @@ func _build_fence_perimeter() -> void:
 				add_child(gate)
 				continue
 			var fence: Node3D = FENCE_PANEL.instantiate()
-			var off := start + i * FENCE_PANEL_WIDTH
+			var off := start + i * spacing
 			var pos := Vector3.ZERO
 			var rot := 0.0
 			match edge:
@@ -348,16 +350,6 @@ func _build_fence_perimeter() -> void:
 			fence.rotation = Vector3(0, rot, 0)
 			add_child(fence)
 			_add_fence_collider(fence)
-
-	# Diagonal panels close each corner cleanly.
-	for corner in [Vector3(-dist, 0, -dist), Vector3(dist, 0, -dist), Vector3(dist, 0, dist), Vector3(-dist, 0, dist)]:
-		var diag: Node3D = FENCE_PANEL.instantiate()
-		diag.position = corner
-		var sx := 1.0 if corner.x > 0.0 else -1.0
-		var sz := 1.0 if corner.z > 0.0 else -1.0
-		diag.rotation = Vector3(0, atan2(-sz, sx), 0)
-		add_child(diag)
-		_add_fence_collider(diag)
 
 
 func _add_fence_collider(parent: Node3D) -> void:
