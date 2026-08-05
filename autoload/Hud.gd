@@ -43,7 +43,7 @@ func _ready() -> void:
 
 	controls_label = Label.new()
 	controls_label.position = Vector2(12, 692)
-	controls_label.text = "Right-drag = look around  |  Click ground = walk  |  Click object = interact  |  Hold+drag = keep walking  |  WASD/arrows = walk  |  Wheel zoom  |  Space jump  |  F eat  |  1 trap  |  2 ladder"
+	controls_label.text = "Right-drag = orbit camera (drag up = fly high)  |  Click ground = walk  |  Click object = interact  |  Hold+drag = keep walking  |  WASD/arrows = walk  |  Wheel zoom  |  Space jump  |  F eat  |  1 trap  |  2 ladder"
 	controls_label.add_theme_font_size_override("font_size", 13)
 	add_child(controls_label)
 

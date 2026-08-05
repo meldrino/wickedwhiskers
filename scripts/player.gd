@@ -3,7 +3,7 @@ extends CharacterBody3D
 @export var move_speed := 3.0
 @export var jump_velocity := 4.5
 @export var mouse_sensitivity := 0.0035
-@export var max_pitch := 1.4
+@export var max_pitch := 1.5
 
 const INTERACT_RANGE := 1.8
 
@@ -78,7 +78,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:
 				camera_distance -= 0.25 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -0.25
-				camera_distance = clampf(camera_distance, 0.9, 4.5)
+				camera_distance = clampf(camera_distance, 0.9, 12.0)
 				camera.position.z = camera_distance
 	elif event is InputEventMouseMotion:
 		_last_look_time = Time.get_ticks_msec()
@@ -87,7 +87,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _right_held and not _look_suspended():
 			yaw -= event.relative.x * mouse_sensitivity
 			pitch -= event.relative.y * mouse_sensitivity
-			pitch = clampf(pitch, -max_pitch, _pitch_max())
+			_clamp_pitch()
 	if event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_E:
@@ -165,9 +165,16 @@ func _collect_rids(node: Node, rids: Array[RID]) -> void:
 		_collect_rids(child, rids)
 
 
-func _pitch_max() -> float:
-	var height := camera_holder.position.y
-	return asin(clampf((height - 0.1) / camera_distance, -1.0, 1.0))
+func _pitch_min() -> float:
+	var d := camera_distance
+	var h := camera_holder.position.y
+	var cam_pos := camera_holder.to_global(camera.position)
+	var t := Terrain.height_at(cam_pos.x, cam_pos.z) + 0.15
+	return asin(clampf((t - global_position.y - h) / d, -1.0, 1.0))
+
+
+func _clamp_pitch() -> void:
+	pitch = clampf(pitch, _pitch_min(), max_pitch)
 
 
 func _clamp_camera_in_room() -> void:
@@ -427,8 +434,8 @@ func _physics_process(delta: float) -> void:
 	if not camera_frozen:
 		if walking and not _waiting_cam and not moving_keys and not _mouse_recent(350):
 			yaw = lerp_angle(yaw, cat_facing + PI, 2.5 * delta)
-		pitch = clampf(pitch, -max_pitch, _pitch_max())
-		camera_holder.rotation = Vector3(pitch, yaw, 0.0)
+		_clamp_pitch()
+		camera_holder.rotation = Vector3(-pitch, yaw, 0.0)
 		_clamp_camera_in_room()
 
 	if Hud.is_dialogue_open():
