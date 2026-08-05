@@ -103,16 +103,21 @@ func _build_grass() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 20260809
 	var placed: Array[Transform3D] = []
-	for i in range(2600):
-		for _attempt in range(8):
-			var px := rng.randf_range(-config.extent + 3.0, config.extent - 3.0)
-			var pz := rng.randf_range(-config.extent + 3.0, config.extent - 3.0)
-			if not _grass_ok(px, pz):
-				continue
-			var y := height_at(px, pz)
-			var t := Transform3D(Basis(Vector3.UP, rng.randf_range(0.0, TAU)), Vector3(px, y - 0.01, pz))
-			placed.append(t.scaled(Vector3.ONE * rng.randf_range(0.7, 1.5)))
-			break
+	var spacing := 0.8
+	var lo := -config.extent + 3.0
+	var hi := config.extent - 3.0
+	var x := lo
+	while x <= hi:
+		var z := lo
+		while z <= hi:
+			var px := x + rng.randf_range(-spacing * 0.4, spacing * 0.4)
+			var pz := z + rng.randf_range(-spacing * 0.4, spacing * 0.4)
+			if _grass_ok(px, pz):
+				var y := height_at(px, pz)
+				var t := Transform3D(Basis(Vector3.UP, rng.randf_range(0.0, TAU)), Vector3(px, y - 0.01, pz))
+				placed.append(t.scaled(Vector3.ONE * rng.randf_range(0.8, 1.8)))
+			z += spacing
+		x += spacing
 	mm.instance_count = placed.size()
 	for i in range(placed.size()):
 		mm.set_instance_transform(i, placed[i])

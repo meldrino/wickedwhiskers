@@ -61,5 +61,18 @@ func _build_fish(i: int) -> Node3D:
 	tail.position = Vector3(0, 0, -0.24)
 	f.add_child(tail)
 
+	var hit := StaticBody3D.new()
+	hit.name = "FishHit"
+	hit.add_to_group("fish_hit")
+	hit.collision_layer = 1
+	hit.collision_mask = 0
+	var cs := CollisionShape3D.new()
+	var sh := SphereShape3D.new()
+	sh.radius = 0.3
+	cs.shape = sh
+	cs.position = Vector3(0, 0.1, 0)
+	hit.add_child(cs)
+	f.add_child(hit)
+
 	f.scale = Vector3.ONE * (0.85 + (i % 3) * 0.12)
 	return f

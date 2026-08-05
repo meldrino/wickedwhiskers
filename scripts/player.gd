@@ -228,6 +228,10 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 	var hit := get_world_3d().direct_space_state.intersect_ray(qa)
 	if hit.is_empty():
 		return
+	var collider: Object = hit.get("collider")
+	if collider != null and collider.is_in_group("fish_hit"):
+		_try_fish()
+		return
 	var gp: Vector3 = hit.get("position")
 	if Terrain.in_water(gp.x, gp.z):
 		_try_fish()
