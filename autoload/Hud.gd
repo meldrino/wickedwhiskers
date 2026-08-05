@@ -7,6 +7,7 @@ var toast_label: Label
 var dialogue_panel: PanelContainer
 var dialogue_label: RichTextLabel
 var dialogue_hint: Label
+var dialogue_button: Button
 var choice_panel: PanelContainer
 var choice_title: Label
 var choice_box: VBoxContainer
@@ -42,7 +43,7 @@ func _ready() -> void:
 
 	controls_label = Label.new()
 	controls_label.position = Vector2(12, 692)
-	controls_label.text = "Click to move / interact  |  Click+hold drag = orbit  |  Wheel zoom  |  Space jump  |  E interact  |  F eat food  |  1 trap  |  2 ladder  |  3 rod"
+	controls_label.text = "Mouse = look  |  Click ground = walk  |  Click object = interact  |  Hold click = keep walking  |  WASD/arrows = walk  |  Wheel zoom  |  Space jump  |  F eat  |  1 trap  |  2 ladder"
 	controls_label.add_theme_font_size_override("font_size", 13)
 	add_child(controls_label)
 
@@ -67,8 +68,8 @@ func _ready() -> void:
 
 func _build_dialogue() -> void:
 	dialogue_panel = PanelContainer.new()
-	dialogue_panel.size = Vector2(1000, 210)
-	dialogue_panel.position = Vector2(140, 460)
+	dialogue_panel.size = Vector2(1000, 250)
+	dialogue_panel.position = Vector2(140, 440)
 	dialogue_panel.visible = false
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 18)
@@ -86,6 +87,13 @@ func _build_dialogue() -> void:
 	dialogue_hint.text = ""
 	dialogue_hint.add_theme_font_size_override("font_size", 13)
 	vbox.add_child(dialogue_hint)
+	dialogue_button = Button.new()
+	dialogue_button.text = "Continue"
+	dialogue_button.custom_minimum_size = Vector2(180, 34)
+	dialogue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	dialogue_button.add_theme_font_size_override("font_size", 15)
+	dialogue_button.pressed.connect(advance_dialogue)
+	vbox.add_child(dialogue_button)
 	margin.add_child(vbox)
 	dialogue_panel.add_child(margin)
 	add_child(dialogue_panel)
@@ -247,9 +255,11 @@ func is_dialogue_open() -> bool:
 func _render_dialogue() -> void:
 	dialogue_label.text = str(dialogue_lines[dialogue_idx])
 	if dialogue_idx < dialogue_lines.size() - 1:
-		dialogue_hint.text = "E — continue"
+		dialogue_hint.text = "Click — continue"
+		dialogue_button.text = "Continue ▶"
 	else:
-		dialogue_hint.text = "E — close"
+		dialogue_hint.text = "Click — close"
+		dialogue_button.text = "Close"
 
 
 func show_choices(title: String, labels: Array, cb: Callable) -> void:

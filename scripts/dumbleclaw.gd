@@ -3,7 +3,7 @@ extends Interactable
 
 func _ready() -> void:
 	super()
-	prompt = "E — Talk to Dumbleclaw"
+	prompt = "Click — Talk to Dumbleclaw"
 	interaction_box = Vector3(0.8, 1.5, 0.8)
 	interaction_center = Vector3(0, 0.75, 0)
 	_build_dumbleclaw()
@@ -14,10 +14,9 @@ func interact() -> void:
 		return
 	if GameState.quest == "meet":
 		Hud.show_dialogue([
-			"Dumbleclaw: Ah, young whiskers. I am Dumbleclaw — nine lifetimes of wisdom, most of it spent napping.",
-			"Dumbleclaw: The night is your hunting hour. Mice, fish and birds are the farm's bounty.",
-			"Dumbleclaw: But no claw will catch them alone. String waits in the shed; sticks litter the yard.",
-			"Dumbleclaw: Each catch fills your belly for a full day. Catch what you need — and bring me your surplus. Gold is worth having where we're headed.",
+			"Dumbleclaw: Ah… young Whiskers. I am Dumbleclaw, former Headmaster of Mogwarts with nearly nine lifetimes of purr-found wisdom to share. I've been playing with this ball for thirty-three and a third years — that must be something of a long-playing record.",
+			"Dumbleclaw: Now then… the farm. A purr-fect playground of opportunity — flying twits perched in the trees, and mice you'll want to be on squeaking terms with. (Hope that last pun is not too cheesy.)",
+			"Dumbleclaw: If you go a day without eating you might lose a life. But if you have any spare fare, I will buy it off you for gold — which will be useful later.",
 		])
 		GameState.quest = "advice"
 		return
@@ -42,13 +41,11 @@ func _advice() -> void:
 	if GameState.total_catches() == 0:
 		if GameState.is_day:
 			Hud.show_dialogue([
-				"Dumbleclaw: Nothing caught yet, whiskers? The farmhouse door is open now — the farmer's wife sometimes leaves catfood for strays.",
-				"Dumbleclaw: But real cats hunt. The bird needs a ladder or the tractor. The fish needs a rod. The mouse needs a TRAP.",
+				"Dumbleclaw: Still nothing caught, whiskers? That's a purr-thetic showing. I have heard tales that the farmer's wife will feed a sorry-looking cat, so you might investigate the farmhouse — but real cats hunt.",
 			])
 		else:
 			Hud.show_dialogue([
-				"Dumbleclaw: Nothing caught yet, whiskers? The shed holds string — but it wears a padlock. Read the tractor's number plate, and the lock will make sense.",
-				"Dumbleclaw: Gather string and sticks, then craft. The night is long; the farm is yours.",
+				"Dumbleclaw: No luck yet, whiskers? Those birds can be a soar point. Let minnow if you need a new angle. As for the mice… they are definitely fast food. Maybe there is something in the shed that can help. That and the tractor might be an interesting combination.",
 			])
 	else:
 		var missing := []
@@ -56,17 +53,15 @@ func _advice() -> void:
 			missing.append("a mouse (it needs a convoluted trap)")
 		if not GameState.bird_caught:
 			missing.append("the bird (ladder or tractor)")
-		if not GameState.fish_caught:
-			missing.append("the fish (you'll need a rod)")
 		if missing.is_empty():
 			Hud.show_dialogue([
-				"Dumbleclaw: You've caught them all, whiskers! Mouse, bird AND fish. I always said you had the makings of a legend.",
-				"Dumbleclaw: Save what you can, trade the surplus, and save gold. Thirty gold opens the gates to the town... and talk of a golden fish.",
+				"Dumbleclaw: You've caught them all, whiskers! Mouse and bird. I always said you had the makings of a legend.",
+				"Dumbleclaw: Save some and trade the surplus, and save gold. Thirty gold opens the gates to the town.",
 			])
 		else:
 			Hud.show_dialogue([
-				"Dumbleclaw: Well done so far! You still have %s to catch." % (" and ".join(missing)),
-				"Dumbleclaw: Each catch is a day's food. Eat one, keep two, and sell the rest to me.",
+				"Dumbleclaw: Well done so far, Whiskers! You still have %s to catch." % (" and ".join(missing)),
+				"Dumbleclaw: Each catch is a day's food. Eat one, keep one and sell the rest to me.",
 			])
 
 
@@ -75,7 +70,7 @@ func _trade() -> void:
 		GameState.food_count -= 1
 		GameState.gold += GameState.TRADE_GOLD
 		Hud.show_dialogue([
-			"Dumbleclaw: Splendid, whisker-youngster! I'm far too old to hunt these days.",
+			"Dumbleclaw: Splendid job, young whiskers! I'm getting too old now to cash them myself.",
 			"Dumbleclaw: Here are %d gold coins for that food. Spend wisely. (%d gold total.)" % [GameState.TRADE_GOLD, GameState.gold],
 		])
 	elif GameState.food_count > 0:
@@ -85,7 +80,7 @@ func _trade() -> void:
 		])
 	else:
 		Hud.show_dialogue([
-			"Dumbleclaw: You've nothing to trade yet, whiskers. Catch a mouse, a fish or a bird first.",
+			"Dumbleclaw: You've nothing to trade yet, Whiskers. Catch a mouse or a flying twit first. Keep one for your own belly — but I'll buy any purr-plus you bring me.",
 		])
 
 

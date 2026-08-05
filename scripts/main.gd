@@ -14,10 +14,9 @@ const TREE_SCENES := [
 	preload("res://assets/tree_cone.glb"),
 	preload("res://assets/tree_blocks.glb"),
 ]
-const FENCE_SCENES := [
-	preload("res://assets/fence_planks.glb"),
-	preload("res://assets/fence_simple.glb"),
-]
+const FENCE_PANEL := preload("res://assets/fence2.glb")
+const FENCE_PANEL_WIDTH := 5.89
+const FENCE_PANEL_HEIGHT := 1.1
 const ROCK_SCENES := [
 	preload("res://assets/rock_smallA.glb"),
 	preload("res://assets/rock_smallB.glb"),
@@ -42,10 +41,9 @@ const GRASS_SCENES := [
 	preload("res://assets/grass_leafs.glb"),
 ]
 
-const FARMHOUSE_POS := Vector3(0, 0, -24)
+const FARMHOUSE_POS := Vector3(0, 0, -38)
 const SHED_POS := Vector3(16, 0, -10)
 const TRACTOR_POS := Vector3(10, 0, -20)
-const POND_POS := Vector3(-11, 0, -16)
 const BIRD_TREE_POS := Vector3(20, 0, -4)
 const DUMBLECLAW_POS := Vector3(4, 0, -14)
 const MOUSE_POS := Vector3(2, 0, 6.5)
@@ -58,23 +56,23 @@ var _enter_shed_delay := -1.0
 
 func _ready() -> void:
 	rng.randomize()
-	_build_ground()
 	_build_farmhouse(FARMHOUSE_POS)
 	_build_shed(SHED_POS)
 	_build_tractor()
-	_build_pond()
+	_build_lake()
 	_build_bird_tree()
 	_build_fence_perimeter()
+	_build_path()
 	_build_trees()
 	_build_rocks()
 	_build_crops()
 	_build_logs()
 	_build_grass()
+	_build_distant_scenery()
 	_spawn_pickups()
 	_spawn_dumbleclaw()
 	_spawn_mouse()
 	_spawn_bird()
-	_spawn_fish()
 	_spawn_player()
 	_maybe_screenshot()
 
@@ -84,8 +82,9 @@ func _spawn_player() -> void:
 	if pl == null:
 		return
 	if GameState.spawn_near_shed:
-		pl.global_position = Vector3(16, 0, -7.2)
+		pl.global_position = Vector3(16, Terrain.height_at(16, -7.2), -7.2)
 		GameState.spawn_near_shed = false
+	pl.global_position.y = Terrain.height_at(pl.global_position.x, pl.global_position.z)
 
 
 func _maybe_screenshot() -> void:
@@ -109,8 +108,6 @@ func _maybe_screenshot() -> void:
 		player.camera_holder.position = Vector3(0, 16, 0)
 		player.camera.position = Vector3(0, 0, 0)
 		player.camera.look_at(Vector3(4, 0, -10), Vector3.UP)
-		for i in range(10):
-			await get_tree().process_frame
 	else:
 		for i in range(30):
 			await get_tree().process_frame
@@ -120,29 +117,9 @@ func _maybe_screenshot() -> void:
 	get_tree().quit()
 
 
-func _build_ground() -> void:
-	var visual := MeshInstance3D.new()
-	var plane := PlaneMesh.new()
-	plane.size = Vector2(WORLD_SIZE, WORLD_SIZE)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.42, 0.62, 0.3)
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	plane.material = mat
-	visual.mesh = plane
-	add_child(visual)
-
-	var body := StaticBody3D.new()
-	var col := CollisionShape3D.new()
-	var boundary := WorldBoundaryShape3D.new()
-	boundary.plane = Plane(0, 1, 0, 0)
-	col.shape = boundary
-	body.add_child(col)
-	add_child(body)
-
-
 func _build_farmhouse(home: Vector3) -> void:
 	var house := Node3D.new()
-	house.position = home
+	house.position = Vector3(home.x, Terrain.height_at(home.x, home.z), home.z)
 	house.name = "Farmhouse"
 	add_child(house)
 
@@ -188,7 +165,7 @@ func _build_farmhouse(home: Vector3) -> void:
 
 func _build_shed(shed_pos: Vector3) -> void:
 	var shed := Node3D.new()
-	shed.position = shed_pos
+	shed.position = Vector3(shed_pos.x, Terrain.height_at(shed_pos.x, shed_pos.z), shed_pos.z)
 	shed.name = "Shed"
 	add_child(shed)
 
@@ -283,12 +260,6 @@ func _run_smoke() -> void:
 
 	GameState.add_string(1)
 	GameState.add_sticks(2)
-	var fish := get_node("Fish")
-	fish._on_choice(1)
-	print("SMOKE fish_caught=%s food=%d rod_placed=%s" % [GameState.fish_caught, GameState.food_count, GameState.rod_placed])
-
-	GameState.add_string(1)
-	GameState.add_sticks(2)
 	var bird := get_node("Bird")
 	bird._on_choice(1)
 	print("SMOKE bird_caught=%s food=%d ladder_placed=%s" % [GameState.bird_caught, GameState.food_count, GameState.ladder_placed])
@@ -318,22 +289,22 @@ func _run_smoke() -> void:
 func _build_tractor() -> void:
 	var tractor: Node3D = preload("res://scripts/tractor.gd").new()
 	tractor.name = "Tractor"
-	tractor.position = TRACTOR_POS
+	tractor.position = Vector3(TRACTOR_POS.x, Terrain.height_at(TRACTOR_POS.x, TRACTOR_POS.z), TRACTOR_POS.z)
 	tractor.rotation = Vector3(0, 0.7, 0)
 	add_child(tractor)
 
 
-func _build_pond() -> void:
-	var fish: Node3D = preload("res://scripts/fish.gd").new()
-	fish.name = "Fish"
-	fish.position = POND_POS
-	add_child(fish)
+func _build_lake() -> void:
+	var lake: Node3D = preload("res://scripts/lake.gd").new()
+	lake.name = "Lake"
+	lake.position = Vector3(Terrain.lake.center.x, 0, Terrain.lake.center.y)
+	add_child(lake)
 
 
 func _build_bird_tree() -> void:
 	var scene: PackedScene = preload("res://assets/tree_detailed.glb")
 	var tree: Node3D = scene.instantiate()
-	tree.position = BIRD_TREE_POS
+	tree.position = Vector3(BIRD_TREE_POS.x, Terrain.height_at(BIRD_TREE_POS.x, BIRD_TREE_POS.z), BIRD_TREE_POS.z)
 	tree.scale = Vector3.ONE * 4.0
 	add_child(tree)
 	tree.add_to_group("trees")
@@ -343,32 +314,61 @@ func _build_bird_tree() -> void:
 
 func _build_fence_perimeter() -> void:
 	var dist := HALF - 2.0
+	var per_edge := int((dist * 2.0) / FENCE_PANEL_WIDTH)
+	var start := -((per_edge - 1) * FENCE_PANEL_WIDTH) / 2.0
+
 	for edge in range(4):
-		var along := (dist * 2.0) / 2.6
-		for i in range(int(along)):
-			var fence: Node3D
-			if i == 0 or i == int(along) - 1:
-				fence = FENCE_SCENES[0].instantiate()
-			else:
-				fence = FENCE_SCENES[rng.randi_range(0, FENCE_SCENES.size() - 1)].instantiate()
+		for i in range(per_edge):
+			var on_north := edge == 0
+			var center_panel := i == per_edge / 2
+			if on_north and center_panel:
+				var gate: Node3D = preload("res://scripts/gate.gd").new()
+				gate.name = "Gate"
+				gate.position = Vector3(0, 0, -dist)
+				add_child(gate)
+				continue
+			var fence: Node3D = FENCE_PANEL.instantiate()
+			var off := start + i * FENCE_PANEL_WIDTH
 			var pos := Vector3.ZERO
 			var rot := 0.0
 			match edge:
 				0:
-					pos = Vector3(-dist + i * 2.6, 0, -dist)
+					pos = Vector3(off, 0, -dist)
 					rot = 0.0
 				1:
-					pos = Vector3(dist, 0, -dist + i * 2.6)
+					pos = Vector3(dist, 0, off)
 					rot = PI / 2.0
 				2:
-					pos = Vector3(dist - i * 2.6, 0, dist)
+					pos = Vector3(-off, 0, dist)
 					rot = PI
 				3:
-					pos = Vector3(-dist, 0, dist - i * 2.6)
+					pos = Vector3(-dist, 0, -off)
 					rot = -PI / 2.0
 			fence.position = pos
 			fence.rotation = Vector3(0, rot, 0)
 			add_child(fence)
+			_add_fence_collider(fence)
+
+	# Diagonal panels close each corner cleanly.
+	for corner in [Vector3(-dist, 0, -dist), Vector3(dist, 0, -dist), Vector3(dist, 0, dist), Vector3(-dist, 0, dist)]:
+		var diag: Node3D = FENCE_PANEL.instantiate()
+		diag.position = corner
+		var sx := 1.0 if corner.x > 0.0 else -1.0
+		var sz := 1.0 if corner.z > 0.0 else -1.0
+		diag.rotation = Vector3(0, atan2(-sz, sx), 0)
+		add_child(diag)
+		_add_fence_collider(diag)
+
+
+func _add_fence_collider(parent: Node3D) -> void:
+	var body := StaticBody3D.new()
+	var col := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(FENCE_PANEL_WIDTH, FENCE_PANEL_HEIGHT, 0.17)
+	col.shape = box
+	col.position = Vector3(0, FENCE_PANEL_HEIGHT / 2.0, 0)
+	body.add_child(col)
+	parent.add_child(body)
 
 
 func _build_trees() -> void:
@@ -378,7 +378,7 @@ func _build_trees() -> void:
 		var pos := _random_pos(3.0)
 		if _too_close_to_landmarks(pos):
 			continue
-		tree.position = pos
+		tree.position = Vector3(pos.x, Terrain.height_at(pos.x, pos.z), pos.z)
 		tree.rotation = Vector3(0, rng.randf_range(0, TAU), 0)
 		var scale := rng.randf_range(2.6, 4.4)
 		tree.scale = Vector3(scale, scale, scale)
@@ -395,7 +395,7 @@ func _build_rocks() -> void:
 		var pos := _random_pos(2.0)
 		if _too_close_to_landmarks(pos):
 			continue
-		rock.position = pos
+		rock.position = Vector3(pos.x, Terrain.height_at(pos.x, pos.z), pos.z)
 		var scale := rng.randf_range(0.7, 1.8)
 		rock.scale = Vector3(scale, scale, scale)
 		add_child(rock)
@@ -403,7 +403,7 @@ func _build_rocks() -> void:
 
 func _build_crops() -> void:
 	var row := Node3D.new()
-	row.position = Vector3(14.5, 0, -6)
+	row.position = Vector3(14.5, Terrain.height_at(14.5, -6), -6)
 	add_child(row)
 	for i in range(6):
 		var scene: PackedScene = CROP_SCENES[rng.randi_range(0, CROP_SCENES.size() - 1)]
@@ -421,7 +421,7 @@ func _build_logs() -> void:
 		var pos := _random_pos(2.0)
 		if _too_close_to_landmarks(pos):
 			continue
-		log.position = pos
+		log.position = Vector3(pos.x, Terrain.height_at(pos.x, pos.z), pos.z)
 		log.rotation = Vector3(0, rng.randf_range(0, TAU), 0)
 		add_child(log)
 
@@ -433,7 +433,7 @@ func _build_grass() -> void:
 		var pos := _random_pos(1.0)
 		if _too_close_to_landmarks(pos):
 			continue
-		tuft.position = pos
+		tuft.position = Vector3(pos.x, Terrain.height_at(pos.x, pos.z), pos.z)
 		var scale := rng.randf_range(0.6, 1.5)
 		tuft.scale = Vector3(scale, scale, scale)
 		add_child(tuft)
@@ -452,36 +452,31 @@ func _spawn_pickups() -> void:
 	for p in stick_positions:
 		var st := preload("res://scripts/pickup.gd").new()
 		st.kind = "stick"
-		st.position = p
+		st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.25, p.z)
 		add_child(st)
 
 
 func _spawn_dumbleclaw() -> void:
 	var dc := preload("res://scripts/dumbleclaw.gd").new()
 	dc.name = "Dumbleclaw"
-	dc.position = DUMBLECLAW_POS
+	dc.position = Vector3(DUMBLECLAW_POS.x, Terrain.height_at(DUMBLECLAW_POS.x, DUMBLECLAW_POS.z), DUMBLECLAW_POS.z)
 	add_child(dc)
 
 
 func _spawn_mouse() -> void:
 	var m := preload("res://scripts/mouse.gd").new()
 	m.name = "Mouse"
-	m.position = MOUSE_POS
+	m.position = Vector3(MOUSE_POS.x, Terrain.height_at(MOUSE_POS.x, MOUSE_POS.z), MOUSE_POS.z)
 	add_child(m)
 
 
 func _spawn_bird() -> void:
 	var b := preload("res://scripts/bird.gd").new()
 	b.name = "Bird"
-	var anchor := BIRD_TREE_POS + Vector3(0, 4.0 * 1.4 + 0.4, 0)
+	var anchor := Vector3(BIRD_TREE_POS.x, Terrain.height_at(BIRD_TREE_POS.x, BIRD_TREE_POS.z) + 4.0 * 1.4 + 0.4, BIRD_TREE_POS.z)
 	b.anchor = anchor
 	b.position = anchor
 	add_child(b)
-
-
-func _spawn_fish() -> void:
-	# fish is built inside fish.gd (pond + fish together)
-	pass
 
 
 func _add_mesh(parent: Node3D, kind: String, size: Vector3, pos: Vector3, color: Color, rot := Vector3.ZERO) -> MeshInstance3D:
@@ -536,7 +531,43 @@ func _random_pos(margin: float) -> Vector3:
 
 
 func _too_close_to_landmarks(pos: Vector3) -> bool:
-	for lm in [FARMHOUSE_POS, SHED_POS, TRACTOR_POS, POND_POS, BIRD_TREE_POS]:
+	var lake_center := Vector3(Terrain.lake.center.x, 0, Terrain.lake.center.y)
+	for lm in [FARMHOUSE_POS, SHED_POS, TRACTOR_POS, lake_center, BIRD_TREE_POS]:
 		if pos.distance_to(lm) < 6.0:
 			return true
 	return pos.distance_to(Vector3(0, 0, 12)) < 3.0
+
+
+func _build_path() -> void:
+	var dirt := Color(0.6, 0.48, 0.32)
+	var dust := Color(0.55, 0.44, 0.3)
+	var fence_z := HALF - 2.0
+	var path: Node3D = Node3D.new()
+	path.name = "Path"
+	add_child(path)
+	# Main run: gate -> farmhouse door
+	var run_len := -FARMHOUSE_POS.z - fence_z - 2.6
+	var run_mid := (fence_z + (-FARMHOUSE_POS.z - 2.6)) / 2.0
+	_add_mesh(path, "box", Vector3(2.6, 0.06, run_len), Vector3(0, 0.02, -run_mid), dirt)
+	# Farmhouse dooryard pad
+	_add_mesh(path, "box", Vector3(4.0, 0.06, 3.0), Vector3(0, 0.02, -FARMHOUSE_POS.z + 1.3), dust)
+	# Gate pad (just outside the fence)
+	_add_mesh(path, "box", Vector3(4.0, 0.06, 2.0), Vector3(0, 0.02, -(fence_z + 1.4)), dust)
+
+
+func _build_distant_scenery() -> void:
+	var spots := [
+		Vector3(-44, 0, 40), Vector3(-38, 0, 44), Vector3(46, 0, 42),
+		Vector3(40, 0, -44), Vector3(-42, 0, -40), Vector3(44, 0, -30),
+		Vector3(30, 0, 46), Vector3(-30, 0, 46), Vector3(46, 0, 20),
+		Vector3(-46, 0, 24), Vector3(18, 0, -45), Vector3(-20, 0, -44),
+	]
+	for s in spots:
+		var scene: PackedScene = TREE_SCENES[rng.randi_range(0, TREE_SCENES.size() - 1)]
+		var tree: Node3D = scene.instantiate()
+		tree.position = Vector3(s.x, Terrain.height_at(s.x, s.z), s.z)
+		tree.rotation = Vector3(0, rng.randf_range(0, TAU), 0)
+		var scale := rng.randf_range(2.2, 3.6)
+		tree.scale = Vector3(scale, scale, scale)
+		add_child(tree)
+		tree.add_to_group("trees")

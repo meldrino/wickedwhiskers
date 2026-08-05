@@ -31,6 +31,30 @@
 <p>AI reference for <strong>Wicked Whiskers</strong> — a mischievous, chaotic, pun-filled 3D cat adventure set on a farm and nearby town. Built with Godot 4 (GDScript). Not linked from main navigation.</p>
 <div class="note"><strong>Source:</strong> converted from the design document <code>wicked whiskers.docx</code>. Includes the canonical additions: the wise old cat is <strong>Dumbleclaw</strong>, and all catching is craft-only (no manual catches).</div>
 
+<h2>Live Build Status (Aug 2026)</h2>
+<div class="note"><strong>Project:</strong> <code>C:\crypto\wicked whiskers</code> — Godot 4.7.1, GDScript, source on GitHub (meldrino/wickedwhiskers).</div>
+<ul>
+<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, random each game), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle.</li>
+<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys).</li>
+<li><strong>S2 farmhouse</strong> — teased only (door locked at night, once-daily catfood at first light); interior not built yet.</li>
+<li><strong>S3 town</strong> — planned (Dick Whittington city, golden fish tease, 30-gold town gates).</li>
+<li><strong>All three catches are craft-only:</strong> convoluted mouse trap / ladder (bird) / fishing rod (fish). No manual catches.</li>
+<li><strong>Dumbleclaw</strong> — quest giver + trader (surplus food → gold), time-of-day aware hints.</li>
+<li><strong>Lake reworked:</strong> sunken pond with a raised bank, reeds + grass shoreline, dark deep bed, and animated rippling water with sky reflections.</li>
+<li>Economy: day = 2 real hours, hunger + tiredness, 9 lives, catchables never respawn.</li>
+<li>Verified by headless smoke tests + screenshots (reviewed by an image-capable model).</li>
+</ul>
+
+<h2>Controls (live build)</h2>
+<ul>
+<li><strong>Mouse</strong> — look / aim; always on, no button needed.</li>
+<li><strong>LMB click</strong> — walk to a spot, or interact with an object once within ~1.8 m (walk-then-interact).</li>
+<li><strong>LMB hold</strong> — keep walking toward the cursor.</li>
+<li><strong>WASD / arrows</strong> — camera-relative movement.</li>
+<li><strong>Camera</strong> — eases behind the cat when walking; the cat faces its own walk direction (not the camera).</li>
+<li><strong>E</strong> interact · <strong>1/2/3</strong> craft trap / ladder / rod · <strong>F</strong> eat · <strong>Space</strong> jump · <strong>mouse wheel</strong> zoom.</li>
+</ul>
+
 <h2>Core Concept</h2>
 <p>Wicked Whiskers is a mischievous, chaotic, pun-filled cat adventure set on a farm and nearby town. The tone is humorous, cheeky, and full of feline wordplay. The player (or main cat) is clever, resourceful, and always up to trouble.</p>
 
@@ -153,13 +177,14 @@
 
 <h2>Status</h2>
 <ul>
-<li>World foundations established.</li>
-<li>Characters, mechanics, and tone defined.</li>
-<li>Ready for expansion into: story arcs, character sheets, quest lines, crafting systems, town development.</li>
-  <li>3D prototype in progress in Godot 4 — <code>C:\crypto\wicked whiskers</code>.</li>
+<li>Design doc + canon established (Dumbleclaw, craft-only catching).</li>
+<li>S1 + S1.5 playable: gather string/sticks, craft, catch mouse/bird/fish, Dumbleclaw quests + trading, day/night + food/tiredness, 9 lives, restart with a fresh combo.</li>
+<li>Control scheme reworked (Aug 2026): always-on mouse-look + WASD + click-to-walk/interact with proximity gating; camera follows behind the cat.</li>
+<li>Lake reworked (Aug 2026): sunken pond, bank + reeds, animated rippling water with sky reflections.</li>
+<li>Next: farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button.</li>
 </ul>
 
 <hr>
-<p><em>Note to AI: This is the reference page for the Wicked Whiskers game project. Design doc source: <code>wicked whiskers.docx</code>. Game code: <code>C:\crypto\wicked whiskers</code> (Godot 4).</em></p>
+<p><em>Note to AI: This is the reference page for the Wicked Whiskers game project. Design doc source: <code>wicked whiskers.docx</code>. Game code: <code>C:\crypto\wicked whiskers</code> (Godot 4). Live project state: <code>PROJECT_STATE.yaml</code> in the project dir.</em></p>
 </body>
 </html>

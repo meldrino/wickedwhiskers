@@ -7,8 +7,6 @@ const TRAP_STRING_COST := 1
 const TRAP_STICK_COST := 2
 const LADDER_STRING_COST := 1
 const LADDER_STICK_COST := 2
-const ROD_STRING_COST := 1
-const ROD_STICK_COST := 2
 
 const TRADE_GOLD := 10
 const TOWN_GOLD_TARGET := 30
@@ -25,11 +23,9 @@ var has_keys := false
 
 var trap_placed := false
 var ladder_placed := false
-var rod_placed := false
 
 var mouse_caught := false
 var bird_caught := false
-var fish_caught := false
 var catfood_used := false
 
 var shed_string_taken := false
@@ -64,10 +60,8 @@ func new_game() -> void:
 	has_keys = false
 	trap_placed = false
 	ladder_placed = false
-	rod_placed = false
 	mouse_caught = false
 	bird_caught = false
-	fish_caught = false
 	catfood_used = false
 	shed_string_taken = false
 	shed_key_taken = false
@@ -87,8 +81,6 @@ func total_catches() -> int:
 	if mouse_caught:
 		n += 1
 	if bird_caught:
-		n += 1
-	if fish_caught:
 		n += 1
 	return n
 
@@ -113,10 +105,6 @@ func can_afford_ladder() -> bool:
 	return string_count >= LADDER_STRING_COST and stick_count >= LADDER_STICK_COST
 
 
-func can_afford_rod() -> bool:
-	return string_count >= ROD_STRING_COST and stick_count >= ROD_STICK_COST
-
-
 func spend_trap() -> void:
 	string_count -= TRAP_STRING_COST
 	stick_count -= TRAP_STICK_COST
@@ -125,11 +113,6 @@ func spend_trap() -> void:
 func spend_ladder() -> void:
 	string_count -= LADDER_STRING_COST
 	stick_count -= LADDER_STICK_COST
-
-
-func spend_rod() -> void:
-	string_count -= ROD_STRING_COST
-	stick_count -= ROD_STICK_COST
 
 
 func materials_status() -> String:

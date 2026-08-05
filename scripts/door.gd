@@ -12,10 +12,10 @@ func _ready() -> void:
 	super()
 	match door_kind:
 		"shed":
-			prompt = "E — Combination padlock"
+			prompt = "Click — Combination padlock"
 			_build_padlock()
 		"farmhouse":
-			prompt = "E — Farmhouse door"
+			prompt = "Click — Farmhouse door"
 	_door_mesh = get_parent().get_node_or_null("Door") as MeshInstance3D
 
 

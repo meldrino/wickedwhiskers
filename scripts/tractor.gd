@@ -13,7 +13,7 @@ func _ready() -> void:
 	interaction_center = Vector3(0, 0.8, 0)
 	add_to_group("tractor")
 	super()
-	prompt = "E — Farm tractor"
+	prompt = "Click — Farm tractor"
 	_build_tractor()
 
 

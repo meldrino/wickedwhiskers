@@ -18,7 +18,7 @@ const CHASE_DURATION := 4.5
 
 func _ready() -> void:
 	super()
-	prompt = "E — A mouse"
+	prompt = "Click — A mouse"
 	interaction_box = Vector3(0.7, 0.6, 1.0)
 	interaction_center = Vector3(0, 0.25, 0)
 	rng.randomize()
@@ -149,11 +149,11 @@ func _end_chase(player: Node3D) -> void:
 
 func _make_trap() -> void:
 	if GameState.trap_placed:
-		Hud.toast("Your convoluted mouse trap is already out there waiting.")
+		Hud.toast("Your mouse trap is already out there waiting.")
 		return
 	match GameState.materials_status():
 		"none":
-			Hud.toast("You don't have the right materials — a convoluted trap needs string and sticks.")
+			Hud.toast("You don't have the right materials — a trap needs string and sticks.")
 		"half":
 			Hud.toast("You only have half the materials you need for the trap.")
 		"full":
@@ -161,7 +161,7 @@ func _make_trap() -> void:
 			GameState.trap_placed = true
 			var trap := preload("res://scripts/trap.gd").new()
 			trap.position = global_position + Vector3(1.2, 0, 0.8)
-			trap.position.y = 0.0
+			trap.position.y = Terrain.height_at(trap.position.x, trap.position.z)
 			get_tree().current_scene.add_child(trap)
 			lure_target = trap
 			state = "to_trap"

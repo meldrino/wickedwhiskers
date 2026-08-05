@@ -10,7 +10,7 @@ func _ready() -> void:
 	interaction_radius = 4.5
 	add_to_group("bird")
 	super()
-	prompt = "E — A bird in the tree"
+	prompt = "Click — A bird in the tree"
 	rng.randomize()
 	_build_bird()
 
@@ -26,7 +26,7 @@ func interact() -> void:
 		return
 	if GameState.bird_caught:
 		Hud.show_dialogue([
-			"The tree's empty — you already caught that bird.",
+			"The tree's empty — you already caught that bird or the bird has flown.",
 		])
 		return
 	Hud.show_choices("A cheeky bird preens in the high branches:", [
@@ -79,7 +79,7 @@ func _use_tractor() -> void:
 
 
 func _knocked_by_tractor() -> void:
-	Hud.toast("WHAM! The tractor rattles the tree and the bird tumbles out, dizzy. Food +1")
+	Hud.toast("WHAM! The tractor smashes into the tree and the bird tumbles out seeing stars, dizzy. Food +1")
 	_catch(true)
 
 

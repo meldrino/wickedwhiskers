@@ -1,7 +1,7 @@
 class_name Interactable
 extends Area3D
 
-@export var prompt := "E — interact"
+@export var prompt := "Click — interact"
 @export var interaction_radius := 2.2
 @export var interaction_box := Vector3.ZERO
 @export var interaction_center := Vector3.ZERO
@@ -10,6 +10,7 @@ var _held_player: Node3D = null
 
 
 func _ready() -> void:
+	add_to_group("interactable")
 	var col := CollisionShape3D.new()
 	col.position = interaction_center
 	if interaction_box != Vector3.ZERO:
@@ -39,3 +40,7 @@ func _on_body_exited(body: Node3D) -> void:
 
 func interact() -> void:
 	pass
+
+
+func get_interaction_point() -> Vector3:
+	return to_global(interaction_center)

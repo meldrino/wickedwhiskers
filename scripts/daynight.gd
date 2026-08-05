@@ -88,7 +88,7 @@ func _process_hunger(delta: float) -> void:
 		Hud.toast("You wolf down some food. Hunger back to full. (+1 food eaten)")
 	elif not GameState.first_dawn:
 		GameState.hunger = 0.05
-		GameState.toast_cooldown("hunger_mercy", "You're hungry, WW — but tonight you won't starve. Dumbleclaw says the farmhouse opens at dawn.")
+		GameState.toast_cooldown("hunger_mercy", "You're hungry, Wicked Whiskers — but tonight you won't starve. Dumbleclaw says the farmhouse opens at dawn.")
 	else:
 		GameState.hunger = 1.0
 		if GameState.lose_life("Starvation caught up with you — no food to eat!"):
