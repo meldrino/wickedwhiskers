@@ -107,17 +107,16 @@ func _spawn_ripple() -> void:
 	mat.albedo_color = Color(0.9, 0.97, 1.0)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var tm := TorusMesh.new()
-	tm.inner_radius = 0.03
-	tm.outer_radius = 0.08
+	tm.inner_radius = 0.42
+	tm.outer_radius = 0.5
 	tm.rings = 8
 	tm.ring_segments = 48
 	tm.material = mat
 	var ring := MeshInstance3D.new()
 	ring.mesh = tm
-	ring.rotation.x = PI / 2.0
 	var a := rng.randf_range(0, TAU)
 	var rad := rng.randf_range(0.5, maxf(_surface_r - 0.5, 0.5))
-	ring.position = Vector3(cos(a) * rad, water_level + 0.01, sin(a) * rad)
+	ring.position = Vector3(cos(a) * rad, water_level + 0.015, sin(a) * rad)
 	add_child(ring)
-	mat.albedo_color.a = 0.28
-	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": 2.4, "start_a": 0.28})
+	mat.albedo_color.a = 0.45
+	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": 2.4, "start_a": 0.45})
