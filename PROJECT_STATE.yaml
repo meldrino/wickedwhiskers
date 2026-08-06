@@ -263,6 +263,21 @@ todo:
     mouse chase comedy, tractor-to-bird drive, padlock digit UI, farmhouse at dawn
   - design + build Scene 2 (farmhouse interior)
   - design + build Scene 3 (city / Dick Whittington)
+  - [DONE] Grass 100% coverage + no grass in the pond + belly-flop dive (commit 856eb1a;
+    ~127,578 tufts @0.3 confirmed real, pond ring excluded, screenshots verified).
+  - [DONE] ANSI-spam root cause identified + fixed: ~/.config/opencode/tui.json
+    {"mouse": false} (see known_issues). Recovery helper C:\Users\Andy\fixterm.ps1.
+  - [IN FLIGHT] VegetationGenerator.gd (spec-driven ground-cover generator: measured tuft
+    footprint 0.22 -> spacing 0.198, physics raycast per placement filtered to the Terrain
+    body, water-disc exclusion, jitter, one-call regen, extensible to flowers/weeds/bushes).
+    Written + class registered (--headless --import). NEXT: wire into Terrain.gd (delete old
+    _build_grass/_grass_ok/_build_tuft_mesh/_add_blade; async _build_vegetation awaiting 2
+    physics frames; regen_vegetation()), drop TerrainConfig grass_* knobs, add KEY_F5 regen
+    to player.gd, then smoke (expect ~290k tufts) + screenshots + commit + push.
+  - [NEXT] opencode "memory watchdog" plugin: on session.end / abort / experimental.session.
+    compacting, snapshot current state to the bigpickle YAML + emit terminal-reset ANSI
+    (prevents both data loss and a broken terminal when a session dies abnormally; runs in
+    the opencode process so uses no LLM tokens). Needs an opencode restart to load.
 
 # =============================================================================
 # KNOWN ISSUES
@@ -282,3 +297,9 @@ known_issues:
   - Kenney GLB scale varies - some props may need per-model tuning
   - interactive set-pieces (padlock UI, tractor drive, chase) verified via the programmatic
     smoke test only, not yet by hand
+  - ANSI flood = SGR MOUSE-TRACKING reports (ESC[<b;x;yM, e.g. "M[555;74;") flooding the
+    console after an abnormal opencode exit: the TUI leaves mouse-tracking enabled (upstream
+    @opentui cleanup order; GH anomalies/opencode #6912, #26198, #20458). FIXED via
+    ~/.config/opencode/tui.json {"mouse": false} (disables TUI mouse capture; next opencode
+    start). A plugin watching session.end could also emit the terminal-reset escapes. If the
+    terminal still floods (e.g. opencode hard-killed), run C:\Users\Andy\fixterm.ps1.

@@ -99,3 +99,30 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
 - Verified: headless smoke PASS (SMOKE DONE), screenshots reviewed via Qwen Vision
   (qwen2.5vl:7b): dense green lawn ~90% coverage, no grass in the water, no artifacts.
   RID-leak noise at exit is benign/pre-existing.
+
+## 2026-08-06 overnight
+
+- ANSI-spam ROOT CAUSE found (research subagent; official docs + GH issues): the flood is
+  NOT coloured output but SGR MOUSE-TRACKING reports (`ESC[<b;x;yM`, e.g. `M[555;74;`) the
+  terminal emits while opencode's TUI leaves mouse-tracking enabled after an abnormal exit
+  (upstream @opentui cleanup order bug). GH anomalies/opencode #6912, #26198, #20458.
+  FIX APPLIED: `C:\Users\Andy\.config\opencode\tui.json` = `{ "$schema": "https://opencode.ai/tui.json", "mouse": false }` — disables TUI mouse capture so mouse-tracking is never switched on; takes effect at next opencode start (config is not hot-reloaded). Recovery helper stays: `C:\Users\Andy\fixterm.ps1` (`?1000l ?1002l ?1003l ?1006l ?1015l ?1049l`). No watchdog/idle-timeout exists in opencode config; `opencode run` (non-interactive) avoids the TUI entirely.
+- Vegetation generator (replaces the old grass scatter per the overnight plan): NEW
+  `autoload/VegetationGenerator.gd` (class_name VegetationGenerator), spec-driven (one
+  `VEG_GRASS` dict; flowers/weeds/bushes = extra specs later). Measured tuft footprint
+  0.22 m (outer blades 0.05-0.1 out + half-width) -> spacing = footprint * spacing_factor
+  0.9 = 0.198 (overlap -> true 100% coverage). Methodical grid over terrain extent, jitter
+  ±35%, physics RAYCAST per placement (downward, filtered to the Terrain body by collider
+  identity so grass never lands on buildings/shore-wall), water-disc rejection retained,
+  analytic slope/height pre-check retained, prints `GRASS tufts=` count. Class registered
+  via `--headless --import` (exit 0). IN FLIGHT (next session resumes here):
+  1) Terrain.gd: delete old `_build_grass`/`_grass_ok`/`_build_tuft_mesh`/`_add_blade`;
+     add async `_build_vegetation(ground)` (await 2 physics frames so the HeightMapShape
+     registers, then create a `Vegetation` container + generator + regen); add
+     `regen_vegetation()`.
+  2) TerrainConfig.gd: remove now-unused grass_* knobs.
+  3) player.gd: add `KEY_F5: Terrain.regen_vegetation()` to _unhandled_input.
+  4) Smoke test (expect ~290k tufts at 0.198 spacing) + screenshots + commit + push.
+- SAFE TO RESTART: repo committed at 856eb1a (working tree otherwise clean except the new
+  untracked VegetationGenerator.gd which is safe on disk). bigpickle YAMLs are local-only;
+  website ww.html is a static reference (unchanged, deployed).
