@@ -102,6 +102,11 @@ func _maybe_screenshot() -> void:
 		player.camera_holder.position = Vector3(0, 16, 0)
 		player.camera.position = Vector3(0, 0, 0)
 		player.camera.look_at(Vector3(4, 0, -10), Vector3.UP)
+	elif "--pond" in args and player != null:
+		player.camera_frozen = true
+		player.camera_holder.position = Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
+		player.camera.position = Vector3(0, 0, 0)
+		player.camera.look_at(Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5), Vector3.UP)
 	else:
 		for i in range(30):
 			await get_tree().process_frame

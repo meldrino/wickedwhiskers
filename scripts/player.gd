@@ -46,7 +46,7 @@ var _drip: CPUParticles3D = null
 const POUNCE_IN_DUR := 0.55
 const POUNCE_OUT_DUR := 0.7
 const POUNCE_WET_DUR := 0.9
-const POUNCE_HEIGHT := 1.6
+const POUNCE_HEIGHT := 0.5
 const POUNCE_DIST := 2.2
 const WET_TIME := 5.0
 
@@ -370,11 +370,13 @@ func _start_pounce() -> void:
 
 func _update_pounce(delta: float) -> void:
 	_pounce_t += delta
+	var pitch_dive := 0.0
 	if _pounce_phase == 0:
 		var k := clampf(_pounce_t / POUNCE_IN_DUR, 0.0, 1.0)
 		var pos := _pounce_origin.lerp(_pounce_target, k)
 		pos.y = lerpf(_pounce_origin.y, _pounce_target.y, k) + sin(k * PI) * POUNCE_HEIGHT
 		global_position = pos
+		pitch_dive = lerpf(0.0, -1.25, k)
 		if _pounce_t >= POUNCE_IN_DUR:
 			_pounce_t = 0.0
 			_pounce_phase = 1
@@ -382,6 +384,7 @@ func _update_pounce(delta: float) -> void:
 	elif _pounce_phase == 1:
 		var k := clampf(_pounce_t / POUNCE_WET_DUR, 0.0, 1.0)
 		global_position = _pounce_target + Vector3(0.0, -sin(k * PI) * 0.32, 0.0)
+		pitch_dive = -0.3
 		if _pounce_t >= POUNCE_WET_DUR:
 			_pounce_t = 0.0
 			_pounce_phase = 2
@@ -390,9 +393,10 @@ func _update_pounce(delta: float) -> void:
 		var pos := _pounce_target.lerp(_pounce_origin, k)
 		pos.y = lerpf(_pounce_target.y, _pounce_origin.y, k) + sin(k * PI) * 0.9
 		global_position = pos
+		pitch_dive = lerpf(-0.3, 0.0, k)
 		if _pounce_t >= POUNCE_OUT_DUR:
 			_finish_pounce()
-	mesh_root.rotation.y = cat_facing
+	mesh_root.rotation = Vector3(pitch_dive, cat_facing, 0.0)
 
 
 func _do_splash() -> void:
@@ -708,17 +712,17 @@ func _animate_pounce() -> void:
 		0:
 			var k := clampf(_pounce_t / POUNCE_IN_DUR, 0.0, 1.0)
 			var s := sin(k * PI)
-			poses["Spine"] = Vector3(0.18 * s, 0.0, 0.0)
-			poses["Chest"] = Vector3(0.22 * s, 0.0, 0.0)
-			poses["Head"] = Vector3(0.3 * s, -0.2 * s, 0.0)
-			poses["UpperArm.L"] = Vector3(-1.1, 0.0, -0.5)
-			poses["UpperArm.R"] = Vector3(-1.1, 0.0, -0.5)
-			poses["Forearm.L"] = Vector3(0.7, 0.0, 0.3)
-			poses["Forearm.R"] = Vector3(0.7, 0.0, 0.3)
-			poses["Thigh.L"] = Vector3(0.7, 0.0, 0.35)
-			poses["Thigh.R"] = Vector3(0.7, 0.0, 0.35)
-			poses["Shin.L"] = Vector3(-0.4, 0.0, 0.0)
-			poses["Shin.R"] = Vector3(-0.4, 0.0, 0.0)
+			poses["Spine"] = Vector3(0.3 * s, 0.0, 0.0)
+			poses["Chest"] = Vector3(0.12 * s, 0.0, 0.0)
+			poses["Head"] = Vector3(0.35 * s, -0.1 * s, -0.35 * s)
+			poses["UpperArm.L"] = Vector3(-1.5, 0.0, 1.0)
+			poses["UpperArm.R"] = Vector3(-1.5, 0.0, 1.0)
+			poses["Forearm.L"] = Vector3(0.9, 0.0, 0.3)
+			poses["Forearm.R"] = Vector3(0.9, 0.0, 0.3)
+			poses["Thigh.L"] = Vector3(0.85, 0.0, 0.5)
+			poses["Thigh.R"] = Vector3(0.85, 0.0, 0.5)
+			poses["Shin.L"] = Vector3(-0.5, 0.0, 0.0)
+			poses["Shin.R"] = Vector3(-0.5, 0.0, 0.0)
 			poses["Tail01"] = Vector3(0.0, 0.0, 0.5)
 			poses["Tail02"] = Vector3(0.0, 0.0, 0.6)
 			poses["Tail03"] = Vector3(0.0, 0.0, 0.4)

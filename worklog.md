@@ -76,3 +76,26 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
 - Commit + push this batch.
 - Land visuals (height/slope coloring) then shader water + sky, per roadmap.
 - Grass tutorial still blocked (resend link); stylized_grass_shader.zip is HTML not a zip.
+
+## 2026-08-06 session
+
+- Grass visual pass: tufts rebuilt as wide fanning clumps (config `grass_spacing` 0.3,
+  `grass_outer_blades` 6 + `grass_inner_blades` 3, blade width 0.006-0.01, lean out from
+  clump center via new `yaw` param in `_add_blade`), base `grass_color` deepened.
+  Re-added the `print("GRASS tufts=%d")` count. Headless smoke shows 127,578 tufts
+  (was ~138k before the pond fix removed ~11k in the water ring — count is real).
+- Pond grass fix: `Terrain.gd` now computes `water_radius` (mirrors lake.gd's 8-direction
+  shore scan + 0.5) and `_grass_ok` rejects any tuft within `water_radius + 0.05` of the
+  lake center, so no grass grows inside the visible water disc.
+- Belly-flop dive: `POUNCE_HEIGHT` 1.6 -> 0.5 (low horizontal arc), phase-0 pose stretched
+  into a forward dive (head/arms leading, legs trailing), and `_update_pounce` pitches
+  `mesh_root` nose-down ~75deg on the way in, recovering on the way out.
+- Added permanent `--pond` screenshot camera (above lake center, looks at the shore);
+  committed screenshot_pond.png.
+- ANSI-flood prevention: added `C:\Users\Andy\fixterm.ps1` — writes the escape reset
+  (`?1000l ?1002l ?1003l ?1004l ?1006l ?1015l ?1049l ?25h`) to rescue a terminal left in
+  mouse-tracking / alternate-screen mode by a crashed TUI. Playbook: fresh tab per session,
+  log Godot output to a file (never live `| Select-String`), run fixterm.ps1 if it floods.
+- Verified: headless smoke PASS (SMOKE DONE), screenshots reviewed via Qwen Vision
+  (qwen2.5vl:7b): dense green lawn ~90% coverage, no grass in the water, no artifacts.
+  RID-leak noise at exit is benign/pre-existing.

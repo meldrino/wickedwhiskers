@@ -20,7 +20,7 @@ var hill_max := 60.0
 var edge_start := 26.8
 var edge_end := 28.0
 
-var grass_color := Color(0.46, 0.63, 0.27)
+var grass_color := Color(0.35, 0.55, 0.2)
 var dirt_color := Color(0.45, 0.33, 0.2)
 var rock_color := Color(0.52, 0.52, 0.54)
 var water_edge_color := Color(0.3, 0.43, 0.21)
@@ -31,6 +31,12 @@ var slope_dirt_start := 0.5
 var slope_dirt_end := 1.0
 var rock_start := 1.5
 var rock_end := 3.0
+
+var grass_spacing := 0.3
+var grass_outer_blades := 6
+var grass_inner_blades := 3
+var grass_min_h := 0.022
+var grass_max_h := 0.052
 
 var lakes: Array = []
 var flats: Array = []
