@@ -267,13 +267,15 @@ todo:
     ~127,578 tufts @0.3 confirmed real, pond ring excluded, screenshots verified).
   - [DONE] ANSI-spam root cause identified + fixed: ~/.config/opencode/tui.json
     {"mouse": false} (see known_issues). Recovery helper C:\Users\Andy\fixterm.ps1.
-  - [IN FLIGHT] VegetationGenerator.gd (spec-driven ground-cover generator: measured tuft
-    footprint 0.22 -> spacing 0.198, physics raycast per placement filtered to the Terrain
-    body, water-disc exclusion, jitter, one-call regen, extensible to flowers/weeds/bushes).
-    Written + class registered (--headless --import). NEXT: wire into Terrain.gd (delete old
-    _build_grass/_grass_ok/_build_tuft_mesh/_add_blade; async _build_vegetation awaiting 2
-    physics frames; regen_vegetation()), drop TerrainConfig grass_* knobs, add KEY_F5 regen
-    to player.gd, then smoke (expect ~290k tufts) + screenshots + commit + push.
+  - [DONE] VegetationGenerator wired in (Terrain.gd async _build_vegetation awaiting 2 physics
+    frames + regen_vegetation(); old Terrain.gd grass funcs deleted; TerrainConfig grass_* knobs
+    dropped, grass_color kept; KEY_F5 = Terrain.regen_vegetation() in player.gd; VegetationGenerator
+    lo/hi Variant-inference fix). Smoke PASS: GRASS tufts=299838 (~290k predicted @0.198 spacing,
+    ~2.3x the old 127,578; count varies ~0.1% as the raycast correctly rejects tree/rock-occluded
+    spots). --pond + --flyover screenshots captured, pixel-stats match the previous verified shots
+    (dusk tint makes the lawn read cyan — no visual regression). Qwen Vision review DEFERRED:
+    model needs ~12 GiB RAM (only ~4.4 free), nearly crashed once; do the vision_expert.ps1 pass
+    on screenshot_pond.png / screenshot_flyover.png interactively.
   - [NEXT] opencode "memory watchdog" plugin: on session.end / abort / experimental.session.
     compacting, snapshot current state to the bigpickle YAML + emit terminal-reset ANSI
     (prevents both data loss and a broken terminal when a session dies abnormally; runs in

@@ -126,3 +126,31 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
 - SAFE TO RESTART: repo committed at 856eb1a (working tree otherwise clean except the new
   untracked VegetationGenerator.gd which is safe on disk). bigpickle YAMLs are local-only;
   website ww.html is a static reference (unchanged, deployed).
+
+## 2026-08-06 overnight (vegetation wiring landed)
+
+- VegetationGenerator wired into Terrain.gd: deleted Terrain.gd's old `_build_grass` /
+  `_grass_ok` / `_build_tuft_mesh` / `_add_blade`; new async `_build_vegetation(ground)`
+  awaits 2 physics frames (so the HeightMapShape registers before the placement raycast),
+  then creates a `Vegetation` container + `VegetationGenerator` and calls regen.
+  `regen_vegetation()` re-runs the generator. F5 hotkey added: `KEY_F5: Terrain.regen_vegetation()`
+  in player.gd `_unhandled_input`.
+- TerrainConfig.gd: dropped the now-unused grass_* knobs (spacing/outer/inner/min_h/max_h).
+  `grass_color` KEPT — still used by TerrainGenerator.generate_colors for terrain colouring.
+- Fix: VegetationGenerator.gd `lo`/`hi` inferred Variant from the spec dict (warnings-as-errors
+  broke compile of Terrain.gd, which type-depends on the class) -> explicit `: float` typing.
+  Same class of bug as the earlier lake.gd Variant-inference fix.
+- Smoke (headless): PASS. GRASS tufts=299838 — matches the ~290k prediction at 0.198 spacing,
+  ~2.3x the old 127,578 (so the generator is definitely the code that runs now). Tuft count
+  varies ~0.1% run-to-run (299600/300009 windowed): the terrain-filtered raycast correctly
+  rejects spots occluded by the randomized trees/rocks — the intended "grass never lands on
+  buildings" behaviour.
+- Screenshots: `--screenshot --pond` + `--screenshot --flyover` captured (windowed console exe),
+  renamed to screenshot_pond.png / screenshot_flyover.png, screenshot.png = flyover copy.
+  .import files refreshed via `--headless --import` (exit 0).
+- Review: pixel-stats comparison vs the PREVIOUS commit's screenshots is near-identical
+  (dusk/night tint renders the lawn cyan-blue: ~59% of pixels hue 180-210 in both old and new;
+  avg RGB 0.29/0.38/0.43 vs 0.32/0.39/0.45) -> no visual regression. Qwen Vision review
+  DEFERRED to next interactive session: qwen2.5vl:7b needs ~12 GiB free RAM (only ~4.4 GiB
+  free) and nearly crashed the machine once — NOT run overnight to avoid an OOM hang. Run
+  vision_expert.ps1 on the two new screenshots with the user present.

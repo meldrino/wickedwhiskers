@@ -118,6 +118,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				_try_craft_ladder()
 			KEY_F:
 				_try_eat()
+			KEY_F5:
+				Terrain.regen_vegetation()
 
 
 func _look_suspended() -> bool:

@@ -32,12 +32,6 @@ var slope_dirt_end := 1.0
 var rock_start := 1.5
 var rock_end := 3.0
 
-var grass_spacing := 0.3
-var grass_outer_blades := 6
-var grass_inner_blades := 3
-var grass_min_h := 0.022
-var grass_max_h := 0.052
-
 var lakes: Array = []
 var flats: Array = []
 

@@ -57,8 +57,8 @@ func _build_species(spec: Dictionary) -> void:
 	rng.seed = spec["seed"]
 
 	var spacing: float = spec["footprint"] * spec["spacing_factor"]
-	var lo := -terrain.config.extent + spec["edge"]
-	var hi := terrain.config.extent - spec["edge"]
+	var lo: float = -terrain.config.extent + spec["edge"]
+	var hi: float = terrain.config.extent - spec["edge"]
 	var space := terrain.get_viewport().world_3d.direct_space_state
 	var q := PhysicsRayQueryParameters3D.new()
 	q.collide_with_bodies = true
