@@ -75,6 +75,13 @@ func _spawn_player() -> void:
 	var pl := get_tree().get_first_node_in_group("player")
 	if pl == null:
 		return
+	if "--spawncorner" in OS.get_cmdline_user_args():
+		var cp := Vector2(-26.0, -26.0)
+		pl.global_position = Vector3(cp.x, Terrain.height_at(cp.x, cp.y), cp.y)
+		pl.yaw = -PI * 0.25
+		pl.cat_facing = pl.yaw + PI
+		pl.rotation.y = pl.cat_facing
+		return
 	if GameState.spawn_near_shed:
 		pl.global_position = Vector3(16, Terrain.height_at(16, -7.2), -7.2)
 		GameState.spawn_near_shed = false
@@ -88,6 +95,10 @@ func _maybe_screenshot() -> void:
 		return
 	if not "--screenshot" in args:
 		return
+	if "--noon" in args:
+		GameState.day_time = GameState.DAY_SECONDS * 0.75
+		await get_tree().process_frame
+		await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var player = get_tree().get_first_node_in_group("player")
@@ -107,6 +118,11 @@ func _maybe_screenshot() -> void:
 		player.camera_holder.position = Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
 		player.camera.position = Vector3(0, 0, 0)
 		player.camera.look_at(Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5), Vector3.UP)
+	elif "--corner" in args and player != null:
+		player.camera_frozen = true
+		player.camera_holder.position = Vector3(-28.5, 10.0, -15.0)
+		player.camera.position = Vector3(0, 0, 0)
+		player.camera.look_at(Vector3(-21.5, 0, -21.5), Vector3.UP)
 	else:
 		for i in range(30):
 			await get_tree().process_frame

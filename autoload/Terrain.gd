@@ -114,6 +114,8 @@ func _build_world() -> void:
 
 
 func _build_vegetation(ground: StaticBody3D) -> void:
+	if "--nograss" in OS.get_cmdline_user_args():
+		return
 	# Wait two physics frames so the HeightMapShape is registered in the physics
 	# space before the placement raycast queries it.
 	await get_tree().physics_frame

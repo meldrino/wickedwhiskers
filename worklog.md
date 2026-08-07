@@ -154,3 +154,23 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
   DEFERRED to next interactive session: qwen2.5vl:7b needs ~12 GiB free RAM (only ~4.4 GiB
   free) and nearly crashed the machine once — NOT run overnight to avoid an OOM hang. Run
   vision_expert.ps1 on the two new screenshots with the user present.
+
+## 2026-08-07 (grass-sheet experiment REJECTED; state checkpoint)
+
+- Grass plan changed direction in grasslab (C:\crypto\grasslab): instead of 290k 3D tufts,
+  cover one 1x1 tile with dense tufts + sward discs, bake the top-down render into a single
+  1024x1024 texture, then use it on ONE deformable plane that bends to pond/hills.
+  Coverage ladder hit 94.9% (676 tufts @0.04 + _add_sward discs); texture baked
+  (grass_tex_1x1.png), tiling seam-checked clean (topdown15), 2x2 slab looked great top-down.
+- Landed in WW: VegetationGenerator.regen() now builds an 8x8 m corner grass plane
+  (_build_grass_plane(CORNER_PATCH) region (-28..-20,-28..-20), cells=24, UV in metres,
+  y = height_at+0.01). New flags: --spawncorner (player at (-26,-26)), --corner screenshot
+  camera, --noon (daytime for shots), --nograss (skip vegetation). Texture copied to
+  assets\grass_tex_1x1.png (+ .import). Launcher now passes -- --spawncorner.
+- USER VERDICT: "looks terrible, blades are just blobs". Recognisable blades lost.
+  SUSPECTED: the bake - a top-down ortho bake flattens 3D blades into a pure vertical
+  projection, so at 1 texel/m the blades are crushed under the sward discs -> flat blobs.
+  Approach PARKED (details + next options in PROJECT_STATE.yaml grass_plane block).
+- Git: state checkpoint committed + pushed so disk = reality before switching project.
+  Revert path: VegetationGenerator.regen() back to _build_species(VEG_GRASS) restores the
+  full-lawn 3D tufts (84cc30f behaviour).

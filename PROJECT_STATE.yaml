@@ -241,6 +241,35 @@ build_status:
     Historical method (pixel sampling) also used.
 
 # =============================================================================
+# GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs
+# =============================================================================
+grass_plane:
+  goal: Replace 290k 3D tufts with ONE baked 1x1 texture on a deformable plane
+    (tufts fully cover 1x1 -> bake top-down -> single plane textured, bends to
+    pond/hills). Staged 1x1 -> 10x10 -> WW world size.
+  grasslab_prototype: C:\crypto\grasslab (Godot). 26x26 grid = 676 tufts @0.04
+    spacing (OUTER 40 / INNER 20 blades), solid sward disc per tuft via
+    _add_sward() -> top-down coverage 94.9% (topdown13/14 verified, 1024x1024).
+    Baked C:\crypto\grasslab\grass_tex_1x1.png (bake.tscn, ortho cam). Tiling
+    checked (tex_test.tscn, topdown15: no seam).
+  ww_landing: Corner patch = 8x8 m region (-28..-20, -28..-20), cells=24
+    (25x25 verts), y = terrain.height_at(x,z)+0.01, UV in metres (1 texel/m).
+    VegetationGenerator.gd _build_grass_plane(CORNER_PATCH), texture copied to
+    assets\grass_tex_1x1.png. Spawn corner = player near (-26,-26).
+  verdict: "LOOKS TERRIBLE - blades are just blobs". Recognisable blades are
+    gone. SUSPECTED: the bake. A top-down ortho bake flattens the 3D blades
+    into a pure vertical-projection image; sampled at 1 texel/m the blades get
+    crushed by the dominant sward discs and read as flat green blobs, not
+    blades. (Also possible: mipmap/import filter softening the 1024 texture at
+    grazing angles, or texel density too low.) USER SUSPECTS THE BAKE ITSELF.
+  parked: true  # whole sheet approach parked 07/08/2026, user moved to another project
+  next_when_resumed: Diagnose the blob look before re-trying. Options: (a) bake at
+    a grazing/oblique camera angle so blade height is encoded in the texture;
+    (b) higher texel density + disable texture mipmaps/filtering for the plane;
+    (c) abandon baked-sheet and keep dense 3D tufts (290k confirmed working).
+    Do NOT re-run the bake until the root cause is agreed.
+
+# =============================================================================
 # TODO / NEXT STEPS
 # =============================================================================
 todo:
