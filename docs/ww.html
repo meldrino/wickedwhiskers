@@ -41,6 +41,7 @@
 <li><strong>All three catches are craft-only:</strong> convoluted mouse trap / ladder (bird) / fishing rod (fish). No manual catches.</li>
 <li><strong>Dumbleclaw</strong> — quest giver + trader (surplus food → gold), time-of-day aware hints.</li>
 <li><strong>Lake reworked:</strong> sunken pond with a raised bank, reeds + grass shoreline, dark deep bed, and animated rippling water with sky reflections.</li>
+<li><strong>Vegetation:</strong> ~300k real 3D grass tufts across the world, terrain-aware placement (never on water/buildings). A baked-texture "grass plane" experiment (one 1×1 texture on a deformable sheet) was <strong>rejected Aug 2026</strong> — blades rendered as flat blobs; the full 3D-tuft lawn is the working approach.</li>
 <li>Economy: day = 2 real hours, hunger + tiredness, 9 lives, catchables never respawn.</li>
 <li>Verified by headless smoke tests + screenshots (reviewed by an image-capable model).</li>
 </ul>
@@ -181,6 +182,7 @@
 <li>S1 + S1.5 playable: gather string/sticks, craft, catch mouse/bird/fish, Dumbleclaw quests + trading, day/night + food/tiredness, 9 lives, restart with a fresh combo.</li>
 <li>Control scheme reworked (Aug 2026): always-on mouse-look + WASD + click-to-walk/interact with proximity gating; camera follows behind the cat.</li>
 <li>Lake reworked (Aug 2026): sunken pond, bank + reeds, animated rippling water with sky reflections.</li>
+<li>Grass plane experiment rejected (Aug 2026): baked 1×1 texture sheet looked like blobs in-game; reverted to the ~300k 3D-tuft lawn. Revert path: <code>VegetationGenerator.regen()</code> → <code>_build_species(VEG_GRASS)</code>.</li>
 <li>Next: farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button.</li>
 </ul>
 
