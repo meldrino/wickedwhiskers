@@ -174,3 +174,75 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
 - Git: state checkpoint committed + pushed so disk = reality before switching project.
   Revert path: VegetationGenerator.regen() back to _build_species(VEG_GRASS) restores the
   full-lawn 3D tufts (84cc30f behaviour).
+
+## 2026-08-07 (grass FIXED via hexaquo tutorial - full-geometry + shader)
+
+- User found the 4-part grass-rendering series at hexaquo.at (Karl Bittner, CC-BY-SA) and
+  asked whether it can fix the rejected baked-sheet blob look or if we must start over.
+  VERDICT: no restart needed. The tutorial's core (parts 2+3) is the SAME architecture we
+  already had (full-geometry blades in a MultiMeshInstance3D). What made our grass read as
+  "green blobs" was the baked top-down texture (a top-down ortho bake flattens 3D blades
+  into pure vertical projections -> crushed into flat discs at 1 texel/m), and even the
+  pre-experiment tufts used a flat unlit StandardMaterial3D with blocky box blades.
+- Applied the tutorial:
+  - NEW shaders/grass.gdshader: spatial, cull_disabled. vertex(): size by clump
+    (mix(size_small,size_large, patch_factor) from seamless world-space patch_noise),
+    tip bend (pow(bottom_to_top,2)), wind gusts (scrolling wind_noise at world scale,
+    bend direction rotated world->instance via inverse(MODEL_MATRIX)). fragment():
+    AO=bottom_to_top-wind*affect (self-shadowing tips bright/base dark), ALBEDO mix of
+    color_small/color_large * per-blade COLOR gradient, BACKLIGHT translucency,
+    ROUGHNESS 0.4 / SPECULAR 0.2, NORMAL leans to straight-up at tips, and the
+    `if (!FRONT_FACING) NORMAL=-NORMAL;` cull_disabled fix.
+  - VegetationGenerator: blades are now thin RIBBONS (4 vertex rings, 6 tris, half the
+    old box's 12) with UV.y 1 at base -> 0 at tip so the shader's bottom_to_top works.
+    VEG_GRASS min_h 0.022->0.05, max_h 0.052->0.12 (real-cat ankle-high lawn). Material is
+    a ShaderMaterial; patch/wind NoiseTexture2D created in code (FastNoiseLite:
+    patch = Perlin+FBM seamless @0.22 for clumps, wind = SimplexSmooth+Ridged @0.6 for
+    gusts). Tuning lives in the GRASS_SHADER const.
+  - regen() reverted to _build_species(VEG_GRASS, FULL) over the whole 120x120 extent;
+    _build_grass_plane/CORNER_PATCH/TEST_PATCH deleted. assets/grass_tex_1x1.png +
+    .import deleted. --spawncorner/--corner flags removed from main.gd + launcher.
+    NEW --ground screenshot camera (cat-eye level, for judging blade detail).
+- Godot gotchas hit: FastNoiseLite has NO `seamless` property (only NoiseTexture2D does) -
+  assigning it throws "Invalid assignment of property 'seamless'"; and the fragment built-in
+  is `COLOR`, not `VERTEX_COLOR` (that's Godot 3). Both fixed.
+- Verified: --headless --import clean; headless smoke PASS (SMOKE DONE, no script/shader
+  errors). GRASS tufts ~335.5k @0.198 spacing over -60..60 (rejection keeps grass off
+  hills/water/buildings). ~44% fewer triangles than the old box blades (18M vs 32M).
+- Screenshots (--noon daylight): screenshot_flyover.png / screenshot_pond.png /
+  screenshot_ground.png + screenshot_ground_zoom.png (2x crop). Pixel stats (System.Drawing
+  sampling @4px grid): green ~58-59% of frame, avgG 0.82, luminance std 0.206 - strong
+  per-blade texture vs a flat sheet (~0.05-0.1). Needs USER EYES to confirm it no longer
+  reads as blobs; tuning knobs all live in the GRASS_SHADER const (size, wind, colors).
+- In flight: git commit + push; user reviews the screenshots / plays the game; then
+  optional Part-3 grass interaction (blades bend away from the cat) + Part-4 LOD only if
+  performance ever demands it.
+
+## 2026-08-08 (grass tuning pass: short blades + sward discs = 100% coverage)
+
+- USER VERDICT on the first shader pass screenshots: grass "way too long" + "not giving
+  100% coverage". Both fixed in one overnight tuning pass.
+- Too long: tutorial bend/wind values assume UNIT-height blades; ours are meter-scaled
+  (~0.05-0.12 m). Flipped to short: VEG_GRASS min_h 0.035 / max_h 0.065 m, blade_bend
+  0.35->0.02, wind_strength 0.12->0.01. Coverage probe (8px windows over lawn crops) before
+  the fix: only ~31% textured / 57% flat-bare - the thin 1.2-1.6cm ribbons covered ~14% of
+  their 0.198m cell, so terrain showed through everywhere.
+- Not covered: added a SWARD DISC under every tuft - flat 10-tri fan (radius 0.11, local
+  y +0.016, so it clears the terrain without z-fighting) with dark vertex colour
+  (base*0.6) and a UV.x=2 shader marker -> vertex() skips wind/bend, fragment() forces
+  AO=1.0 / NORMAL up. Blades base lifted to +0.02 so they rise out of the sward. This is
+  the same _add_sward() trick grasslab used to hit 94.9% top-down coverage.
+- Gotchas on the way: `return` is NOT allowed in Godot 4 fragment shaders; the ground
+  cat-eye camera can't see the flat 1cm discs at all (edge-on) - red-ALBEDO tests showed
+  0 red from the ground cam but 54% of the lawn-crop pixels red from --flyover, proving the
+  discs render and it was purely a viewing-angle artefact.
+- Final density nudge: outer 8->10 / inner 4->5 blades, widths 0.014-0.019, outer blades
+  pushed out to r 0.055-0.115 so tufts interleave. ~33.5M tris (10 disc + 15 blades x 6),
+  back near the old-box budget (32M).
+- Verified: headless smoke PASS (no script/shader errors, ~335.4k tufts). Coverage
+  pixel-stats (lawn crops, System.Drawing): green 96% ground / 93% flyover / 95% pond,
+  textured 42/67/58% - the lawn now reads as a solid green carpet with per-blade texture.
+- Committed + pushed for user review in the morning. Next: user eyeballs screenshot_ground
+  / flyover / pond, then optional Part-3 interaction (blades bend away from the cat) and
+  Part-4 LOD only if perf demands.
+

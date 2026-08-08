@@ -241,6 +241,46 @@ build_status:
     Historical method (pixel sampling) also used.
 
 # =============================================================================
+# GRASS RENDERING - full-geometry + shader (2026-08-07, hexaquo tutorial)
+# =============================================================================
+grass_rendering:
+  approach: Full-geometry ribbon blades in ONE MultiMeshInstance3D (~335k tufts @0.198
+    spacing over the full 120x120 extent) with shaders/grass.gdshader - adapted from the
+    hexaquo.at grass-rendering series (parts 2+3, CC-BY-SA). Replaces BOTH the rejected
+    baked-sheet plane (grass_plane below, parked) and the old flat unlit box blades.
+  shader: shaders/grass.gdshader. vertex: clump size mix(size_small/large, patch_noise
+    seamless world-space), tip bend pow(bottom_to_top,2), wind gusts (wind_noise scrolling
+    at world scale; bend direction rotated to instance space via inverse(MODEL_MATRIX)).
+    Discs skip the wind/bend branch (UV.x <= 1.0 gate). fragment: AO=bottom_to_top -
+    wind*affect (self-shadowing), ALBEDO = mix of color_small/large * per-blade COLOR
+    gradient, BACKLIGHT translucency, ROUGHNESS 0.4 / SPECULAR 0.2, NORMAL mix to
+    straight-up at tips, `if (!FRONT_FACING) NORMAL=-NORMAL;` for cull_disabled.
+  blades: thin ribbons (4 vertex rings = 6 tris, half the old box) UV.y 1 base -> 0 tip.
+    VEG_GRASS: outer 10 / inner 5 blades, widths 0.014-0.019 (outer lean out to
+    r 0.055-0.115), min_h 0.035 / max_h 0.065 m (USER: original 0.05-0.12 was "way too
+    long"; this is the short cut). All tuning = GRASS_SHADER const in
+    VegetationGenerator.gd (patch_scale, size, wind strength/scale/ao, colors). Tutorial
+    bend/wind values assume UNIT-height blades - ours are meter-scaled, so bend/wind must
+    stay ~0.02/0.01 m (0.35/0.12 flung the short blades sideways).
+  sward_disc: ONE flat fan (10 tris, radius 0.11, local y +0.016) under every tuft for
+    100% top-down lawn coverage (dark = base*0.6 vertex colour, UV.x=2 shader marker ->
+    fully lit, NORMAL up, wind-still). Blades base at +0.02 so they rise out of it.
+    NOTE: a flat 1cm disc is edge-on/invisible from the cat-eye ground camera - it only
+    shows top-down; low-angle coverage comes from blade density instead.
+  noise: patch = FastNoiseLite Perlin+FBM seamless @0.22 (clumps); wind = SimplexSmooth+
+    Ridged @0.6 (gusts). NOTE FastNoiseLite has NO `seamless` prop - that's NoiseTexture2D.
+    Godot4 fragment built-in is `COLOR` (not VERTEX_COLOR).
+  verified: --import clean; headless smoke PASS (no script/shader errors, ~335.4k tufts).
+    Red-ALBEDO test from --flyover proved the sward discs render (54% of lawn-crop pixels
+    = discs; ~0% seen from the low ground cam, confirming edge-on not absent). Coverage
+    pixel-stats (lawn crops): green 96/93/95% (ground/flyover/pond), textured 42/67/58%
+    vs ~57% flat/bare before the sward - the "not 100% coverage" complaint is fixed.
+    Tri count ~33.5M (10 disc + 15 blades x 6), back near the old-box budget (32M).
+    USER EYES still needed to confirm the look; tweak GRASS_SHADER / VEG_GRASS as they prefer.
+  next: optional Part-3 interaction (blades bend away from the cat walking through);
+    Part-4 LOD only if perf ever needs it.
+
+# =============================================================================
 # GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs
 # =============================================================================
 grass_plane:

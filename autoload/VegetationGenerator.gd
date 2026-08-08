@@ -8,27 +8,41 @@ const VEG_GRASS := {
 	"edge": 3.0,
 	"slope_max": 1.0,
 	"water_allowed": false,
-	"outer": 6,
-	"inner": 3,
-	"min_h": 0.022,
-	"max_h": 0.052,
-	"base": Color(0.22, 0.35, 0.12),
-	"tip": Color(0.52, 0.72, 0.34),
+	"outer": 10,
+	"inner": 5,
+	"min_h": 0.035,
+	"max_h": 0.065,
+	"base": Color(0.24, 0.42, 0.16),
+	"tip": Color(0.55, 0.78, 0.34),
 	"scale_min": 0.85,
 	"scale_max": 1.25,
 	"seed": 4242,
 }
 
-const TEST_PATCH := {
-	"x0": -27.5, "z0": -27.5,
-	"x1": -15.5, "z1": -15.5,
-	"cluster": 8,
+const FULL := {
+	"x0": -60.0, "z0": -60.0,
+	"x1": 60.0, "z1": 60.0,
+	"cluster": 1,
 }
 
-const CORNER_PATCH := {
-	"x0": -28.0, "z0": -28.0,
-	"x1": -20.0, "z1": -20.0,
-	"cells": 24,
+# Tuning for shaders/grass.gdshader (hexaquo grass series parts 2+3).
+# IMPORTANT: our blades are already meter-scaled (~0.035-0.065 m), so bend/wind
+# offsets are in meters - the tutorial's values (blade_bend 0.35, wind_strength
+# 0.12) assume UNIT-height blades and fling short blades out sideways. Scale
+# them to ~40-50% of blade height.
+const GRASS_SHADER := {
+	"patch_scale": 6.0,
+	"size_small": 0.95,
+	"size_large": 1.05,
+	"blade_bend": 0.02,
+	"wind_strength": 0.01,
+	"wind_scale": 9.0,
+	"wind_ao_affect": 0.35,
+	"wind_direction": Vector2(0.7, -0.5),
+	"patch_noise_seed": 2027,
+	"patch_noise_freq": 0.22,
+	"wind_noise_seed": 31337,
+	"wind_noise_freq": 0.6,
 }
 
 var terrain: Node = null
@@ -48,7 +62,7 @@ func regen() -> void:
 	if terrain == null or container == null:
 		return
 	_clear_container(container)
-	_build_grass_plane(CORNER_PATCH)
+	_build_species(VEG_GRASS, FULL)
 
 
 func _clear_container(c: Node3D) -> void:
@@ -56,45 +70,43 @@ func _clear_container(c: Node3D) -> void:
 		child.queue_free()
 
 
-func _build_grass_plane(region: Dictionary) -> void:
-	var x0: float = region["x0"]
-	var z0: float = region["z0"]
-	var x1: float = region["x1"]
-	var z1: float = region["z1"]
-	var cells: int = region["cells"]
-	var tex: Texture2D = load("res://assets/grass_tex_1x1.png")
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var n := cells + 1
-	for iz in range(n):
-		var z := z0 + (z1 - z0) * float(iz) / float(cells)
-		for ix in range(n):
-			var x := x0 + (x1 - x0) * float(ix) / float(cells)
-			var y: float = terrain.height_at(x, z)
-			st.set_uv(Vector2(x - x0, z - z0))
-			st.add_vertex(Vector3(x, y + 0.01, z))
-	for iz in range(cells):
-		for ix in range(cells):
-			var a := iz * n + ix
-			var b := a + 1
-			var c := a + n
-			var d := c + 1
-			st.add_index(a)
-			st.add_index(b)
-			st.add_index(c)
-			st.add_index(b)
-			st.add_index(d)
-			st.add_index(c)
-	st.generate_normals()
-	var mesh := st.commit()
-	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = tex
-	var mi := MeshInstance3D.new()
-	mi.mesh = mesh
-	mi.material_override = mat
-	mi.name = "Grass"
-	container.add_child(mi)
-	print("GRASS plane %.0fx%.0f m region=(%.0f..%.0f, %.0f..%.0f) cells=%d" % [x1 - x0, z1 - z0, x0, x1, z0, z1, cells])
+func _make_grass_material(spec: Dictionary) -> ShaderMaterial:
+	var s := GRASS_SHADER
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://shaders/grass.gdshader")
+	mat.set_shader_parameter("color_small", spec["base"])
+	mat.set_shader_parameter("color_large", spec["tip"])
+	mat.set_shader_parameter("patch_scale", s["patch_scale"])
+	mat.set_shader_parameter("size_small", s["size_small"])
+	mat.set_shader_parameter("size_large", s["size_large"])
+	mat.set_shader_parameter("blade_bend", s["blade_bend"])
+	mat.set_shader_parameter("wind_strength", s["wind_strength"])
+	mat.set_shader_parameter("wind_scale", s["wind_scale"])
+	mat.set_shader_parameter("wind_ao_affect", s["wind_ao_affect"])
+	mat.set_shader_parameter("wind_direction", s["wind_direction"])
+	mat.set_shader_parameter("patch_noise", _noise_texture(
+		s["patch_noise_seed"], true, FastNoiseLite.TYPE_PERLIN,
+		FastNoiseLite.FRACTAL_FBM, s["patch_noise_freq"]))
+	mat.set_shader_parameter("wind_noise", _noise_texture(
+		s["wind_noise_seed"], false, FastNoiseLite.TYPE_SIMPLEX_SMOOTH,
+		FastNoiseLite.FRACTAL_RIDGED, s["wind_noise_freq"]))
+	return mat
+
+
+func _noise_texture(seed_n: int, seamless: bool, type_i: int, fractal: int, freq: float) -> NoiseTexture2D:
+	var n := FastNoiseLite.new()
+	n.seed = seed_n
+	n.noise_type = type_i
+	n.frequency = freq
+	n.fractal_type = fractal
+	n.fractal_octaves = 3
+	n.fractal_gain = 0.5
+	var tex := NoiseTexture2D.new()
+	tex.noise = n
+	tex.seamless = seamless
+	tex.width = 256
+	tex.height = 256
+	return tex
 
 
 func _build_species(spec: Dictionary, region: Dictionary) -> void:
@@ -102,9 +114,7 @@ func _build_species(spec: Dictionary, region: Dictionary) -> void:
 	var mesh := _build_cluster_mesh(spec, cluster_n) if cluster_n > 1 else _build_tuft_mesh(spec)
 	if mesh == null:
 		return
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.albedo_color = Color.WHITE
+	var mat := _make_grass_material(spec)
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.mesh = mesh
@@ -229,49 +239,75 @@ func _add_tuft(st: SurfaceTool, spec: Dictionary, rng2: RandomNumberGenerator, o
 	var base: Color = spec["base"]
 	var tip: Color = spec["tip"]
 	var outer: int = spec["outer"]
+	# Solid base under the tuft so the lawn reads as fully covered from above;
+	# blades on top add the 3D texture. (Sward disc = UV.x 2 marker in the shader.)
+	base_idx = _add_sward_disc(st, origin, 0.11, base, base_idx)
 	for b in range(outer):
 		var len := rng2.randf_range(spec["min_h"], spec["max_h"])
 		var ang := b * TAU / outer + rng2.randf_range(-0.35, 0.35)
-		var bx := cos(ang) * rng2.randf_range(0.05, 0.1)
-		var bz := sin(ang) * rng2.randf_range(0.05, 0.1)
-		var w := rng2.randf_range(0.006, 0.01)
-		_add_blade(st, origin + Vector3(bx, 0.0, bz), w, len, rng2.randf_range(0.6, 0.95), ang, base, tip, base_idx)
-		base_idx += 8
+		var bx := cos(ang) * rng2.randf_range(0.055, 0.115)
+		var bz := sin(ang) * rng2.randf_range(0.055, 0.115)
+		var w := rng2.randf_range(0.014, 0.019)
+		base_idx = _add_blade(st, origin + Vector3(bx, 0.0, bz), w, len, rng2.randf_range(0.6, 0.95), ang, base, tip, base_idx)
 	var inner: int = spec["inner"]
 	for b in range(inner):
 		var len := rng2.randf_range(spec["min_h"] * 0.6, spec["max_h"] * 0.85)
 		var ang := rng2.randf_range(0.0, TAU)
-		var bx := cos(ang) * rng2.randf_range(0.0, 0.02)
-		var bz := sin(ang) * rng2.randf_range(0.0, 0.02)
-		_add_blade(st, origin + Vector3(bx, 0.0, bz), rng2.randf_range(0.004, 0.007), len, rng2.randf_range(-0.25, 0.25), ang, base, tip, base_idx)
-		base_idx += 8
+		var bx := cos(ang) * rng2.randf_range(0.0, 0.03)
+		var bz := sin(ang) * rng2.randf_range(0.0, 0.03)
+		base_idx = _add_blade(st, origin + Vector3(bx, 0.0, bz), rng2.randf_range(0.009, 0.013), len, rng2.randf_range(-0.25, 0.25), ang, base, tip, base_idx)
 	return base_idx
 
 
-func _add_blade(st: SurfaceTool, o: Vector3, w: float, h: float, lean: float, yaw: float, base: Color, tip: Color, base_idx: int) -> void:
-	var half := Vector3(w * 0.5, 0.0, w * 0.4)
-	var apex := o + Vector3(lean * h, h, 0.0)
-	var pts := [
-		o + Vector3(-half.x, 0.0, -half.z), o + Vector3(half.x, 0.0, -half.z),
-		o + Vector3(half.x, 0.0, half.z), o + Vector3(-half.x, 0.0, half.z),
-		apex + Vector3(-half.x, 0.0, -half.z), apex + Vector3(half.x, 0.0, -half.z),
-		apex + Vector3(half.x, 0.0, half.z), apex + Vector3(-half.x, 0.0, half.z),
-	]
+# A flat fan of triangles under the tuft. Dark vertex colour = undergrowth, and
+# UV.x = 2 tells the shader to keep it flat, fully lit and wind-still.
+func _add_sward_disc(st: SurfaceTool, o: Vector3, radius: float, color: Color, base_idx: int) -> int:
+	var segs := 10
+	var dark := color * 0.6
+	var center := o + Vector3(0.0, 0.016, 0.0)
+	st.set_uv(Vector2(2.0, 1.0))
+	st.set_color(dark)
+	st.add_vertex(center)
+	for i in range(segs + 1):
+		var a := float(i) / float(segs) * TAU
+		st.set_uv(Vector2(2.0, 1.0))
+		st.set_color(dark)
+		st.add_vertex(center + Vector3(cos(a) * radius, 0.0, sin(a) * radius))
+	for i in range(segs):
+		st.add_index(base_idx)
+		st.add_index(base_idx + i + 1)
+		st.add_index(base_idx + i + 2)
+	return base_idx + segs + 2
+
+
+# A thin ribbon blade (4 vertex rings = 6 triangles, half the old box) so the
+# vertex shader can bend it smoothly. UV.y = 1 at the base, 0 at the tip - the
+# shader derives its bottom_to_top factor and blade gradient from that.
+func _add_blade(st: SurfaceTool, o: Vector3, w: float, h: float, lean: float, yaw: float, base: Color, tip: Color, base_idx: int) -> int:
+	var segs := 3
+	var half := w * 0.5
 	var rot := Basis(Vector3.UP, yaw)
-	for v in range(8):
-		pts[v] = rot * pts[v]
-	for v in range(8):
-		st.set_color(base.lerp(tip, 1.0 if v >= 4 else 0.0))
-		st.add_vertex(pts[v])
-	var quads := [
-		[0, 1, 2, 3], [4, 5, 6, 7],
-		[0, 1, 5, 4], [2, 3, 7, 6],
-		[1, 2, 6, 5], [3, 0, 4, 7],
-	]
-	for q in quads:
-		st.add_index(base_idx + q[0])
-		st.add_index(base_idx + q[1])
-		st.add_index(base_idx + q[2])
-		st.add_index(base_idx + q[0])
-		st.add_index(base_idx + q[2])
-		st.add_index(base_idx + q[3])
+	var count := (segs + 1) * 2
+	var verts: Array[Vector3] = []
+	verts.resize(count)
+	for ring in range(segs + 1):
+		var t := float(ring) / float(segs)
+		verts[ring * 2] = rot * (o + Vector3(lean * h * t - half, 0.02 + h * t, 0.0))
+		verts[ring * 2 + 1] = rot * (o + Vector3(lean * h * t + half, 0.02 + h * t, 0.0))
+	for v in range(count):
+		var t := float(v / 2) / float(segs)
+		st.set_uv(Vector2(0.0, 1.0 - t))
+		st.set_color(base.lerp(tip, t))
+		st.add_vertex(verts[v])
+	for seg in range(segs):
+		var a := base_idx + seg * 2
+		var b := a + 1
+		var c := a + 2
+		var d := a + 3
+		st.add_index(a)
+		st.add_index(c)
+		st.add_index(b)
+		st.add_index(b)
+		st.add_index(c)
+		st.add_index(d)
+	return base_idx + count
