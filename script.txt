@@ -276,3 +276,7 @@ Combo padlock title: "Combination padlock — enter 3 digits"
 Buttons: TRY LOCK  /  CANCEL
 Inventory line: "Day <n>  Lives: <l>/9  Food: <n>  Gold: <n>
   Hunger ????  Energy ????  String: <n>  Sticks: <n>  (keys!)"
+
+
+stuff to add. with the fish have a gag about  floundering
+

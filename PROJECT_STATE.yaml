@@ -241,44 +241,75 @@ build_status:
     Historical method (pixel sampling) also used.
 
 # =============================================================================
-# GRASS RENDERING - full-geometry + shader (2026-08-07, hexaquo tutorial)
+# GRASS RENDERING - CALIBRATED 1/10-SIZE SYSTEM PORTED INTO WW (2026-08-09)
 # =============================================================================
 grass_rendering:
-  approach: Full-geometry ribbon blades in ONE MultiMeshInstance3D (~335k tufts @0.198
-    spacing over the full 120x120 extent) with shaders/grass.gdshader - adapted from the
-    hexaquo.at grass-rendering series (parts 2+3, CC-BY-SA). Replaces BOTH the rejected
-    baked-sheet plane (grass_plane below, parked) and the old flat unlit box blades.
-  shader: shaders/grass.gdshader. vertex: clump size mix(size_small/large, patch_noise
-    seamless world-space), tip bend pow(bottom_to_top,2), wind gusts (wind_noise scrolling
-    at world scale; bend direction rotated to instance space via inverse(MODEL_MATRIX)).
-    Discs skip the wind/bend branch (UV.x <= 1.0 gate). fragment: AO=bottom_to_top -
-    wind*affect (self-shadowing), ALBEDO = mix of color_small/large * per-blade COLOR
-    gradient, BACKLIGHT translucency, ROUGHNESS 0.4 / SPECULAR 0.2, NORMAL mix to
-    straight-up at tips, `if (!FRONT_FACING) NORMAL=-NORMAL;` for cull_disabled.
-  blades: thin ribbons (4 vertex rings = 6 tris, half the old box) UV.y 1 base -> 0 tip.
-    VEG_GRASS: outer 10 / inner 5 blades, widths 0.014-0.019 (outer lean out to
-    r 0.055-0.115), min_h 0.035 / max_h 0.065 m (USER: original 0.05-0.12 was "way too
-    long"; this is the short cut). All tuning = GRASS_SHADER const in
-    VegetationGenerator.gd (patch_scale, size, wind strength/scale/ao, colors). Tutorial
-    bend/wind values assume UNIT-height blades - ours are meter-scaled, so bend/wind must
-    stay ~0.02/0.01 m (0.35/0.12 flung the short blades sideways).
-  sward_disc: ONE flat fan (10 tris, radius 0.11, local y +0.016) under every tuft for
-    100% top-down lawn coverage (dark = base*0.6 vertex colour, UV.x=2 shader marker ->
-    fully lit, NORMAL up, wind-still). Blades base at +0.02 so they rise out of it.
-    NOTE: a flat 1cm disc is edge-on/invisible from the cat-eye ground camera - it only
-    shows top-down; low-angle coverage comes from blade density instead.
-  noise: patch = FastNoiseLite Perlin+FBM seamless @0.22 (clumps); wind = SimplexSmooth+
-    Ridged @0.6 (gusts). NOTE FastNoiseLite has NO `seamless` prop - that's NoiseTexture2D.
-    Godot4 fragment built-in is `COLOR` (not VERTEX_COLOR).
-  verified: --import clean; headless smoke PASS (no script/shader errors, ~335.4k tufts).
-    Red-ALBEDO test from --flyover proved the sward discs render (54% of lawn-crop pixels
-    = discs; ~0% seen from the low ground cam, confirming edge-on not absent). Coverage
-    pixel-stats (lawn crops): green 96/93/95% (ground/flyover/pond), textured 42/67/58%
-    vs ~57% flat/bare before the sward - the "not 100% coverage" complaint is fixed.
-    Tri count ~33.5M (10 disc + 15 blades x 6), back near the old-box budget (32M).
-    USER EYES still needed to confirm the look; tweak GRASS_SHADER / VEG_GRASS as they prefer.
-  next: optional Part-3 interaction (blades bend away from the cat walking through);
-    Part-4 LOD only if perf ever needs it.
+  history:
+    - 2026-08-07/08 hexaquo full-geometry + shader in the SANDBOX (temp grass_test
+      folders) was CALIBRATED to 1/10 size: size_small 0.02 / size_large 0.04 with real
+      blades ~0.05-0.12 m. Impostor far-plane approach proven: real blades near camera,
+      shader impostor beyond ~20 m so the viewer never sees the LOD seam.
+    - 2026-08-08 in-game (pre-port): VegetationGenerator + shaders/grass.gdshader +
+      sward discs, ~335.4k tufts, full 120x120. USER: blades "way too long", then good
+      coverage but only after sward discs.
+    - 2026-08-09 PORT: the calibrated 1/10-size system moved into the game.
+      VegetationGenerator.gd and shaders/grass.gdshader DELETED; replaced by the chunked
+      system below. Sandbox experiment folders (grass_test / grass_part2 / grass_part3 /
+      godot-grass) remain in temp ONLY - backup copies made (see backup section).
+  approach: CHUNKED density system - near-tier 1M blades/chunk (40k/m2 detailed mesh),
+    mid-tier 250k/chunk (10k/m2 simple mesh) in 5x5 m chunks streamed around the camera
+    + mouse; a terrain-draped IMPOSTOR plane covers the far field (CENTRE (0,-6),
+    HALF_X 32, HALF_Z 40, RES 1.0) so the LOD seam is never visible.
+  files:
+    scripts/grass_system.gd: owns materials + impostor; streams 5x5 chunks within
+      STREAM_RADIUS 14 (CHUNK_SIZE 5.0); NEAR_RADIUS 6.0 (tier 0 detailed) / MID_RADIUS
+      14.0 (tier 1 simple); centres = camera + Mouse node.
+    scripts/grass_chunk.gd: NEAR_COUNT 1_000_000 / MID_COUNT 250_000 per 25 m2 chunk
+      (40k/m2 detailed vs 10k/m2 simple). Multi-frame build: BUILD_PER_FRAME 250_000
+      via _process, _mm.visible=false until done; MultiMesh set via
+      set_instance_transform (NOT the .buffer array path - that silently failed and
+      rendered the impostor only = the "painted grass" bug). Uses set_instance_transform.
+    scripts/grass_impostor.gd: terrain-draped far plane (SurfaceTool), carves
+      GrassExclusion + Terrain.water_level; local `vid` counter (SurfaceTool
+      get_vertex_count() does NOT exist in Godot 4.7.1 - compile error).
+    scripts/grass_game.gdshader: SIZES ALIGNED TO 1/10 SCALE - size_small 0.02 /
+      size_large 0.04 (was 0.012/0.03). This is the CALIBRATED lock.
+    scripts/impostor_grass.gdshader + assets/grass_normals.png: ported impostor shader
+      (color_small 0.25/0.55/0.12, color_large 0.4/0.65/0.15, ground_color 0.06/0.12/0.04,
+      patch_scale 7.0, wind_strength 0.04, wind_direction (1,0), wind_bend_strength 2.0,
+      wind_ao_affect 1.5).
+    scripts/grass_static.gd: STILL PRESENT but NO LONGER instantiated by grass_system.gd.
+  gotchas:
+    - NEW TEXTURE = run `--headless --import` first or preload fails
+      ("no resource loaders (unrecognized file extension)").
+    - SurfaceTool.get_vertex_count() does not exist (use a local counter).
+    - `var i0 := ...` type-inference can fail under warnings-as-errors.
+    - Full-render screenshots must be WINDOWED (not --headless), and the game starts at
+      NIGHT - pass --noon or every capture is dark (GameState.gd day_time := 0.0).
+    - BUILD_PER_FRAME 250_000 means a 1M-blade chunk takes several frames; screenshots
+      taken mid-build can under-render (check chunk completion before judging).
+  verified:
+    - Screenshots into `small grass\` (NOT the project root, to avoid git noise):
+      04_game_flyover.png (green frac 0.5798), 05_game_catclose.png (green frac 0.5936 -
+      USER-APPROVED: "absolutely perfect, you nailed it!"), 06_game_pond.png
+      (green frac 0.5769 - PROBLEM, see below). Screenshot modes: --catclose / --pond /
+      --flyover in main.gd.
+    - 05_game_catclose.png = the approved reference look (real near blades + far
+      impostor reads as grass).
+  problems:
+    - 06_game_pond.png: near grass "no good" (mid tier = 10k/m2 reads too sparse) and
+      "there is no pond" - the water is NOT in the rendered frame. Pixel analysis (3x3
+      grid) showed ONLY grass rows 1-3 + sky row 0, ZERO water region, despite lake.gd
+      running. --pond camera = Terrain.lake.center + y 9 = (-11,9,-16), look_at
+      lake.center+(3.5,0,3.5) = (-7.5,0,-12.5). ROOT CAUSE NOT FOUND YET (investigation
+      interrupted for the backup). Candidates: camera occlusion, water not built at that
+      view, mid-tier grass density too low near the shore, chunk build not finished.
+  next_when_resumed:
+    1) Make everything look like 05_game_catclose.png - the approved reference.
+    2) Fix the pond: confirm --pond camera sees the water (lake.gd _build_water) and
+       that water is not occluded; check whether mid-tier grass (10k/m2) reads too
+       sparse near the shore and raise MID density / extend NEAR_RADIUS to match 40k/m2.
+    3) After each change re-capture --noon screenshots into `small grass\`.
 
 # =============================================================================
 # GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs
@@ -308,6 +339,28 @@ grass_plane:
     (b) higher texel density + disable texture mipmaps/filtering for the plane;
     (c) abandon baked-sheet and keep dense 3D tufts (290k confirmed working).
     Do NOT re-run the bake until the root cause is agreed.
+
+# =============================================================================
+# BACKUP (2026-08-09, pre-Isle-of-Wight power-down)
+# =============================================================================
+backup_2026_08_09:
+  purpose: Everything uncommitted backed up before the laptop is powered down for an
+    Isle of Wight trip. Resume on the Island when the user says so.
+  done:
+    - PROJECT_STATE.yaml updated (this file) - grass port + pond issue documented.
+    - worklog.md entry appended (grass port + backup record).
+    - git commit + push of the current state (grass port incl. new scripts/shaders/assets
+      and deletions of the old VegetationGenerator.gd + shaders/grass.gdshader).
+    - meldrino.com/forai/ww.html updated + deployed (deploy: edit local copy in
+      /home/andy then sudo cp to /var/www/html/forai/, keep a .bak first).
+    - Sandbox experiment folders copied out of temp to a durable location:
+      grass_test (43 MB) + grass_part2 + grass_part3 + godot-grass
+      (calibration work - source of the ported numbers).
+    - Screenshots (small grass\ + grass_compare\) copied alongside.
+  resume_checklist:
+    - Read this YAML + worklog.md tail + git log to re-anchor.
+    - Fix the pond (grass_rendering.problems) then match 05_game_catclose.png everywhere.
+    - Re-capture --noon screenshots into small grass\.
 
 # =============================================================================
 # TODO / NEXT STEPS
@@ -349,6 +402,10 @@ todo:
     compacting, snapshot current state to the bigpickle YAML + emit terminal-reset ANSI
     (prevents both data loss and a broken terminal when a session dies abnormally; runs in
     the opencode process so uses no LLM tokens). Needs an opencode restart to load.
+  - [DONE] Calibrated 1/10-size grass system ported into WW (chunked near/mid tiers +
+    far impostor, 05_game_catclose.png approved). See grass_rendering.
+  - [NEXT -> ISLE OF WIGHT] Fix 06_game_pond.png: water missing from the --pond frame
+    + near-pond grass too sparse. Goal = everything matches 05_game_catclose.png.
 
 # =============================================================================
 # KNOWN ISSUES

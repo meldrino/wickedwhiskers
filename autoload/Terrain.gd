@@ -8,10 +8,6 @@ var lake := { "center": Vector2.ZERO, "radius": 0.0, "depth": 0.0 }
 var water_level := 0.0
 var water_radius := 0.0
 
-var _veg_container: Node3D = null
-var _veg_generator: VegetationGenerator = null
-
-
 func _ready() -> void:
 	config = TerrainConfig.whiskers()
 	heights = TerrainGenerator.generate(config)
@@ -110,25 +106,3 @@ func _build_world() -> void:
 	ground.add_child(col)
 
 	add_child(ground)
-	_build_vegetation(ground)
-
-
-func _build_vegetation(ground: StaticBody3D) -> void:
-	if "--nograss" in OS.get_cmdline_user_args():
-		return
-	# Wait two physics frames so the HeightMapShape is registered in the physics
-	# space before the placement raycast queries it.
-	await get_tree().physics_frame
-	await get_tree().physics_frame
-	if _veg_generator == null:
-		_veg_container = Node3D.new()
-		_veg_container.name = "Vegetation"
-		add_child(_veg_container)
-		_veg_generator = VegetationGenerator.new()
-		_veg_generator.setup(self, ground, _veg_container)
-	_veg_generator.regen()
-
-
-func regen_vegetation() -> void:
-	if _veg_generator != null:
-		_veg_generator.regen()

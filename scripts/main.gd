@@ -68,7 +68,15 @@ func _ready() -> void:
 	_spawn_mouse()
 	_spawn_bird()
 	_spawn_player()
+	_build_grass()
 	_maybe_screenshot()
+
+func _build_grass() -> void:
+	if "--nograss" in OS.get_cmdline_user_args():
+		return
+	var grass: Node3D = preload("res://scripts/grass_system.gd").new()
+	grass.name = "GrassSystem"
+	add_child(grass)
 
 
 func _spawn_player() -> void:

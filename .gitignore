@@ -8,6 +8,7 @@ export_presets.cfg
 Thumbs.db
 .DS_Store
 ~$*
+~WR*.tmp
 
 # Uncommitted asset inbox (keep laptop clean; recover from git history)
 assets/pending/

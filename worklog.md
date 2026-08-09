@@ -246,3 +246,36 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
   / flyover / pond, then optional Part-3 interaction (blades bend away from the cat) and
   Part-4 LOD only if perf demands.
 
+## 2026-08-09 (CALIBRATED grass PORTED into WW + pre-Isle-of-Wight backup)
+
+- Sandbox calibration (temp grass_test folder, hexaquo tutorial) reached a 1/10-size lock:
+  size_small 0.02 / size_large 0.04 with real blades, plus a far impostor plane so the LOD
+  seam is never seen. PORTED into the game (full session - bug-fix + screenshots):
+- In-game system is now CHUNKED: scripts/grass_system.gd streams 5x5 m chunks
+  (CHUNK_SIZE 5.0, STREAM_RADIUS 14, NEAR_RADIUS 6.0 / MID_RADIUS 14.0) centred on the
+  camera + mouse. scripts/grass_chunk.gd builds NEAR_COUNT 1,000,000 (40k/m2 detailed
+  mesh) / MID_COUNT 250,000 (10k/m2 simple mesh) blades per chunk over multiple frames
+  (BUILD_PER_FRAME 250,000) using set_instance_transform. scripts/grass_impostor.gd adds
+  a terrain-draped far plane (CENTRE (0,-6), HALF_X 32, HALF_Z 40, RES 1.0) carving
+  GrassExclusion + Terrain.water_level. Old VegetationGenerator.gd + shaders/grass.gdshader
+  DELETED; grass_static.gd no longer instantiated.
+- Shader sizes aligned to 1/10 scale in scripts/grass_game.gdshader: size_small 0.02 /
+  size_large 0.04 (was 0.012/0.03). Impostor assets ported: scripts/impostor_grass.gdshader
+  + assets/grass_normals.png (imported via --headless --import).
+- BUGS FIXED: "painted grass" was the MultiMesh.buffer array path silently failing - the
+  impostor alone rendered; rebuilt with set_instance_transform and blades came back.
+  SurfaceTool.get_vertex_count() does not exist in Godot 4.7.1 - replaced with a local
+  counter. New textures need `--headless --import` before preload works.
+- Game starts at NIGHT (GameState.gd day_time := 0.0) - all screenshots now use --noon.
+- Screenshots into `small grass\` (kept out of the project root to avoid git noise):
+  05_game_catclose.png = USER-APPROVED ("absolutely perfect, you nailed it!").
+  06_game_pond.png = BROKEN: "no pond" in frame + near grass too sparse. Pixel analysis
+  (3x3 grid) shows NO water region at all despite lake.gd running. --pond camera =
+  (-11,9,-16) look_at (-7.5,0,-12.5). Root cause NOT found yet - deferred.
+- PRE-ISLE-OF-WIGHT BACKUP (user is powering down; work resumes on the Island):
+  PROJECT_STATE.yaml + this worklog updated; git commit + push; meldrino.com/forai/ww.html
+  updated + deployed; temp sandbox experiment folders (grass_test 43 MB + grass_part2 +
+  grass_part3 + godot-grass) and screenshots copied out of temp to a durable location.
+- Next on the Island: make everything look like 05_game_catclose.png; fix the missing
+  pond + sparse near-pond grass in the --pond view; re-capture --noon shots into small grass\.
+
