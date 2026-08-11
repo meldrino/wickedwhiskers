@@ -1,13 +1,15 @@
 extends Node3D
 
 const CHUNK_SIZE := 5.0
-const TUFT_SPACING := 0.198
+const TUFT_SPACING := 0.12
 const JITTER := 0.02
 const EMBED := -0.002
 const BUILD_PER_FRAME := 6000
+const PROBE_STEP := 0.035
+const COVER_RADIUS := 0.02
 
-# Full-geometry tuft: a flat sward disc (the solid lawn base, UV.x=2 marker) +
-# short blades on top. Blade world height is hard-capped at 2 cm: local blade
+# Full-geometry tuft: short blades on top of the terrain, no sward base.
+# Blade world height is hard-capped at 2 cm: local blade
 # tip = base_off + max_h = 0.016 m, times the shader's size_large 1.15 -> 0.018 m.
 const VEG := {
 	"outer": 16,
@@ -32,6 +34,10 @@ var _pending := 0
 var _placed := 0
 var _cursor := 0
 var _per_axis := 1
+var _probes_x := 0
+var _probe_total := 0
+var _probe_cursor := 0
+var _probe_covered := PackedByteArray()
 var _new_mm: MultiMesh
 
 
@@ -89,7 +95,6 @@ func _process(_delta: float) -> void:
 		budget -= 1
 	if _pending > 0:
 		return
-	_new_mm.instance_count = _placed
 	_mm.multimesh = _new_mm
 	_new_mm = null
 	_mm.visible = true
@@ -98,15 +103,22 @@ func _process(_delta: float) -> void:
 func _rebuild() -> void:
 	if _mm == null:
 		return
-	_per_axis = maxi(1, int(ceil(CHUNK_SIZE / TUFT_SPACING)))
-	var count := _per_axis * _per_axis
 	_rng.seed = hash(_cell) ^ 0x5DEECE66D
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.mesh = _full_mesh if _tier == 0 else _disc_mesh
-	mm.instance_count = count
+	if _tier == 0:
+		_probes_x = int(ceil(CHUNK_SIZE / PROBE_STEP))
+		_probe_total = _probes_x * _probes_x
+		_probe_covered = PackedByteArray()
+		_probe_covered.resize(_probe_total)
+		_probe_cursor = 0
+		mm.instance_count = _probe_total
+	else:
+		_per_axis = maxi(1, int(ceil(CHUNK_SIZE / TUFT_SPACING)))
+		mm.instance_count = _per_axis * _per_axis
 	_new_mm = mm
-	_pending = count
+	_pending = _probe_total if _tier == 0 else _per_axis * _per_axis
 	_placed = 0
 	_cursor = 0
 	if _mm.multimesh == null:
@@ -114,6 +126,56 @@ func _rebuild() -> void:
 
 
 func _place_one() -> void:
+	if _tier == 0:
+		_place_adaptive()
+		return
+	_place_grid()
+
+
+func _place_adaptive() -> void:
+	while _probe_cursor < _probe_total:
+		var i := _probe_cursor
+		_probe_cursor += 1
+		if _probe_covered[i]:
+			continue
+		var px := i % _probes_x
+		var pz := i / _probes_x
+		var lx := (px + 0.5) * PROBE_STEP
+		var lz := (pz + 0.5) * PROBE_STEP
+		var wx := _cell.x * CHUNK_SIZE + lx
+		var wz := _cell.y * CHUNK_SIZE + lz
+		var h := Terrain.height_at(wx, wz)
+		if h > Terrain.config.rock_start + 0.3:
+			_probe_covered[i] = 1
+			continue
+		if GrassExclusion.is_excluded(wx, wz, h):
+			_probe_covered[i] = 1
+			continue
+		var t := Transform3D(Basis(Vector3.UP, _rng.randf_range(0.0, TAU)), Vector3(lx, h + EMBED + _rng.randf_range(-0.002, 0.002), lz))
+		_new_mm.set_instance_transform(_placed, t)
+		_placed += 1
+		_mark_covered(px, pz)
+		return
+
+
+func _mark_covered(px: int, pz: int) -> void:
+	var r := int(ceil(COVER_RADIUS / PROBE_STEP))
+	var x0 := maxi(0, px - r)
+	var x1 := mini(_probes_x - 1, px + r)
+	var z0 := maxi(0, pz - r)
+	var z1 := mini(_probes_x - 1, pz + r)
+	var cr := COVER_RADIUS * COVER_RADIUS
+	for z in range(z0, z1 + 1):
+		var dz := float(z - pz) * PROBE_STEP
+		var dz2 := dz * dz
+		var row := z * _probes_x
+		for x in range(x0, x1 + 1):
+			var dx := float(x - px) * PROBE_STEP
+			if dx * dx + dz2 <= cr:
+				_probe_covered[row + x] = 1
+
+
+func _place_grid() -> void:
 	while _cursor < _per_axis * _per_axis:
 		var idx := _cursor
 		_cursor += 1
