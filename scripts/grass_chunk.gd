@@ -139,11 +139,6 @@ static func _add_tuft(st: SurfaceTool, v: Dictionary, rng2: RandomNumberGenerato
 	var base: Color = v["base"]
 	var tip: Color = v["tip"]
 	var base_off: float = v["base_off"]
-	var disc_off: float = v["disc_off"]
-	var disc_radius: float = v["disc_radius"]
-	# Solid base under the tuft so the lawn reads as fully covered from above;
-	# blades on top add the 3D texture. (Sward disc = UV.x 2 marker in the shader.)
-	base_idx = _add_sward_disc(st, origin, disc_radius, base, base_idx, disc_off)
 	var s: float = v.get("spread", 1.0)
 	var outer: int = v["outer"]
 	for b in range(outer):

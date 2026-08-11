@@ -76,6 +76,8 @@ static func generate_colors(heights: PackedFloat32Array, cfg: TerrainConfig) -> 
 			var dz := (hz1 - hz0) / (2.0 * cell)
 			var slope := atan(sqrt(dx * dx + dz * dz))
 			var c: Color = cfg.grass_color * (1.0 + n.get_noise_2d(x, z) * cfg.color_variation)
+			if "--pinkground" in OS.get_cmdline_user_args():
+				c = Color(0.95, 0.15, 0.5) * (1.0 + n.get_noise_2d(x, z) * cfg.color_variation)
 			c = c.lerp(cfg.dirt_color, smoothstep(cfg.slope_dirt_start, cfg.slope_dirt_end, slope))
 			c = c.lerp(cfg.rock_color, smoothstep(cfg.rock_start, cfg.rock_end, h))
 			for lake in cfg.lakes:
