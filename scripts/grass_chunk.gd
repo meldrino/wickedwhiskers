@@ -1,11 +1,12 @@
 extends Node3D
 
 const CHUNK_SIZE := 5.0
-const TUFT_SPACING := 0.12
+const TUFT_SPACING := 0.2
+const TUFT_SPACING_FAR := 0.32
 const JITTER := 0.02
 const EMBED := -0.002
 const BUILD_PER_FRAME := 6000
-const PROBE_STEP := 0.035
+const PROBE_STEP := 0.07
 const COVER_RADIUS := 0.02
 
 # Full-geometry tuft: short blades on top of the terrain, no sward base.
@@ -26,8 +27,11 @@ const VEG := {
 
 var _mm: MultiMeshInstance3D
 var _cell := Vector2i.ZERO
+var _size := 1.0
+var size_m := 1.0
 var _tier := -1
 var _full_mesh: Mesh
+var _full_mesh_far: Mesh
 var _disc_mesh: Mesh
 var _rng := RandomNumberGenerator.new()
 var _pending := 0
@@ -66,15 +70,18 @@ static func build_disc_mesh() -> Mesh:
 	return st.commit()
 
 
-func setup(cell: Vector2i, material: ShaderMaterial, full_mesh: Mesh, disc_mesh: Mesh) -> void:
+func setup(cell: Vector2i, size: float, material: ShaderMaterial, full_mesh: Mesh, full_mesh_far: Mesh, disc_mesh: Mesh) -> void:
 	_cell = cell
+	_size = size
+	size_m = size
 	_full_mesh = full_mesh
+	_full_mesh_far = full_mesh_far
 	_disc_mesh = disc_mesh
 	position = Vector3(cell.x * CHUNK_SIZE, 0.0, cell.y * CHUNK_SIZE)
 	_mm = MultiMeshInstance3D.new()
 	_mm.material_override = material
 	_mm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	_mm.custom_aabb = AABB(Vector3(0, -0.5, 0), Vector3(CHUNK_SIZE, 1.5, CHUNK_SIZE))
+	_mm.custom_aabb = AABB(Vector3(0, -0.5, 0), Vector3(_size, 1.5, _size))
 	add_child(_mm)
 
 
@@ -106,7 +113,7 @@ func _rebuild() -> void:
 	_rng.seed = hash(_cell) ^ 0x5DEECE66D
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = _full_mesh if _tier == 0 else _disc_mesh
+	mm.mesh = _full_mesh if _tier == 0 else _full_mesh_far
 	if _tier == 0:
 		_probes_x = int(ceil(CHUNK_SIZE / PROBE_STEP))
 		_probe_total = _probes_x * _probes_x
@@ -115,7 +122,8 @@ func _rebuild() -> void:
 		_probe_cursor = 0
 		mm.instance_count = _probe_total
 	else:
-		_per_axis = maxi(1, int(ceil(CHUNK_SIZE / TUFT_SPACING)))
+		var spacing := TUFT_SPACING if _tier == 1 else TUFT_SPACING_FAR
+		_per_axis = maxi(1, int(ceil(_size / spacing)))
 		mm.instance_count = _per_axis * _per_axis
 	_new_mm = mm
 	_pending = _probe_total if _tier == 0 else _per_axis * _per_axis
@@ -181,7 +189,7 @@ func _place_grid() -> void:
 		_cursor += 1
 		var ix := idx % _per_axis
 		var iz := idx / _per_axis
-		var step := CHUNK_SIZE / float(_per_axis)
+		var step := _size / float(_per_axis)
 		var lx := (ix + 0.5) * step + _rng.randf_range(-JITTER, JITTER)
 		var lz := (iz + 0.5) * step + _rng.randf_range(-JITTER, JITTER)
 		var wx := _cell.x * CHUNK_SIZE + lx

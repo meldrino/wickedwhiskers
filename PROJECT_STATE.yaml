@@ -244,6 +244,23 @@ build_status:
 # GRASS RENDERING - OPTION B REBUILD: FULL-GEOMETRY <=2CM LAWN (2026-08-11)
 # =============================================================================
 grass_rendering:
+  current_state_2026_08_11_afternoon:  # SUPERSEDES the 08-11-morning rebuild below
+    look: far field now renders the SAME full-geometry tufts as near (impostor/small-tufts
+      approach is DEAD). Dark far band gone; grass reads as grass to the horizon.
+    stream: STREAM_RADIUS 70 (terrain caps at +-60 so 70 == full coverage; 100 dropped the
+      grazing bench to 26.2 and was reverted). Near adaptive tier 4x density (8af0dde).
+    field: WORLD_SIZE 54 -> fence HALF-2 = 25 -> field exactly 50x50 = 10 whole 5m chunks.
+      Lake (-11,-16 r6.8) / tractor (10,-20) / bird tree (20,-4) all still inside the fence.
+    macro_far_chunks: beyond FAR_RADIUS 40m chunks are true 10x10m (MACRO_SIZE 2 = 4 cells in
+      ONE real chunk, key "x,z,size"), tufts at TUFT_SPACING_FAR 0.32 vs 0.2 near. Tiers:
+      0 adaptive <=18m, 1 grid @0.2 <=40m, 2 macro @0.32 >40m. Fewer draw calls + ~4x less far
+      fill. (User's "bigger chunks far away" idea - implemented + benchmarked.)
+    fpsbench: grazing view avg 41.1 / p95 55.0 / min 1.0 (first-frame build hitch), exit 0.
+      Effective flat vs the old reach-92 baseline 43.7 but WITH real far tufts.
+    GOTCHA: Godot user args need `--` : --path <proj> -- --fpsbench (without it the flag never
+      reaches the game and it idles forever - cost ~10 min diagnosing a false "hang").
+    next: USER EYES - does the 0.32m far meadow + 10m chunk seams read OK at the horizon?
+      Then optionally tune TUFT_SPACING_FAR / FAR_RADIUS.
   history:
     - 2026-08-08 in-game (pre-port, 026850c): VegetationGenerator + shaders/grass.gdshader
       + sward discs, ~335.4k tufts, full 120x120 -> 05_game_catclose.png USER-APPROVED.
@@ -319,11 +336,11 @@ grass_rendering:
     open_decision: game cap <=2cm = the carpet read. Approved 05 look was 3.5-6.5cm.
       Options: relax cap to ~8cm (reads as grass, zero perf cost) OR keep 2cm + much denser
       geometry (expensive, far field still hard). USER MUST DECIDE.
-  next_when_resumed:
-    1) USER EYES on small grass/11 + 12 + 13 and the height/cap decision.
-    2) On approval: commit + push (new shader, rewritten grass_system/grass_chunk,
-       --bare/--hscale rig, deleted impostor files, worklog, PROJECT_STATE).
-    3) Re-check --pond grass near the shore with the new system.
+  next_when_resumed:  # current_state_2026_08_11_afternoon block above is the live state
+    1) USER EYES in-game: macro-chunk far meadow @0.32m + 10m seams + the 50x50 field
+       (the far look is the one thing NOT yet human-reviewed this session).
+    2) Then decide: tune TUFT_SPACING_FAR / FAR_RADIUS, or commit+push is already done.
+    3) Re-check --pond grass near the shore with the new system (old issue, still open).
     4) After each change re-capture --noon screenshots into `small grass\`.
 
 # =============================================================================

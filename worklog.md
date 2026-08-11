@@ -454,3 +454,27 @@ FIX: grass_system.gd default hscale 1.0 -> 8.0 (--hscale flag still overrides).
 VERIFIED default launch at noon vs 13_game_catclose_h8: sky 165/209/242 vs 165/203/235, grass bands 142.5/126 vs 144/108, GreenFrac 0.59 vs 0.584. Matches.
 Night start (day_time := 0.0) unchanged - intentional day/night cycle.
 Screenshots: screenshots/17_game_noon_h8default.png (default camera, noon, hscale=8 default).
+
+## 2026-08-11 - REAL far grass everywhere + field 50x50 + macro far chunks (LOD)
+USER: far field still read dark / not real grass. The old far-impostor path is dead - far chunks now
+render the SAME full-geometry tufts as near (grass_chunk _full_mesh_far), one shared shader.
+- Far tier = full tufts (no impostor, no "small tufts"): the dark far band is gone; grass reads as
+  grass to the horizon. STREAM_RADIUS: 92 -> 100 made the grazing bench drop 43.7 -> 26.2 fps, so
+  settled on 70 (terrain caps at +-60 anyway, so 70 == full coverage with no waste).
+- Near adaptive tier 4x density (commit 8af0dde) so coverage is complete even looking straight down.
+- FIELD SHRINK (user-approved, "50 x 50 is plenty"): WORLD_SIZE 60 -> 54 -> fence at HALF-2 = 25
+  -> field is exactly 50 x 50 = 10 WHOLE 5m chunks (chunk-aligned). Lake/tractor/bird tree all
+  still fit inside the new fence (verified). Fence build auto-derives from HALF - no position edits.
+- MACRO FAR CHUNKS (user's "bigger chunks far away" idea, TESTED): beyond FAR_RADIUS 40m, chunks
+  are true 10x10m (MACRO_SIZE 2 = four 5m cells merged into ONE real chunk, key "cx,cz,size"),
+  tufts at TUFT_SPACING_FAR 0.32 vs 0.2 near. Fewer MultiMesh draw calls AND ~4x less far fill
+  (the GPU cost that dominates). Chunk key format changed to "x,z,size" everywhere (desired map,
+  _key_dist, _spawn, _update_tiers). Tier: 0 adaptive <= 18m, 1 grid @0.2 <= 40m, 2 macro @0.32 >40m.
+- fpsbench at the grazing view: avg 41.1 / p95 55.0 / min 1.0 (min = first-frame grass build hitch).
+  vs the pre-regression reach-92 baseline of 43.7 - effectively flat, but now with real far tufts.
+  GOTCHA (cost me ~10 min): Godot user args need the `--` separator: `--path <proj> -- --fpsbench`
+  (without `--` the flag never reaches the game and it just idles forever). Windowed, NOT --headless.
+- Verified: parse/boot clean (--quit-after 240, no SCRIPT errors); fpsbench exit code 0.
+- NOT yet verified: user eyes on whether 0.32m far meadow + 10m chunk seams read OK at the horizon.
+Screenshots: fpsbench_diag.txt (bench log), screenshots/29_lakeshore_pinkground.png +
+30_lakeshore_pinkground_90.png + 31_lakeshore_map.png + 32/33 (disc-bright lake + catclose shots).

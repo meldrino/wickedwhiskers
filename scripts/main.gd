@@ -1,6 +1,6 @@
 extends Node3D
 
-const WORLD_SIZE := 60.0
+const WORLD_SIZE := 54.0
 const HALF := WORLD_SIZE / 2.0
 
 const TREE_SCENES := [
@@ -108,12 +108,16 @@ func _maybe_screenshot() -> void:
 	if "--fpsbench" in args:
 		_run_fpsbench()
 		return
-	if not "--screenshot" in args:
-		return
 	if "--noon" in args:
 		GameState.day_time = GameState.DAY_SECONDS * 0.75
 		await get_tree().process_frame
 		await get_tree().process_frame
+	if "--dawn" in args:
+		GameState.day_time = GameState.DAY_SECONDS * 0.575
+		await get_tree().process_frame
+		await get_tree().process_frame
+	if not "--screenshot" in args:
+		return
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_log_debug("after awaits, ticking=" + str(Engine.get_frames_drawn()) + " fps=" + str(Engine.get_frames_per_second()))

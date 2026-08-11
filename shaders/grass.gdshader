@@ -28,6 +28,14 @@ uniform vec3 backlight : source_color = vec3(0.18, 0.3, 0.12);
 uniform float roughness = 0.4;
 uniform float specular = 0.2;
 
+// Sun direction (set each frame by grass_system.gd from GameState.day_time, in
+// sync with daynight.gd). The far-tier sward discs are flat and face straight
+// up, so at low sun they catch almost no direct light while the near blades
+// (outward-leaning faces) stay bright. Tilting the disc normal toward the sun
+// the lower it gets makes the far field catch the sun exactly like the blades.
+uniform float sun_elev = 0.0;
+uniform float sun_azim = 0.0;
+
 varying float bottom_to_top;
 varying float patch_factor;
 varying float current_wind_bend;

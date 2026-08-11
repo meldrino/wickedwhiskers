@@ -2,8 +2,11 @@ extends Node3D
 
 const CHUNK_SIZE := 5.0
 const NEAR_RADIUS := 18.0
-const STREAM_RADIUS := 92.0
+const FAR_RADIUS := 40.0
+const MACRO_SIZE := 2
+const STREAM_RADIUS := 70.0
 const TERRAIN_CELLS := 12
+const FAR_HSCALE := 1.0
 
 # Restored 026850c GRASS_SHADER params (bend/wind offsets are meters - the
 # blades are only ~1-2 cm, so the tutorial's unit-height values would fling
@@ -25,6 +28,7 @@ const PARAMS := {
 
 var _material: ShaderMaterial
 var _full_mesh: Mesh
+var _full_mesh_far: Mesh
 var _disc_mesh: Mesh
 var _chunks := {}
 
@@ -54,6 +58,7 @@ func _ready() -> void:
 		if a.begins_with("--hscale="):
 			hscale = float(a.get_slice("=", 1))
 	_full_mesh = chunk_script.build_full_mesh(hscale)
+	_full_mesh_far = chunk_script.build_full_mesh(hscale * FAR_HSCALE)
 	_disc_mesh = chunk_script.build_disc_mesh()
 
 
@@ -106,7 +111,7 @@ func _update_chunks(centers: Array) -> void:
 					continue
 				var dist := Vector2((cx + 0.5) * CHUNK_SIZE - c.x, (cz + 0.5) * CHUNK_SIZE - c.z).length()
 				if dist <= STREAM_RADIUS + CHUNK_SIZE:
-					desired["%d,%d" % [cx, cz]] = true
+					desired[_chunk_key(cx, cz, c)] = true
 	var cam: Vector3 = centers[0] if centers.size() > 0 else Vector3.ZERO
 	var missing: Array[String] = []
 	for key in desired:
@@ -122,20 +127,32 @@ func _update_chunks(centers: Array) -> void:
 			_chunks.erase(key)
 
 
+func _chunk_key(cx: int, cz: int, c: Vector3) -> String:
+	var d := Vector2((cx + 0.5) * CHUNK_SIZE - c.x, (cz + 0.5) * CHUNK_SIZE - c.z).length()
+	if d <= FAR_RADIUS:
+		return "%d,%d,1" % [cx, cz]
+	var bx := floori(cx / MACRO_SIZE) * MACRO_SIZE
+	var bz := floori(cz / MACRO_SIZE) * MACRO_SIZE
+	return "%d,%d,%d" % [bx, bz, MACRO_SIZE]
+
+
 func _key_dist(key: String, cam: Vector3) -> float:
 	var parts := key.split(",")
 	var cx := int(parts[0])
 	var cz := int(parts[1])
-	return Vector2((cx + 0.5) * CHUNK_SIZE - cam.x, (cz + 0.5) * CHUNK_SIZE - cam.z).length()
+	var size := int(parts[2]) if parts.size() > 2 else 1
+	var half := size * CHUNK_SIZE * 0.5
+	return Vector2(cx * CHUNK_SIZE + half - cam.x, cz * CHUNK_SIZE + half - cam.z).length()
 
 
 func _spawn(key: String) -> void:
 	var parts := key.split(",")
 	var cell := Vector2i(int(parts[0]), int(parts[1]))
+	var size := int(parts[2]) if parts.size() > 2 else 1
 	var chunk: Node3D = preload("res://scripts/grass_chunk.gd").new()
 	chunk.name = "Chunk_%s" % key
 	add_child(chunk)
-	chunk.setup(cell, _material, _full_mesh, _disc_mesh)
+	chunk.setup(cell, size, _material, _full_mesh, _full_mesh_far, _disc_mesh)
 	_chunks[key] = chunk
 
 
@@ -148,6 +165,8 @@ func _update_tiers(centers: Array) -> void:
 			var d := Vector2(c.x - cpos.x, c.z - cpos.z).length()
 			best = minf(best, d)
 		var tier := 1
-		if best <= NEAR_RADIUS:
+		if chunk.size_m > CHUNK_SIZE + 0.01:
+			tier = 2
+		elif best <= NEAR_RADIUS:
 			tier = 0
 		chunk.set_tier(tier)
