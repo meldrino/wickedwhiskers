@@ -279,3 +279,170 @@ along with PROJECT_STATE.yaml and `git log` to restore context after a window cl
 - Next on the Island: make everything look like 05_game_catclose.png; fix the missing
   pond + sparse near-pond grass in the --pond view; re-capture --noon shots into small grass\.
 
+
+## 2026-08-10 — Far grass lighter than near: distance darkening attempt
+
+Problem (user-confirmed brute fact): far grass is lighter than near grass until you walk up to it. Root cause hypothesis (Gemini + Copilot + sandbox notes agree): it is a LIGHTING mismatch, not a color mismatch. The flat impostor plane catches full sun while real blades self-shadow; AO_LIGHT_AFFECT only affects ambient, not the sun's direct light; DIFFUSE_LIGHT is not writable in fragment() so earlier attempts were no-ops. NOTE: an earlier claim that the scene had fog was WRONG - no environment.gd exists and no scene has fog configured. Godot default = no fog. The distance darkening ramp is the sole compensation for the impostor being over-lit.
+
+User decision: don't try to make everything the same color; just darken the far grass to compensate for the light source. Amount = trial and error.
+
+What was done:
+- impostor_grass.gdshader: added darken_start (14.0), darken_end (40.0), darken_amount (0.35) uniforms; fragment() now does ALBEDO *= (1.0 - dist_factor * darken_amount) where dist_factor ramps 0->1 from darken_start to darken_end using distance(world_vertex, CAMERA_POSITION_WORLD).
+- grass_system.gd: _impostor_material now sets those 3 params (14.0 / 40.0 / 0.35).
+
+NOT verified in-game yet. Next: run, screenshot, tune darken_amount (and possibly darken_start/end). Fog (environment.gd fog_density 0.028) is a likely compounding factor if distance ramp alone is not enough — consider lowering fog density or moving fog start out past the grass field.
+
+
+## 2026-08-10 evening - Far-grass darkening VERIFIED + pond camera bug FIXED
+
+Far-grass darkening verified in-game (grassprobe, --grassheight=0.4 --grasspitch=0):
+camera at (0, 0.463, 12), luminance reads flat 0.410 @3m / 0.417 @10m / 0.422 @14.5m /
+0.414 @26m - impostor no longer reads lighter than near blades. darken params in
+grass_system.gd: darken_start 14 / darken_end 22 / darken_amount 0.5 (shader defaults
+14/40/0.35). DONE.
+
+POND BUG ROOT CAUSE FOUND + FIXED. Original code set camera_holder.position (LOCAL to
+the player node) to Terrain.lake.center + y9 = (-11,9,-16). Because camera_holder is a
+child of player (at spawn (0,0,12) with yaw 0.6), the local offset was rotated/translated
+away: probe showed cam_world=(-18.11, 9.06, 5.00) - 21m from the lake, hence "no pond".
+FIX in main.gd --pond branch: use player.camera.look_at_from_position(pond_from, pond_to,
+Vector3.UP) with WORLD coordinates; do NOT touch camera_holder.position afterwards
+(touching it recomposes the camera transform because the camera is its child). Verified:
+cam_world now exactly (-11.0, 9.0, -16.0) (probe), pitch -61.2, water renders as a band
+y~0-250 in the frame (STRIP teal (0.31,0.90,0.94) at y=80-200 = water material colour;
+light-blue rows above = metallic water reflecting the sky; grass below). Qwen vision
+(3b) false-negatived (said no water) - trust the pixel/STRIP probe data instead.
+
+## 2026-08-10 - POND ROOT CAUSE FOUND + FIXED (--pond screenshot)
+
+Problem (from backup notes): 06_game_pond.png had "no pond" - the water was NOT in the
+rendered frame despite lake.gd building it.
+
+ROOT CAUSE: the --pond screenshot branch in main.gd did
+  player.camera_holder.position = Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
+i.e. it set the CAMERA HOLDER (a CHILD of the player node) to the lake-center offset in
+PLAYER-LOCAL space. With the player's spawn transform (position (0,0,12) + yaw 0.6) the
+holder/camera ended up at world (-18.11, 9.06, 5.00) - about 21m away from the lake at
+(-11,-16), so the pond was simply out of frame. First fix attempt added a
+player.to_local() holder line that made it worse (cam_world went to (-22, 17, -44))
+because setting the holder AFTER look_at_from_position re-composed the camera's child
+transform.
+
+FIX (main.gd --pond branch): pure world-space placement -
+  var pond_from := Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
+  var pond_to := Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5)
+  player.camera.look_at_from_position(pond_from, pond_to, Vector3.UP)
+and DO NOT touch camera_holder.position afterwards (camera_frozen=true already stops the
+per-frame player camera updates).
+
+VERIFIED via --grassprobe on the same run: PROBE cam_world=(-11.0, 9.0, -16.0) - camera
+exactly above the lake center. Fresh screenshot_pond.png row analysis: water surface
+fills the top ~250px of the frame (STRIP y=80-200 = teal (0.31,0.90,0.94) = water albedo;
+lighter blue rows above = metallic water reflecting the sky at pitch -61.2, so NOT actual
+sky). Grass below. The pond IS in the frame now.
+
+NOTE: qwen2.5vl:3b vision review falsely reported "no water" - the 3b model is too weak
+to read the water against the sky reflection at a steep angle. Pixel/probe analysis is
+the trustworthy signal here.
+
+Also VERIFIED far-grass distance darkening from earlier today (grassprobe): luminance
+flat across distance (0.410 @3m -> 0.422 @14.5m -> 0.414 @26m) - impostor no longer
+reads lighter than near blades.
+
+## 2026-08-11 - GRASS REBUILT: OPTION B (full-geometry, <=2cm cap, impostor DELETED)
+
+User ultimatum: Option B - restore the USER-APPROVED 05_game_catclose look (026850c
+full-geometry tufts) with engine-native LOD, and a NEW hard constraint: grass must be
+NO MORE THAN 2 CM TALL. If this fails -> week gets thrown away (Option 3).
+
+KEY REALISATION (ground truth): the approved 05 screenshot was pre-port full geometry;
+the game NEVER ran at that quality (33.5M tris all drawn, single MultiMesh, no culling).
+The port (e081557) = 2-tier ground (blades + baked impostor plane) = the ROT.
+
+WHAT WAS BUILT
+- scripts/grass_system.gd: rewritten - ONE shared shader (shaders/grass.gdshader), NO
+  impostor, NO light-split. Streams ALL terrain cells (cx/cz -12..11 = full +-60m; no
+  fog in env so full coverage required or bare lighter terrain shows as "far lighter").
+  Tier 0 = full tufts within NEAR_RADIUS 10m, tier 1 = sward-disc-only beyond. Chunks
+  spawn sorted by distance to camera/mouse. STREAM_RADIUS 92.
+- scripts/grass_chunk.gd: rewritten - runtime-built tuft meshes (static build_full_mesh
+  / build_disc_mesh, SurfaceTool). Tuft = flat sward disc (UV.x=2 marker, radius 0.11,
+  base*0.6 dark) + 10 outer + 5 inner ribbon blades. Placement = jittered grid at
+  0.198 spacing (676/chunk), skips water/slope>1.2/rock>1.8/exclusion rects. Budgeted
+  build (6000/frame).
+- shaders/grass.gdshader: RESTORED from 026850c + per-instance noise fix -
+  NODE_POSITION_WORLD is only the chunk origin for MultiMesh (would chunk-quantise
+  patch/wind); now samples at (MODEL_MATRIX * vec4(0,0,0,1)).xz = per-tuft world pos.
+- 2CM CAP MATH: local blade tip = base_off 0.008 + max_h 0.008 = 0.016 m; x shader
+  size_large 1.25 = 0.020 m EXACTLY. Disc top 0.006x1.25 = 0.75cm (flat base, invisible).
+  Instance scale = 1.0 (no extra scale factor).
+- DELETED (dead rot files): scripts/grass_impostor.gd, scripts/impostor_grass.gdshader,
+  scripts/grass_game.gdshader, scripts/grass_common.gdshaderinc (+ .uid).
+
+DEAD-END FOUND: assets/grass.glb, grass_leafs.glb, grass_large.glb = REJECTED grass-sheet
+experiment leftovers (max Y 0.254m = 25cm, teal pbr 0.17,0.85,0.72) - NOT usable
+"importable scenes" for the engine-native-LOD idea; runtime tuft build used instead.
+
+VERIFICATION (all passed)
+- headless --smoketest: PASS, zero SCRIPT/Parse errors.
+- --screenshot --catclose --noon vs approved 05: GreenFrac 0.602 vs 0.606; bands
+  0,0,0,0.454,0.95,0.955,0.994,0.989 vs 0,0,0,0.462,0.964,0.96,0.998,0.99. Match.
+- --grassprobe --probescan: luminance FLAT 0.41 (2m) -> 0.44 (10-20m). No lighter band.
+- Qwen vision (3b) catclose + grazing angle: "short lawn", "coverage uniform near and
+  far, no lighter band/bare ring/seams", "green". (NOTE: 3b was WRONG about pond water
+  on 08-10 - pixel stats stay the primary signal, vision is corroboration.)
+- --fpsbench: avg 152.8 fps / p95 166 (min 1.0 = first-frame grass build hitch).
+  First time full-geometry grass is PLAYABLE (old = 33.5M tris lag).
+Screenshots: small grass/09_catclose_2cm_lawn.png, 10_grass_grazing_2cm_lawn.png.
+
+## 2026-08-11 - GRASS VISION LOOP: BARE TEST WORLD -> QWEN "FIELD OF GRASS" (height is the lever)
+
+User: "it is not much better" -> build a NEW WORLD (no houses/trees/anything, just flat ground +
+grass), screenshot it, show Qwen, iterate until Qwen describes it as "a field of grass".
+
+BUILT: --bare mode (test rig, reusable):
+- autoload/Terrain.gd: --bare uses TerrainConfig.flat() (no lakes/flats) + heights zero-filled.
+- TerrainConfig.flat(): static, lakes=[] flats=[].
+- scripts/grass_exclusion.gd: --bare short-circuits exclusions (no buildings = no bald rects).
+- scripts/main.gd: --bare skips ALL build_* (farmhouse/shed/tractor/lake/trees/rocks/pickups/NPCs),
+  still spawns player + grass; bare screenshots hide the cat (MeshRoot) and the HUD (Hud.visible).
+- scripts/grass_system.gd + grass_chunk.gd: --hscale=<n> runtime blade-height override
+  (scales min_h/max_h/disc_radius/spread/width in build_full_mesh) for height experiments.
+
+GRASS IMPROVEMENTS (all kept, independent of height):
+- blades denser (outer 10->16, inner 5->8) + wider (7-11mm outer / 5-7mm inner) + TAPERED tips
+  (half-width * (1-0.6*t)) - blades now read as grass blades.
+- sward disc gradient re-tuned darker (center base*0.6, rim base*0.78) so bright tips pop.
+- shader: 3-scale world-space noise = patch_factor (6m) + mottle (0.3m per-tuft) + mottle2 (1.4m)
+  + per-pixel turf grain fm (world_vertex.xz/0.05). Disc sits darker (mix 0.55-1.05) than blades.
+- NEAR_RADIUS 10 -> 18 (blades cover more of the frame).
+
+VISION LOOP (qwen2.5vl:3b, vision_expert.ps1) - the key result:
+- 2cm grass (game default): "green carpet, smooth uniform, no visible blades".
+- CALIBRATION: real grass-field photo (Pexels, downscaled 1280x720) -> Qwen says
+  "a field of grass with visible blades and texture" => the 3b model CAN read blades.
+- Close-up crop of our own render (bottom 30%) -> "grass blades elongated narrow, overlap" =>
+  blades RENDER fine; the full-frame read failed because blades only filled the frame's bottom sliver.
+- Height sweep at base camera: hscale=6 (~6.4cm tips) = carpet; hscale=7 (~7.4cm) = borderline;
+  hscale=8 (~8.4cm tips) = PASS: "a dense, green grassy field... grass blades are visible...
+  individual blades and strands clearly discernible... lush, green field". Grazing view also PASS.
+- fpsbench hscale=8: bare 152.8 avg / full game 151.9 avg (NO perf cost - height is free).
+Screenshots: small grass/11_bare_field_h8.png, 12_bare_grazing_h8.png, 13_game_catclose_h8.png.
+
+OPEN DECISION for user: game cap is <=2cm (mowed lawn) = exactly the carpet read. The USER-APPROVED
+05 look was 3.5-6.5cm. Options: (a) relax cap to ~8cm (top of approved range, reads as grass, free perf),
+(b) keep 2cm and invest in MUCH denser geometry (prohibitive for far field).
+
+## 2026-08-11 - REVERT to the 13_game_catclose_h8 look + backup rule
+USER: 13_game_catclose_h8 was "massively better" than the dense-scatter version; revert to it exactly.
+- Reverted grass_chunk.gd to h8-era: VEG outer 16 / inner 8, ring-layout tufts (outer ring 0.03-0.06m,
+  inner ring 0-0.02m), 24-seg sward disc, ribbon blades (segs=3, taper 0.6), per-instance jitter +-0.002.
+- Reverted shader to h8-era: blade_bend 0.35, roughness/specular uniforms (0.4/0.2), rest bend
+  `blade_bend * pow(bottom_to_top, 2.0)` (no *VERTEX.y).
+- grass_system.gd: blade_bend 0.02, NEAR_RADIUS 18, wind_strength 0.01 (all h8-era).
+- daynight.gd: DAY_TOP (0.35,0.6,0.95), DAY_HORIZON (0.82,0.86,0.9), ambient 0.32+0.5*day (h8-era).
+- Verified vs 13_game_catclose_h8.png: GreenFrac 0.59 vs 0.58, same mid/bottom band profile, sky matches.
+- NEW BACKUP RULE (user): every screenshot = GitHub commit + push, so any look is fetchable from backup.
+  Screenshot naming convention: <seq>_<mode>_<camera>_<state>.png, e.g. 16_game_catclose_h8.png.
+  Commit message = same state tag so GitHub history is the revert map.
+Screenshots: screenshots/16_game_catclose_h8.png (game catclose, hscale=8).

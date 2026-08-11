@@ -49,3 +49,13 @@ static func whiskers() -> TerrainConfig:
 		{ "center": Vector2(16.0, -10.0), "radius": 8.0 },
 	]
 	return c
+
+
+# Bare flat test world: no lakes, no flats, no hills - just grass everywhere.
+# Terrain.gd zero-fills the heights when --bare, so only the lake/flat removal matters.
+static func flat() -> TerrainConfig:
+	var c := TerrainConfig.new()
+	c.seed = 20260804
+	c.lakes = []
+	c.flats = []
+	return c

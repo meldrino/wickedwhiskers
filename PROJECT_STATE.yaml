@@ -241,75 +241,90 @@ build_status:
     Historical method (pixel sampling) also used.
 
 # =============================================================================
-# GRASS RENDERING - CALIBRATED 1/10-SIZE SYSTEM PORTED INTO WW (2026-08-09)
+# GRASS RENDERING - OPTION B REBUILD: FULL-GEOMETRY <=2CM LAWN (2026-08-11)
 # =============================================================================
 grass_rendering:
   history:
-    - 2026-08-07/08 hexaquo full-geometry + shader in the SANDBOX (temp grass_test
-      folders) was CALIBRATED to 1/10 size: size_small 0.02 / size_large 0.04 with real
-      blades ~0.05-0.12 m. Impostor far-plane approach proven: real blades near camera,
-      shader impostor beyond ~20 m so the viewer never sees the LOD seam.
-    - 2026-08-08 in-game (pre-port): VegetationGenerator + shaders/grass.gdshader +
-      sward discs, ~335.4k tufts, full 120x120. USER: blades "way too long", then good
-      coverage but only after sward discs.
-    - 2026-08-09 PORT: the calibrated 1/10-size system moved into the game.
-      VegetationGenerator.gd and shaders/grass.gdshader DELETED; replaced by the chunked
-      system below. Sandbox experiment folders (grass_test / grass_part2 / grass_part3 /
-      godot-grass) remain in temp ONLY - backup copies made (see backup section).
-  approach: CHUNKED density system - near-tier 1M blades/chunk (40k/m2 detailed mesh),
-    mid-tier 250k/chunk (10k/m2 simple mesh) in 5x5 m chunks streamed around the camera
-    + mouse; a terrain-draped IMPOSTOR plane covers the far field (CENTRE (0,-6),
-    HALF_X 32, HALF_Z 40, RES 1.0) so the LOD seam is never visible.
+    - 2026-08-08 in-game (pre-port, 026850c): VegetationGenerator + shaders/grass.gdshader
+      + sward discs, ~335.4k tufts, full 120x120 -> 05_game_catclose.png USER-APPROVED.
+      BUT the game NEVER ran at that quality (33.5M tris all drawn, no culling = lag).
+    - 2026-08-09 PORT (e081557): 2-tier ground = chunked blades (1M/250k per 5x5 chunk) +
+      baked IMPOSTOR plane + separate impostor shader = THE ROT. Far field read lighter,
+      ground "unacceptable", pond tier sparse. 06/07/08 screenshots all failed review.
+    - 2026-08-11 REBUILD (THIS): the impostor approach is DEAD. Restored the approved
+      full-geometry tuft look INSIDE the chunked streamer, one shared shader, engine-native
+      tiers, with the user's NEW hard constraint: GRASS <= 2 CM TALL (mowed lawn).
+  approach: chunked full-geometry tufts. 5x5 m chunks over ALL terrain cells
+    (cx/cz -12..11 = full +-60 m; env has NO fog so partial coverage would show the
+    lighter bare terrain as the old "far lighter" ring). Each tuft = flat sward disc
+    (UV.x=2 shader marker, radius 0.11, dark = base*0.6) + 10 outer + 5 inner ribbon
+    blades, placed on a jittered 0.198 m grid (676/chunk). Tier 0 = full tufts within
+    NEAR_RADIUS 10 m of camera/mouse; tier 1 = sward-disc-only beyond. ONE shared
+    shader/lighting -> no light split. cast_shadow off everywhere.
+    2CM CAP MATH: local blade tip = base_off 0.008 + max_h 0.008 = 0.016 m, x shader
+    size_large 1.25 = 0.020 m EXACTLY; disc top 0.75 cm; instance scale pinned to 1.0.
   files:
-    scripts/grass_system.gd: owns materials + impostor; streams 5x5 chunks within
-      STREAM_RADIUS 14 (CHUNK_SIZE 5.0); NEAR_RADIUS 6.0 (tier 0 detailed) / MID_RADIUS
-      14.0 (tier 1 simple); centres = camera + Mouse node.
-    scripts/grass_chunk.gd: NEAR_COUNT 1_000_000 / MID_COUNT 250_000 per 25 m2 chunk
-      (40k/m2 detailed vs 10k/m2 simple). Multi-frame build: BUILD_PER_FRAME 250_000
-      via _process, _mm.visible=false until done; MultiMesh set via
-      set_instance_transform (NOT the .buffer array path - that silently failed and
-      rendered the impostor only = the "painted grass" bug). Uses set_instance_transform.
-    scripts/grass_impostor.gd: terrain-draped far plane (SurfaceTool), carves
-      GrassExclusion + Terrain.water_level; local `vid` counter (SurfaceTool
-      get_vertex_count() does NOT exist in Godot 4.7.1 - compile error).
-    scripts/grass_game.gdshader: SIZES ALIGNED TO 1/10 SCALE - size_small 0.02 /
-      size_large 0.04 (was 0.012/0.03). This is the CALIBRATED lock.
-    scripts/impostor_grass.gdshader + assets/grass_normals.png: ported impostor shader
-      (color_small 0.25/0.55/0.12, color_large 0.4/0.65/0.15, ground_color 0.06/0.12/0.04,
-      patch_scale 7.0, wind_strength 0.04, wind_direction (1,0), wind_bend_strength 2.0,
-      wind_ao_affect 1.5).
-    scripts/grass_static.gd: STILL PRESENT but NO LONGER instantiated by grass_system.gd.
+    scripts/grass_system.gd: owns the ONE ShaderMaterial + prebuilt meshes; streams all
+      terrain chunks (STREAM_RADIUS 92), spawns sorted by distance to camera + Mouse;
+      set_tier 0/1 by NEAR_RADIUS 10.
+    scripts/grass_chunk.gd: static build_full_mesh()/build_disc_mesh() (SurfaceTool tuft
+      geometry, seed 4242); budgeted per-frame placement (BUILD_PER_FRAME 6000,
+      _mm.visible=false until built); MultiMesh via set_instance_transform (the
+      .buffer array path silently failed = "painted grass" bug, do not go back);
+      skips water / slope>1.2 / rock>1.8 / GrassExclusion rects.
+    shaders/grass.gdshader: RESTORED from 026850c (approved look) + per-instance noise
+      fix - NODE_POSITION_WORLD is the CHUNK origin for MultiMesh (chunk-quantised
+      patch/wind), now sampled at (MODEL_MATRIX * vec4(0,0,0,1)).xz = per-tuft position.
+    DELETED (rot): scripts/grass_impostor.gd, impostor_grass.gdshader,
+      grass_game.gdshader, grass_common.gdshaderinc.
+    scripts/grass_static.gd: STILL PRESENT but UNREFERENCED (dead, harmless).
   gotchas:
-    - NEW TEXTURE = run `--headless --import` first or preload fails
-      ("no resource loaders (unrecognized file extension)").
-    - SurfaceTool.get_vertex_count() does not exist (use a local counter).
-    - `var i0 := ...` type-inference can fail under warnings-as-errors.
+    - assets/grass.glb + grass_leafs.glb + grass_large.glb = REJECTED grass-sheet
+      leftovers (max Y 0.254 m, teal pbr) - NOT usable "importable scenes"; runtime tuft
+      build is the way.
     - Full-render screenshots must be WINDOWED (not --headless), and the game starts at
       NIGHT - pass --noon or every capture is dark (GameState.gd day_time := 0.0).
-    - BUILD_PER_FRAME 250_000 means a 1M-blade chunk takes several frames; screenshots
-      taken mid-build can under-render (check chunk completion before judging).
-  verified:
-    - Screenshots into `small grass\` (NOT the project root, to avoid git noise):
-      04_game_flyover.png (green frac 0.5798), 05_game_catclose.png (green frac 0.5936 -
-      USER-APPROVED: "absolutely perfect, you nailed it!"), 06_game_pond.png
-      (green frac 0.5769 - PROBLEM, see below). Screenshot modes: --catclose / --pond /
-      --flyover in main.gd.
-    - 05_game_catclose.png = the approved reference look (real near blades + far
-      impostor reads as grass).
+    - `var cam := centers[0]` fails to infer type from an untyped Array (use `: Vector3`).
+    - qwen2.5vl:3b vision is UNRELIABLE (false-negatived pond water on 08-10) - pixel/
+      probe stats are the primary signal; vision is corroboration only.
+  verified: (2026-08-11, all PASS)
+    - headless --smoketest: PASS, zero SCRIPT/Parse errors.
+    - --screenshot --catclose --noon vs approved 05_game_catclose.png: GreenFrac 0.602 vs
+      0.606; bands 0,0,0,0.454,0.95,0.955,0.994,0.989 vs 0,0,0,0.462,0.964,0.96,0.998,0.99.
+    - --grassprobe --probescan: luminance FLAT 0.41 (2m) -> 0.44 (10-20m). No lighter band.
+    - Qwen vision (3b) catclose + grazing angle: "short lawn", "uniform near and far,
+      no lighter band/bare ring/seams", "green".
+    - --fpsbench: avg 152.8 fps / p95 166 (min 1.0 = first-frame grass build hitch).
+      First time full-geometry grass is PLAYABLE.
+    - Reference shots: small grass/09_catclose_2cm_lawn.png (matches approved 05 look,
+      <=2cm), 10_grass_grazing_2cm_lawn.png (cat-eye grazing angle, uniform).
   problems:
-    - 06_game_pond.png: near grass "no good" (mid tier = 10k/m2 reads too sparse) and
-      "there is no pond" - the water is NOT in the rendered frame. Pixel analysis (3x3
-      grid) showed ONLY grass rows 1-3 + sky row 0, ZERO water region, despite lake.gd
-      running. --pond camera = Terrain.lake.center + y 9 = (-11,9,-16), look_at
-      lake.center+(3.5,0,3.5) = (-7.5,0,-12.5). ROOT CAUSE NOT FOUND YET (investigation
-      interrupted for the backup). Candidates: camera occlusion, water not built at that
-      view, mid-tier grass density too low near the shore, chunk build not finished.
+    - 06_game_pond.png "no pond" root cause was a PLAYER-LOCAL camera_holder offset in
+      main.gd --pond (ended up 21m off). FIXED 2026-08-10: --pond now uses
+      player.camera.look_at_from_position(pond_from, pond_to, UP) in WORLD space and never
+      touches the holder. Verified cam_world=(-11.0, 9.0, -16.0) exactly above lake center.
+    - Pond framing (straight down y=9, pitch -61.2) still to judge with human eyes.
+  vision_loop_2026_08_11:
+    rig: --bare mode (flat world, no buildings/pond/HUD/cat) + --hscale=<n> blade-height
+      override. Vision = qwen2.5vl:3b via vision_expert.ps1.
+    finding: "field of grass" read is driven by BLADE SIZE IN FRAME. 2cm (game default)
+      reads as "green carpet, smooth". Calibrated against a REAL grass photo - Qwen 3b DOES
+      say "field of grass with visible blades" for real grass. Our own close-up crop also
+      reads as grass blades. Height sweep: 6.4cm=carpet, 7.4cm=borderline, 8.4cm=PASS
+      ("a dense green grassy field, blades visible, strands clearly discernible").
+    kept_improvements: denser+wider+tapered blades, darker disc gradient (tips pop),
+      3-scale noise (6m patch + 1.4m + 0.3m mottle + per-pixel turf grain), NEAR_RADIUS 18.
+      fpsbench unchanged (151.9 avg full game at hscale=8) - blade height is free.
+    shots: small grass/11_bare_field_h8.png, 12_bare_grazing_h8.png, 13_game_catclose_h8.png.
+    open_decision: game cap <=2cm = the carpet read. Approved 05 look was 3.5-6.5cm.
+      Options: relax cap to ~8cm (reads as grass, zero perf cost) OR keep 2cm + much denser
+      geometry (expensive, far field still hard). USER MUST DECIDE.
   next_when_resumed:
-    1) Make everything look like 05_game_catclose.png - the approved reference.
-    2) Fix the pond: confirm --pond camera sees the water (lake.gd _build_water) and
-       that water is not occluded; check whether mid-tier grass (10k/m2) reads too
-       sparse near the shore and raise MID density / extend NEAR_RADIUS to match 40k/m2.
-    3) After each change re-capture --noon screenshots into `small grass\`.
+    1) USER EYES on small grass/11 + 12 + 13 and the height/cap decision.
+    2) On approval: commit + push (new shader, rewritten grass_system/grass_chunk,
+       --bare/--hscale rig, deleted impostor files, worklog, PROJECT_STATE).
+    3) Re-check --pond grass near the shore with the new system.
+    4) After each change re-capture --noon screenshots into `small grass\`.
 
 # =============================================================================
 # GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs

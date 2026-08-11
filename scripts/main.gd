@@ -51,22 +51,24 @@ var _enter_shed_delay := -1.0
 
 func _ready() -> void:
 	rng.randomize()
-	_build_farmhouse(FARMHOUSE_POS)
-	_build_shed(SHED_POS)
-	_build_tractor()
-	_build_lake()
-	_build_bird_tree()
-	_build_fence_perimeter()
-	_build_path()
-	_build_trees()
-	_build_rocks()
-	_build_crops()
-	_build_logs()
-	_build_distant_scenery()
-	_spawn_pickups()
-	_spawn_dumbleclaw()
-	_spawn_mouse()
-	_spawn_bird()
+	var bare := "--bare" in OS.get_cmdline_user_args()
+	if not bare:
+		_build_farmhouse(FARMHOUSE_POS)
+		_build_shed(SHED_POS)
+		_build_tractor()
+		_build_lake()
+		_build_bird_tree()
+		_build_fence_perimeter()
+		_build_path()
+		_build_trees()
+		_build_rocks()
+		_build_crops()
+		_build_logs()
+		_build_distant_scenery()
+		_spawn_pickups()
+		_spawn_dumbleclaw()
+		_spawn_mouse()
+		_spawn_bird()
 	_spawn_player()
 	_build_grass()
 	_maybe_screenshot()
@@ -90,9 +92,21 @@ func _spawn_player() -> void:
 
 
 func _maybe_screenshot() -> void:
+	print("MAYBESCREEN START")
 	var args := OS.get_cmdline_user_args()
+	_log_debug("maybe_screenshot args=" + str(args))
+	if "--bare" in args:
+		var p0 = get_tree().get_first_node_in_group("player")
+		if p0 != null:
+			var mr := p0.get_node_or_null("MeshRoot")
+			if mr != null:
+				mr.visible = false
+		Hud.visible = false
 	if "--smoketest" in args:
 		_run_smoke()
+		return
+	if "--fpsbench" in args:
+		_run_fpsbench()
 		return
 	if not "--screenshot" in args:
 		return
@@ -102,6 +116,8 @@ func _maybe_screenshot() -> void:
 		await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
+	_log_debug("after awaits, ticking=" + str(Engine.get_frames_drawn()) + " fps=" + str(Engine.get_frames_per_second()))
+	print("MAYBESCREEN got player")
 	var player = get_tree().get_first_node_in_group("player")
 	if "--catclose" in args and player != null:
 		player.camera_frozen = true
@@ -116,21 +132,182 @@ func _maybe_screenshot() -> void:
 		player.camera.look_at(Vector3(4, 0, -10), Vector3.UP)
 	elif "--pond" in args and player != null:
 		player.camera_frozen = true
-		player.camera_holder.position = Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
-		player.camera.position = Vector3(0, 0, 0)
-		player.camera.look_at(Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5), Vector3.UP)
+		var pond_from := Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
+		var pond_to := Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5)
+		player.camera.look_at_from_position(pond_from, pond_to, Vector3.UP)
 	elif "--ground" in args and player != null:
 		player.camera_frozen = true
 		player.camera_holder.position = player.global_position + Vector3(0, 0.4, 0)
 		player.camera.position = Vector3(0, 0, 0)
 		player.camera.look_at(player.global_position + Vector3(5, 0.1, -2), Vector3.UP)
+	elif "--grass" in args and player != null:
+		player.camera_frozen = true
+		var gh := 0.4
+		var gp := 0.0
+		var gy := 0.0
+		for a in args:
+			if a.begins_with("--grassheight="):
+				gh = float(a.get_slice("=", 1))
+			if a.begins_with("--grasspitch="):
+				gp = float(a.get_slice("=", 1))
+			if a.begins_with("--grassyaw="):
+				gy = float(a.get_slice("=", 1))
+		player.camera_holder.position = Vector3(0, gh, 0)
+		player.camera.position = Vector3(0, 0, 0)
+		var look_off := Vector3(0, gh + sin(deg_to_rad(gp)) * 22.0, cos(deg_to_rad(gp)) * 22.0).rotated(Vector3.UP, deg_to_rad(gy))
+		player.camera.look_at(player.global_position + look_off, Vector3.UP)
+		if "--grassprobe" in args:
+			for i in range(90):
+				await get_tree().process_frame
+			print("CALLING PROBE")
+			_probe_grass(player, args)
+		else:
+			for i in range(5):
+				await get_tree().process_frame
+	elif "--dumbleclaw" in args and player != null:
+		player.camera_frozen = true
+		player.camera_holder.position = Vector3(4.2, 1.1, -12.4)
+		player.camera.position = Vector3(0, 0, 0)
+		player.camera.look_at(Vector3(4, 0.45, -14), Vector3.UP)
 	else:
 		for i in range(30):
 			await get_tree().process_frame
+	var mode := "base"
+	for flag in ["catclose", "flyover", "pond", "ground", "grass", "dumbleclaw"]:
+		if "--%s" % flag in args:
+			mode = flag
+			break
+	if mode == "grass":
+		for a in args:
+			if a.begins_with("--grassyaw="):
+				mode += "_" + a.get_slice("=", 1)
+				break
+	if "--grassprobe" in args and not mode.begins_with("grass"):
+		_probe_grass(player, args)
+	DirAccess.make_dir_recursive_absolute("res://screenshots")
 	var img := get_viewport().get_texture().get_image()
-	img.save_png("res://screenshot.png")
-	print("SCREENSHOT SAVED")
+	img.save_png("res://screenshots/screenshot_%s.png" % mode)
+	print("SCREENSHOT SAVED: res://screenshots/screenshot_%s.png" % mode)
 	get_tree().quit()
+
+
+func _probe_grass(player: Node3D, args: Array) -> void:
+	# Samples actual rendered pixel colors at fixed world points, so we can
+	# measure (not guess) the near-vs-far and camera-angle brightness deltas.
+	var cam: Camera3D = player.camera
+	var px_origin: Vector3 = player.global_position
+	var heights := [
+		Vector3(0.0, 0.0, 3.0),
+		Vector3(0.0, 0.0, 10.0),
+		Vector3(0.0, 0.0, 14.5),
+		Vector3(0.0, 0.0, 26.0),
+	]
+	for a in args:
+		if a.begins_with("--probez="):
+			heights = [Vector3(0.0, 0.0, float(a.get_slice("=", 1)))]
+	if "--probescan" in args:
+		heights = []
+		for d in range(2, 41, 1):
+			heights.append(Vector3(0.0, 0.0, float(d)))
+	if "--probeforward" in args:
+		var fwd: Vector3 = -cam.global_transform.basis.z
+		fwd.y = 0.0
+		fwd = fwd.normalized()
+		heights = []
+		for d in range(1, 26, 1):
+			heights.append(fwd * float(d))
+	print("PROBE camera_height=%.2f pitch=%.1f" % [player.camera_holder.position.y, rad_to_deg(cam.global_rotation.x)])
+	print("PROBE cam_world=%s cur_cam=%s same=%s day=%.1f is_day=%s" % [cam.global_position, get_viewport().get_camera_3d().global_position, get_viewport().get_camera_3d() == cam, GameState.day_time, GameState.is_day])
+	var img := get_viewport().get_texture().get_image()
+	var vw := img.get_width()
+	var vh := img.get_height()
+	var pc := func(x: int, y: int) -> String:
+		var c := img.get_pixel(x, y)
+		return "(%.3f, %.3f, %.3f)" % [c.r, c.g, c.b]
+	print("PROBE refpix top=%s center=%s bottom=%s" % [pc.call(vw / 2, 10), pc.call(vw / 2, vh / 2), pc.call(vw / 2, vh - 10)])
+	for y in range(0, vh, 40):
+		print("STRIP y=%d %s" % [y, pc.call(vw / 2, y)])
+	if "--probefine" in args:
+		for y in range(230, 350, 10):
+			var frow := ""
+			for x in range(vw / 2 - 200, vw / 2 + 201, 50):
+				frow += "%d:%s " % [x, pc.call(x, y)]
+			print("FINE y=%d %s" % [y, frow])
+	for y in [240, 300, 360, 500, 640]:
+		var row := ""
+		for x in range(0, vw, 160):
+			row += "%d:%s " % [x, pc.call(x, y)]
+		print("ROW y=%d %s" % [y, row])
+	print("PROBE terrain water_level=%.3f water_radius=%.1f lake=%.1f,%.1f r%.1f" % [Terrain.water_level, Terrain.water_radius, Terrain.lake.center.x, Terrain.lake.center.y, Terrain.lake.radius])
+	for wp in heights:
+		var wpos: Vector3 = px_origin + wp
+		var ground := Terrain.height_at(wpos.x, wpos.z)
+		wpos.y = ground + 0.15
+		var slope := TerrainGenerator.slope_at(Terrain.heights, Terrain.config, wpos.x, wpos.z)
+		var excl := GrassExclusion.is_excluded(wpos.x, wpos.z, ground)
+		print("PROBE geom dist=%.1fm world=(%.1f,%.3f,%.1f) h=%.3f slope=%.3f excluded=%s" % [wp.z, wpos.x, wpos.y, wpos.z, ground, slope, excl])
+		var sp: Vector2 = cam.unproject_position(wpos)
+		var sx := int(sp.x)
+		var sy := int(sp.y)
+		if sx < 2 or sy < 2 or sx >= vw - 2 or sy >= vh - 2:
+			print("PROBE dist=%.1fm OFF-SCREEN (screen %d,%d of %dx%d)" % [wp.z, sx, sy, vw, vh])
+			continue
+		if sy > vh - 90:
+			print("PROBE dist=%.1fm SKIPPED (near bottom edge, screen %d,%d)" % [wp.z, sx, sy])
+			continue
+		var r_sum := 0.0
+		var g_sum := 0.0
+		var b_sum := 0.0
+		var dark := 0
+		var n := 0
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				var c := img.get_pixel(sx + dx, sy + dy)
+				r_sum += c.r
+				g_sum += c.g
+				b_sum += c.b
+				if (c.r + c.g + c.b) / 3.0 < 0.35:
+					dark += 1
+				n += 1
+		var r := r_sum / n
+		var g := g_sum / n
+		var b := b_sum / n
+		var lum := (r + g + b) / 3.0
+		print("PROBE dist=%.1fm rgb=(%.3f, %.3f, %.3f) lum=%.3f dark_flecks=%d/9 screen=%d,%d" % [wp.z, r, g, b, lum, dark, sx, sy])
+	print("PROBE DONE")
+
+
+func _run_fpsbench() -> void:
+	GameState.day_time = GameState.DAY_SECONDS * 0.75
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var player = get_tree().get_first_node_in_group("player")
+	if player == null:
+		return
+	player.camera_frozen = true
+	var samples: Array[float] = []
+	print("FPSBENCH START")
+	var frames := 0
+	var deadline := Time.get_ticks_msec() + 15000
+	var cam_pos: Vector3 = player.global_position + Vector3(0, 0.4, 0)
+	while Time.get_ticks_msec() < deadline:
+		player.camera_holder.position = cam_pos
+		player.camera.position = Vector3(0, 0, 0)
+		player.camera.look_at(player.global_position + Vector3(5, 0.1, -2), Vector3.UP)
+		var fps := Engine.get_frames_per_second()
+		samples.append(fps)
+		frames += 1
+		await get_tree().process_frame
+	samples.sort()
+	var avg := 0.0
+	for s in samples:
+		avg += s
+	avg /= float(samples.size())
+	var p95 := samples[int(samples.size() * 0.95)]
+	var min_f := samples[0]
+	print("FPSBENCH frames=%d avg=%.1f p95=%.1f min=%.1f" % [samples.size(), avg, p95, min_f])
+	get_tree().quit()
+
 
 
 func _build_farmhouse(home: Vector3) -> void:
@@ -326,6 +503,13 @@ func _build_bird_tree() -> void:
 	tree.add_to_group("trees")
 	trees.append(tree)
 	_add_collider(tree, Vector3(0.9, 2.4, 0.9), Vector3(0, 1.2, 0))
+
+
+func _log_debug(msg: String) -> void:
+	var f := FileAccess.open("res://screenshots/debug.log", FileAccess.WRITE)
+	if f:
+		f.store_line(msg)
+		f.close()
 
 
 func _build_fence_perimeter() -> void:

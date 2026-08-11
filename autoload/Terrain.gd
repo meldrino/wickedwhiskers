@@ -9,8 +9,11 @@ var water_level := 0.0
 var water_radius := 0.0
 
 func _ready() -> void:
-	config = TerrainConfig.whiskers()
+	var args := OS.get_cmdline_user_args()
+	config = TerrainConfig.flat() if "--bare" in args else TerrainConfig.whiskers()
 	heights = TerrainGenerator.generate(config)
+	if "--bare" in args or "--flat" in args:
+		heights.fill(0.0)
 	if not config.lakes.is_empty():
 		lake = config.lakes[0]
 		water_level = height_at(lake.center.x, lake.center.y) + lake.depth - 1.4 * CAT

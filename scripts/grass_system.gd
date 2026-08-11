@@ -1,67 +1,76 @@
 extends Node3D
 
 const CHUNK_SIZE := 5.0
-const NEAR_RADIUS := 6.0
-const MID_RADIUS := 14.0
-const STREAM_RADIUS := 14.0
+const NEAR_RADIUS := 18.0
+const STREAM_RADIUS := 92.0
+const TERRAIN_CELLS := 12
+
+# Restored 026850c GRASS_SHADER params (bend/wind offsets are meters - the
+# blades are only ~1-2 cm, so the tutorial's unit-height values would fling
+# them out sideways).
+const PARAMS := {
+	"patch_scale": 6.0,
+	"size_small": 1.0,
+	"size_large": 1.15,
+	"blade_bend": 0.02,
+	"wind_strength": 0.01,
+	"wind_scale": 9.0,
+	"wind_ao_affect": 0.35,
+	"wind_direction": Vector2(0.7, -0.5),
+	"patch_noise_seed": 2027,
+	"patch_noise_freq": 0.22,
+	"wind_noise_seed": 31337,
+	"wind_noise_freq": 0.6,
+}
 
 var _material: ShaderMaterial
-var _impostor_material: ShaderMaterial
+var _full_mesh: Mesh
+var _disc_mesh: Mesh
 var _chunks := {}
 
 
 func _ready() -> void:
 	_material = ShaderMaterial.new()
-	_material.shader = preload("res://scripts/grass_game.gdshader")
-	_material.set_shader_parameter("patch_noise", _make_noise(_patch_noise(), true))
-	_material.set_shader_parameter("wind_noise", _make_noise(_wind_noise(), true))
+	_material.shader = preload("res://shaders/grass.gdshader")
+	_material.set_shader_parameter("color_small", Color(0.24, 0.42, 0.16))
+	_material.set_shader_parameter("color_large", Color(0.55, 0.78, 0.34))
+	_material.set_shader_parameter("patch_scale", PARAMS["patch_scale"])
+	_material.set_shader_parameter("size_small", PARAMS["size_small"])
+	_material.set_shader_parameter("size_large", PARAMS["size_large"])
+	_material.set_shader_parameter("blade_bend", PARAMS["blade_bend"])
+	_material.set_shader_parameter("wind_strength", PARAMS["wind_strength"])
+	_material.set_shader_parameter("wind_scale", PARAMS["wind_scale"])
+	_material.set_shader_parameter("wind_ao_affect", PARAMS["wind_ao_affect"])
+	_material.set_shader_parameter("wind_direction", PARAMS["wind_direction"])
+	_material.set_shader_parameter("patch_noise", _noise_texture(
+		PARAMS["patch_noise_seed"], true, FastNoiseLite.TYPE_PERLIN,
+		FastNoiseLite.FRACTAL_FBM, PARAMS["patch_noise_freq"]))
+	_material.set_shader_parameter("wind_noise", _noise_texture(
+		PARAMS["wind_noise_seed"], false, FastNoiseLite.TYPE_SIMPLEX_SMOOTH,
+		FastNoiseLite.FRACTAL_RIDGED, PARAMS["wind_noise_freq"]))
+	var chunk_script: GDScript = preload("res://scripts/grass_chunk.gd")
+	var hscale := 1.0
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--hscale="):
+			hscale = float(a.get_slice("=", 1))
+	_full_mesh = chunk_script.build_full_mesh(hscale)
+	_disc_mesh = chunk_script.build_disc_mesh()
 
-	_impostor_material = ShaderMaterial.new()
-	_impostor_material.shader = preload("res://scripts/impostor_grass.gdshader")
-	_impostor_material.set_shader_parameter("color_small", Color(0.25, 0.55, 0.12))
-	_impostor_material.set_shader_parameter("color_large", Color(0.4, 0.65, 0.15))
-	_impostor_material.set_shader_parameter("ground_color", Color(0.06, 0.12, 0.04))
-	_impostor_material.set_shader_parameter("patch_noise", _make_noise(_patch_noise(), true))
-	_impostor_material.set_shader_parameter("patch_scale", 7.0)
-	_impostor_material.set_shader_parameter("high_frequency_noise", _make_noise(_high_frequency_noise(), false))
-	_impostor_material.set_shader_parameter("baked_normals", preload("res://assets/grass_normals.png"))
-	_impostor_material.set_shader_parameter("wind_noise", _make_noise(_wind_noise(), true))
-	_impostor_material.set_shader_parameter("wind_strength", 0.04)
-	_impostor_material.set_shader_parameter("wind_direction", Vector2(1, 0))
-	_impostor_material.set_shader_parameter("wind_bend_strength", 2.0)
-	_impostor_material.set_shader_parameter("wind_ao_affect", 1.5)
 
-	var impostor: MeshInstance3D = preload("res://scripts/grass_impostor.gd").new()
-	impostor.name = "GrassImpostor"
-	impostor.material_override = _impostor_material
-	add_child(impostor)
-
-
-func _patch_noise() -> FastNoiseLite:
+func _noise_texture(seed_n: int, seamless: bool, type_i: int, fractal: int, freq: float) -> NoiseTexture2D:
 	var n := FastNoiseLite.new()
-	n.seed = 101
-	return n
-
-
-func _wind_noise() -> FastNoiseLite:
-	var n := FastNoiseLite.new()
-	n.fractal_type = FastNoiseLite.FRACTAL_FBM
-	n.fractal_gain = 0.45
-	n.seed = 202
-	return n
-
-
-func _high_frequency_noise() -> FastNoiseLite:
-	var n := FastNoiseLite.new()
-	n.frequency = 0.1
-	return n
-
-
-func _make_noise(n: FastNoiseLite, seamless: bool) -> NoiseTexture2D:
-	var t := NoiseTexture2D.new()
-	t.seamless = seamless
-	t.noise = n
-	return t
+	n.seed = seed_n
+	n.noise_type = type_i
+	n.frequency = freq
+	n.fractal_type = fractal
+	n.fractal_octaves = 3
+	n.fractal_gain = 0.5
+	var tex := NoiseTexture2D.new()
+	tex.noise = n
+	tex.seamless = seamless
+	tex.width = 256
+	tex.height = 256
+	return tex
 
 
 func _process(_delta: float) -> void:
@@ -91,16 +100,33 @@ func _update_chunks(centers: Array) -> void:
 			for dz in range(-r, r + 1):
 				var cx := ccx + dx
 				var cz := ccz + dz
+				if cx < -TERRAIN_CELLS or cx > TERRAIN_CELLS - 1:
+					continue
+				if cz < -TERRAIN_CELLS or cz > TERRAIN_CELLS - 1:
+					continue
 				var dist := Vector2((cx + 0.5) * CHUNK_SIZE - c.x, (cz + 0.5) * CHUNK_SIZE - c.z).length()
 				if dist <= STREAM_RADIUS + CHUNK_SIZE:
 					desired["%d,%d" % [cx, cz]] = true
+	var cam: Vector3 = centers[0] if centers.size() > 0 else Vector3.ZERO
+	var missing: Array[String] = []
 	for key in desired:
 		if not _chunks.has(key):
-			_spawn(key)
+			missing.append(key)
+	missing.sort_custom(func(a: String, b: String) -> bool:
+		return _key_dist(a, cam) < _key_dist(b, cam))
+	for key in missing:
+		_spawn(key)
 	for key in _chunks.keys():
 		if not desired.has(key):
 			_chunks[key].queue_free()
 			_chunks.erase(key)
+
+
+func _key_dist(key: String, cam: Vector3) -> float:
+	var parts := key.split(",")
+	var cx := int(parts[0])
+	var cz := int(parts[1])
+	return Vector2((cx + 0.5) * CHUNK_SIZE - cam.x, (cz + 0.5) * CHUNK_SIZE - cam.z).length()
 
 
 func _spawn(key: String) -> void:
@@ -109,7 +135,7 @@ func _spawn(key: String) -> void:
 	var chunk: Node3D = preload("res://scripts/grass_chunk.gd").new()
 	chunk.name = "Chunk_%s" % key
 	add_child(chunk)
-	chunk.setup(cell, _material)
+	chunk.setup(cell, _material, _full_mesh, _disc_mesh)
 	_chunks[key] = chunk
 
 

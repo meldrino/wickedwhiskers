@@ -4,8 +4,8 @@ extends Interactable
 func _ready() -> void:
 	super()
 	prompt = "Click — Talk to Dumbleclaw"
-	interaction_box = Vector3(0.8, 1.5, 0.8)
-	interaction_center = Vector3(0, 0.75, 0)
+	interaction_box = Vector3(0.7, 0.9, 0.7)
+	interaction_center = Vector3(0, 0.45, 0)
 	_build_dumbleclaw()
 
 
@@ -85,51 +85,68 @@ func _trade() -> void:
 
 
 func _build_dumbleclaw() -> void:
-	var grey := StandardMaterial3D.new()
-	grey.albedo_color = Color(0.62, 0.6, 0.58)
-	var robe := StandardMaterial3D.new()
-	robe.albedo_color = Color(0.45, 0.4, 0.6)
-	var white := StandardMaterial3D.new()
-	white.albedo_color = Color(0.95, 0.95, 0.92)
-	var dark := StandardMaterial3D.new()
-	dark.albedo_color = Color(0.2, 0.16, 0.12)
+	var robe := _mat(Color(0.18, 0.12, 0.28), 0.85, 0.0)
+	var hat := _mat(Color(0.14, 0.09, 0.20), 0.90, 0.0)
+	var gold := _mat(Color(0.90, 0.72, 0.20), 0.25, 0.9)
+	var beard := _mat(Color(0.88, 0.88, 0.92), 0.65, 0.05)
+	var fur := _mat(Color(0.50, 0.48, 0.46), 0.80, 0.0)
+	var eye := _mat(Color(0.1, 0.65, 0.95), 0.05, 0.1)
+	eye.emission_enabled = true
+	eye.emission = Color(0.05, 0.35, 0.6)
+	eye.emission_energy_multiplier = 0.4
+	var glass := _mat(Color(0.85, 0.95, 1.0, 0.2), 0.0, 0.1)
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var wood := _mat(Color(0.22, 0.14, 0.08), 0.70, 0.0)
+	var nose_mat := _mat(Color(0.45, 0.30, 0.30), 0.50, 0.0)
 
-	var barrel := _mesh("cylinder", Vector3(0.38, 0.5, 0.38), dark)
-	barrel.position = Vector3(0, 0.25, 0)
-	add_child(barrel)
+	add_child(_mesh("cylinder", Vector3(0.22, 0.32, 0.22), robe, Vector3(0, 0.16, 0), Vector3.ZERO, 0.14))
+	add_child(_mesh("cylinder", Vector3(0.13, 0.08, 0.13), robe, Vector3(0, 0.34, 0.01), Vector3.ZERO, 0.11))
+	add_child(_mesh("box", Vector3(0.03, 0.30, 0.01), gold, Vector3(0, 0.16, 0.18), Vector3(-0.175, 0, 0)))
+	for x in [-1.0, 1.0]:
+		add_child(_mesh("cylinder", Vector3(0.06, 0.22, 0.06), robe, Vector3(0.14 * x, 0.22, 0.04), Vector3(0.262, 0, -0.436 * x)))
+	add_child(_mesh("sphere", Vector3(0.05, 0.03, 0.07), fur, Vector3(-0.07, 0.02, 0.18), Vector3(0, -0.175, 0)))
+	add_child(_mesh("sphere", Vector3(0.05, 0.03, 0.07), fur, Vector3(0.07, 0.02, 0.18), Vector3(0, 0.175, 0)))
 
-	var robe_mesh := _mesh("box", Vector3(0.6, 0.45, 0.42), robe)
-	robe_mesh.position = Vector3(0, 0.55, 0)
-	add_child(robe_mesh)
+	add_child(_mesh("sphere", Vector3(0.16, 0.12, 0.14), fur, Vector3(0, 0.40, 0.02)))
+	for x in [-1.0, 1.0]:
+		add_child(_mesh("sphere", Vector3(0.06, 0.05, 0.05), fur, Vector3(0.06 * x, 0.38, 0.09)))
+		add_child(_mesh("prism", Vector3(0.05, 0.08, 0.02), fur, Vector3(0.09 * x, 0.48, 0.0), Vector3(-0.175, 0.262 * x, -0.349 * x)))
+		add_child(_mesh("sphere", Vector3(0.022, 0.022, 0.022), eye, Vector3(0.045 * x, 0.42, 0.12)))
 
-	var head := _mesh("sphere", Vector3(0.4, 0.36, 0.38), grey)
-	head.position = Vector3(0, 0.88, 0.02)
-	add_child(head)
+	add_child(_mesh("sphere", Vector3(0.018, 0.012, 0.015), nose_mat, Vector3(0, 0.395, 0.15)))
 
-	for x in [-0.14, 0.14]:
-		var ear := _mesh("box", Vector3(0.09, 0.12, 0.07), grey)
-		ear.position = Vector3(x, 1.05, 0.04)
-		ear.rotation = Vector3(-0.2, 0, x * -0.4)
-		add_child(ear)
+	add_child(_mesh("cylinder", Vector3(0.20, 0.01, 0.20), hat, Vector3(0, 0.46, 0.02), Vector3(0.209, 0, 0)))
+	add_child(_mesh("cylinder", Vector3(0.12, 0.12, 0.12), hat, Vector3(0, 0.52, -0.01), Vector3(0.314, 0, 0), 0.07))
+	add_child(_mesh("cylinder", Vector3(0.07, 0.14, 0.07), hat, Vector3(0, 0.61, -0.06), Vector3(0.785, 0, 0), 0.01))
 
-	var beard := _mesh("box", Vector3(0.24, 0.34, 0.06), white)
-	beard.position = Vector3(0, 0.66, 0.22)
-	add_child(beard)
+	for x in [-1.0, 1.0]:
+		add_child(_mesh("box", Vector3(0.035, 0.018, 0.002), glass, Vector3(0.038 * x, 0.41, 0.142), Vector3(0.262, -0.14 * x, 0)))
+		add_child(_mesh("box", Vector3(0.037, 0.003, 0.003), gold, Vector3(0.038 * x, 0.40, 0.143)))
+		add_child(_mesh("cylinder", Vector3(0.001, 0.08, 0.001), gold, Vector3(0.058 * x, 0.38, 0.08), Vector3(0.785, 0, -0.262 * x)))
+	add_child(_mesh("box", Vector3(0.02, 0.003, 0.003), gold, Vector3(0, 0.412, 0.145)))
 
-	for x in [-0.07, 0.07]:
-		var lens := _mesh("box", Vector3(0.07, 0.07, 0.02), white)
-		lens.position = Vector3(x, 0.92, 0.21)
-		add_child(lens)
-	var bridge := _mesh("box", Vector3(0.1, 0.025, 0.02), white)
-	bridge.position = Vector3(0, 0.92, 0.21)
-	add_child(bridge)
+	for x in [-1.0, 1.0]:
+		add_child(_mesh("prism", Vector3(0.06, 0.025, 0.02), beard, Vector3(0.03 * x, 0.385, 0.145), Vector3(0, 0, -2.793 * x)))
+		add_child(_mesh("cylinder", Vector3(0.0008, 0.12, 0.0008), beard, Vector3(0.07 * x, 0.39, 0.13), Vector3(0.087, -1.396 * x, -0.175 * x)))
 
-	var nose := _mesh("sphere", Vector3(0.09, 0.08, 0.06), dark)
-	nose.position = Vector3(0, 0.82, 0.24)
-	add_child(nose)
+	add_child(_mesh("box", Vector3(0.14, 0.12, 0.06), beard, Vector3(0, 0.32, 0.13), Vector3(-0.175, 0, 0)))
+	add_child(_mesh("cylinder", Vector3(0.03, 0.14, 0.03), beard, Vector3(0, 0.20, 0.16), Vector3(-0.087, 0, 0), 0.01))
+	add_child(_mesh("torus", Vector3(0.015, 0.025, 0), gold, Vector3(0, 0.25, 0.16), Vector3(PI * 0.5, 0, 0)))
+
+	add_child(_mesh("cylinder", Vector3(0.01, 0.55, 0.01), wood, Vector3(0.18, 0.24, 0.14), Vector3(-0.175, 0, -0.262), 0.005))
+	for y in [0.25, 0.32, 0.39]:
+		add_child(_mesh("sphere", Vector3(0.016, 0.02, 0.016), wood, Vector3(0.18, y, 0.14)))
 
 
-func _mesh(kind: String, size: Vector3, mat: StandardMaterial3D) -> MeshInstance3D:
+func _mat(color: Color, roughness: float, metallic: float) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = color
+	m.roughness = roughness
+	m.metallic = metallic
+	return m
+
+
+func _mesh(kind: String, size: Vector3, mat: StandardMaterial3D, pos := Vector3.ZERO, rot := Vector3.ZERO, top_radius: float = -1.0) -> MeshInstance3D:
 	var mi := MeshInstance3D.new()
 	var mesh: Mesh
 	match kind:
@@ -144,10 +161,21 @@ func _mesh(kind: String, size: Vector3, mat: StandardMaterial3D) -> MeshInstance
 			mesh = sm
 		"cylinder":
 			var cm := CylinderMesh.new()
-			cm.top_radius = size.x
+			cm.top_radius = top_radius if top_radius >= 0.0 else size.x
 			cm.bottom_radius = size.x
 			cm.height = size.y
 			mesh = cm
+		"prism":
+			var pm := PrismMesh.new()
+			pm.size = size
+			mesh = pm
+		"torus":
+			var torus := TorusMesh.new()
+			torus.inner_radius = size.x
+			torus.outer_radius = size.y
+			mesh = torus
 	mesh.material = mat
 	mi.mesh = mesh
+	mi.position = pos
+	mi.rotation = rot
 	return mi
