@@ -446,3 +446,11 @@ USER: 13_game_catclose_h8 was "massively better" than the dense-scatter version;
   Screenshot naming convention: <seq>_<mode>_<camera>_<state>.png, e.g. 16_game_catclose_h8.png.
   Commit message = same state tag so GitHub history is the revert map.
 Screenshots: screenshots/16_game_catclose_h8.png (game catclose, hscale=8).
+
+## 2026-08-11 - DEFAULT game height = h8 look (fixes "game looks nothing like h8")
+USER ran the game plain (double-click) -> 2cm carpet at night = "utter shit, nothing like 13_game_catclose_h8".
+ROOT CAUSE: 13_game_catclose_h8 used --hscale=8 (8cm blades); the game DEFAULT was still hscale=1 (2cm mowed-lawn carpet).
+FIX: grass_system.gd default hscale 1.0 -> 8.0 (--hscale flag still overrides).
+VERIFIED default launch at noon vs 13_game_catclose_h8: sky 165/209/242 vs 165/203/235, grass bands 142.5/126 vs 144/108, GreenFrac 0.59 vs 0.584. Matches.
+Night start (day_time := 0.0) unchanged - intentional day/night cycle.
+Screenshots: screenshots/17_game_noon_h8default.png (default camera, noon, hscale=8 default).
