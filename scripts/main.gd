@@ -2,6 +2,7 @@ extends Node3D
 
 const WORLD_SIZE := 60.0
 const HALF := WORLD_SIZE / 2.0
+const FENCE_HALF := 25.0
 
 const TREE_SCENES := [
 	preload("res://assets/tree_default.glb"),
@@ -513,7 +514,7 @@ func _log_debug(msg: String) -> void:
 
 
 func _build_fence_perimeter() -> void:
-	var dist := HALF - 2.0
+	var dist := FENCE_HALF
 	var span := dist * 2.0
 	var per_edge := maxi(2, int(round(span / FENCE_PANEL_WIDTH)))
 	var spacing := span / per_edge
@@ -704,8 +705,8 @@ func _add_collider(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 
 
 func _random_pos(margin: float) -> Vector3:
-	var x := rng.randf_range(-HALF + margin + 2.0, HALF - margin - 2.0)
-	var z := rng.randf_range(-HALF + margin + 2.0, HALF - margin - 2.0)
+	var x := rng.randf_range(-FENCE_HALF + margin, FENCE_HALF - margin)
+	var z := rng.randf_range(-FENCE_HALF + margin, FENCE_HALF - margin)
 	return Vector3(x, 0, z)
 
 
@@ -720,7 +721,7 @@ func _too_close_to_landmarks(pos: Vector3) -> bool:
 func _build_path() -> void:
 	var dirt := Color(0.6, 0.48, 0.32)
 	var dust := Color(0.55, 0.44, 0.3)
-	var fence_z := HALF - 2.0
+	var fence_z := FENCE_HALF
 	var path: Node3D = Node3D.new()
 	path.name = "Path"
 	add_child(path)

@@ -258,15 +258,16 @@ grass_rendering:
     (cx/cz -12..11 = full +-60 m; env has NO fog so partial coverage would show the
     lighter bare terrain as the old "far lighter" ring). Each tuft = flat sward disc
     (UV.x=2 shader marker, radius 0.11, dark = base*0.6) + 10 outer + 5 inner ribbon
-    blades, placed on a jittered 0.198 m grid (676/chunk). Tier 0 = full tufts within
-    NEAR_RADIUS 10 m of camera/mouse; tier 1 = sward-disc-only beyond. ONE shared
-    shader/lighting -> no light split. cast_shadow off everywhere.
+      blades, placed on a jittered 0.198 m grid (676/chunk). Tier 0 = full tufts INSIDE
+      the 50x50 fenced area (FENCE_HALF 25), tier 1 = sward-disc-only outside, regardless
+      of distance. ONE shared
+      shader/lighting -> no light split. cast_shadow off everywhere.
     2CM CAP MATH: local blade tip = base_off 0.008 + max_h 0.008 = 0.016 m, x shader
     size_large 1.25 = 0.020 m EXACTLY; disc top 0.75 cm; instance scale pinned to 1.0.
   files:
     scripts/grass_system.gd: owns the ONE ShaderMaterial + prebuilt meshes; streams all
       terrain chunks (STREAM_RADIUS 92), spawns sorted by distance to camera + Mouse;
-      set_tier 0/1 by NEAR_RADIUS 10.
+      set_tier 0/1 by position inside/outside fence (FENCE_HALF 25).
     scripts/grass_chunk.gd: static build_full_mesh()/build_disc_mesh() (SurfaceTool tuft
       geometry, seed 4242); budgeted per-frame placement (BUILD_PER_FRAME 6000,
       _mm.visible=false until built); MultiMesh via set_instance_transform (the
@@ -313,7 +314,8 @@ grass_rendering:
       reads as grass blades. Height sweep: 6.4cm=carpet, 7.4cm=borderline, 8.4cm=PASS
       ("a dense green grassy field, blades visible, strands clearly discernible").
     kept_improvements: denser+wider+tapered blades, darker disc gradient (tips pop),
-      3-scale noise (6m patch + 1.4m + 0.3m mottle + per-pixel turf grain), NEAR_RADIUS 18.
+      3-scale noise (6m patch + 1.4m + 0.3m mottle + per-pixel turf grain), tiers keyed
+      to fence (tier 0 inside 50x50, tier 1 outside) not camera radius.
       fpsbench unchanged (151.9 avg full game at hscale=8) - blade height is free.
     shots: small grass/11_bare_field_h8.png, 12_bare_grazing_h8.png, 13_game_catclose_h8.png.
     open_decision: game cap <=2cm = the carpet read. Approved 05 look was 3.5-6.5cm.

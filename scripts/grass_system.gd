@@ -1,7 +1,7 @@
 extends Node3D
 
 const CHUNK_SIZE := 5.0
-const NEAR_RADIUS := 18.0
+const FENCE_HALF := 25.0
 const STREAM_RADIUS := 92.0
 const TERRAIN_CELLS := 12
 
@@ -139,15 +139,37 @@ func _spawn(key: String) -> void:
 	_chunks[key] = chunk
 
 
-func _update_tiers(centers: Array) -> void:
+func _update_tiers(_centers: Array) -> void:
 	for key in _chunks:
 		var chunk: Node3D = _chunks[key]
 		var cpos := chunk.position + Vector3(CHUNK_SIZE * 0.5, 0, CHUNK_SIZE * 0.5)
-		var best := INF
-		for c in centers:
-			var d := Vector2(c.x - cpos.x, c.z - cpos.z).length()
-			best = minf(best, d)
 		var tier := 1
-		if best <= NEAR_RADIUS:
+		if absf(cpos.x) <= FENCE_HALF and absf(cpos.z) <= FENCE_HALF:
 			tier = 0
 		chunk.set_tier(tier)
+	_dbg_tier_count()
+
+
+var _dbg_frames := 0
+func _dbg_tier_count() -> void:
+	_dbg_frames += 1
+	if _dbg_frames % 120 != 0:
+		return
+	var t0 := 0
+	var t1 := 0
+	var placed0 := 0
+	var placed1 := 0
+	for key in _chunks:
+		var chunk: Node3D = _chunks[key]
+		if chunk._tier == 0:
+			t0 += 1
+			placed0 += chunk._placed
+		else:
+			t1 += 1
+			placed1 += chunk._placed
+	var centers := _centers()
+	var cam: Vector3 = centers[0] if centers.size() > 0 else Vector3.ZERO
+	print("GRASSDBG cam=(%.1f,%.1f) t0=%d t1=%d total=%d | t0_area=%.0fm2 t1_area=%.0fm2 | t0_tufts=%d t1_tufts=%d" % [
+		cam.x, cam.z, t0, t1, t0 + t1,
+		t0 * CHUNK_SIZE * CHUNK_SIZE, t1 * CHUNK_SIZE * CHUNK_SIZE,
+		placed0, placed1])
