@@ -18,6 +18,7 @@ const TREE_SCENES := [
 const FENCE_PANEL := preload("res://assets/fence2.glb")
 const FENCE_PANEL_WIDTH := 5.89
 const FENCE_PANEL_HEIGHT := 1.1
+const TRUNK_COLLIDER_SIZE := Vector3(0.5, 1.8, 0.5)
 const ROCK_SCENES := [
 	preload("res://assets/rock_smallA.glb"),
 	preload("res://assets/rock_smallB.glb"),
@@ -503,7 +504,7 @@ func _build_bird_tree() -> void:
 	add_child(tree)
 	tree.add_to_group("trees")
 	trees.append(tree)
-	_add_collider(tree, Vector3(0.9, 2.4, 0.9), Vector3(0, 1.2, 0))
+	_add_collider(tree, TRUNK_COLLIDER_SIZE / 4.0, Vector3(0, 1.2, 0))
 
 
 func _log_debug(msg: String) -> void:
@@ -521,23 +522,15 @@ func _build_fence_perimeter() -> void:
 	var start := -dist + spacing / 2.0
 
 	for edge in range(4):
+		if edge == 0:
+			_build_gate_edge(dist, spacing)
+			continue
 		for i in range(per_edge):
-			var on_north := edge == 0
-			var center_panel := i == per_edge / 2
-			if on_north and center_panel:
-				var gate: Node3D = preload("res://scripts/gate.gd").new()
-				gate.name = "Gate"
-				gate.position = Vector3(0, 0, -dist)
-				add_child(gate)
-				continue
 			var fence: Node3D = FENCE_PANEL.instantiate()
 			var off := start + i * spacing
 			var pos := Vector3.ZERO
 			var rot := 0.0
 			match edge:
-				0:
-					pos = Vector3(off, 0, -dist)
-					rot = 0.0
 				1:
 					pos = Vector3(dist, 0, off)
 					rot = PI / 2.0
@@ -551,6 +544,24 @@ func _build_fence_perimeter() -> void:
 			fence.rotation = Vector3(0, rot, 0)
 			add_child(fence)
 			_add_fence_collider(fence)
+
+
+func _build_gate_edge(dist: float, spacing: float) -> void:
+	# North edge (faces the farmhouse): gate centred at x=0, panels symmetric on
+	# either side at the same spacing as the other edges.
+	var items := int(round(dist * 2.0 / spacing)) + 1
+	for i in range(items):
+		var off := -dist + i * spacing
+		if is_equal_approx(off, 0.0):
+			var gate: Node3D = preload("res://scripts/gate.gd").new()
+			gate.name = "Gate"
+			gate.position = Vector3(0, 0, -dist)
+			add_child(gate)
+			continue
+		var fence: Node3D = FENCE_PANEL.instantiate()
+		fence.position = Vector3(off, 0, -dist)
+		add_child(fence)
+		_add_fence_collider(fence)
 
 
 func _add_fence_collider(parent: Node3D) -> void:
@@ -578,7 +589,7 @@ func _build_trees() -> void:
 		add_child(tree)
 		tree.add_to_group("trees")
 		trees.append(tree)
-		_add_collider(tree, Vector3(0.6, 2.0, 0.6), Vector3(0, 1.0, 0))
+		_add_collider(tree, TRUNK_COLLIDER_SIZE / scale, Vector3(0, 1.0, 0))
 
 
 func _build_rocks() -> void:

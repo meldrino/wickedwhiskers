@@ -104,6 +104,12 @@ func _update_chunks(centers: Array) -> void:
 					continue
 				if cz < -TERRAIN_CELLS or cz > TERRAIN_CELLS - 1:
 					continue
+				# No grass outside the farm: only chunks whose center is inside
+				# the 50x50 fence (kills all tier-1 discs; outside = bare terrain).
+				var chunk_cx := (cx + 0.5) * CHUNK_SIZE
+				var chunk_cz := (cz + 0.5) * CHUNK_SIZE
+				if absf(chunk_cx) > FENCE_HALF or absf(chunk_cz) > FENCE_HALF:
+					continue
 				var dist := Vector2((cx + 0.5) * CHUNK_SIZE - c.x, (cz + 0.5) * CHUNK_SIZE - c.z).length()
 				if dist <= STREAM_RADIUS + CHUNK_SIZE:
 					desired["%d,%d" % [cx, cz]] = true

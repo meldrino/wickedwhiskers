@@ -4,7 +4,9 @@ var sun: DirectionalLight3D
 var moon: DirectionalLight3D
 var moon_mesh: MeshInstance3D
 var stars: MeshInstance3D
+var stars_mat: StandardMaterial3D
 var sky_mat: ProceduralSkyMaterial
+var cloud_tex: NoiseTexture2D
 
 const DAY_SECONDS := 7200.0
 const SUN_AMPLITUDE := deg_to_rad(55.0)
@@ -17,7 +19,15 @@ const DUSK_HORIZON := Color(0.85, 0.45, 0.32)
 const DAY_TOP := Color(0.35, 0.6, 0.95)
 const DAY_HORIZON := Color(0.82, 0.86, 0.9)
 
+const SHOOT_INTERVAL_MIN := 22.0
+const SHOOT_INTERVAL_MAX := 55.0
+const SHOOT_RADIUS := 260.0
+const SHOOT_SPEED := 150.0
+const SHOOT_LIFE := 1.4
+
 var rng := RandomNumberGenerator.new()
+var _shoot_timer := 10.0
+var _shooting: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -27,6 +37,7 @@ func _ready() -> void:
 		sky_mat = we.environment.sky.sky_material as ProceduralSkyMaterial
 	_build_lights()
 	_build_moon_mesh()
+	_build_clouds()
 	_build_stars()
 	_update_sky(0.0)
 
@@ -36,12 +47,13 @@ func _process(delta: float) -> void:
 	if GameState.day_time >= DAY_SECONDS:
 		GameState.day_time -= DAY_SECONDS
 		GameState.day_index += 1
-	_update_sky(GameState.day_time)
+	var night := _update_sky(GameState.day_time)
+	_process_shooting_stars(delta, night)
 	_process_hunger(delta)
 	_process_tiredness(delta)
 
 
-func _update_sky(time_s: float) -> void:
+func _update_sky(time_s: float) -> float:
 	var t := fmod(time_s / DAY_SECONDS, 1.0)
 	var elev := SUN_AMPLITUDE * cos((t - 0.75) * TAU) - SUN_BASE
 	var e_deg := rad_to_deg(elev)
@@ -58,6 +70,8 @@ func _update_sky(time_s: float) -> void:
 		sky_mat.sky_horizon_color = horizon
 		sky_mat.ground_bottom_color = NIGHT_TOP.lerp(DAY_TOP, day)
 		sky_mat.ground_horizon_color = horizon
+		# Clouds fade in with the day, dim bluish under moonlight (the fader).
+		sky_mat.sky_cover_modulate = Color.WHITE.lerp(Color(0.3, 0.34, 0.55), night)
 
 	GameState.is_day = e_deg > 4.0
 	if GameState.is_day and not GameState.first_dawn:
@@ -77,6 +91,35 @@ func _update_sky(time_s: float) -> void:
 
 	moon_mesh.visible = night > 0.2
 	stars.visible = night > 0.15
+	if stars_mat != null:
+		stars_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.6 + 0.4 * sin(time_s * 2.1))
+	return night
+
+
+func _build_clouds() -> void:
+	if sky_mat == null:
+		return
+	var noise := FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_PERLIN
+	noise.seed = rng.randi()
+	noise.frequency = 0.0028
+	noise.fractal_octaves = 4
+	noise.fractal_gain = 0.5
+	noise.fractal_lacunarity = 2.2
+	var grad := Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 0.42, 0.6, 1.0])
+	grad.colors = PackedColorArray([
+		Color(0, 0, 0), Color(0, 0, 0), Color(0.9, 0.9, 0.95), Color(1, 1, 1),
+	])
+	cloud_tex = NoiseTexture2D.new()
+	cloud_tex.width = 1024
+	cloud_tex.height = 512
+	cloud_tex.seamless = true
+	cloud_tex.generate_mipmaps = true
+	cloud_tex.noise = noise
+	cloud_tex.color_ramp = grad
+	sky_mat.sky_cover = cloud_tex
+	sky_mat.sky_cover_modulate = Color.WHITE
 
 
 func _process_hunger(delta: float) -> void:
@@ -154,21 +197,75 @@ func _build_moon_mesh() -> void:
 
 func _build_stars() -> void:
 	var pts := PackedVector3Array()
-	for i in range(220):
+	var cols := PackedColorArray()
+	for i in range(320):
 		var a := rng.randf_range(0.0, TAU)
 		var e := rng.randf_range(0.05, 1.35)
 		pts.append(Vector3(cos(a) * cos(e), sin(e), sin(a) * cos(e)) * 280.0)
+		var b := rng.randf_range(0.6, 1.0)
+		cols.append(Color(b, b, b))
 	var arr := []
 	arr.resize(Mesh.ARRAY_MAX)
 	arr[Mesh.ARRAY_VERTEX] = pts
+	arr[Mesh.ARRAY_COLOR] = cols
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_POINTS, arr)
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(1.0, 1.0, 1.0)
-	mat.point_size = 2.5
-	mesh.surface_set_material(0, mat)
+	stars_mat = StandardMaterial3D.new()
+	stars_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	stars_mat.albedo_color = Color(1.0, 1.0, 1.0)
+	stars_mat.point_size = 2.5
+	stars_mat.vertex_color_use_as_albedo = true
+	mesh.surface_set_material(0, stars_mat)
 	stars = MeshInstance3D.new()
 	stars.mesh = mesh
 	stars.visible = false
 	add_child(stars)
+
+
+func _process_shooting_stars(delta: float, night: float) -> void:
+	if night > 0.3:
+		_shoot_timer -= delta
+		if _shoot_timer <= 0.0:
+			_spawn_shooting_star()
+			_shoot_timer = rng.randf_range(SHOOT_INTERVAL_MIN, SHOOT_INTERVAL_MAX)
+	for s in _shooting:
+		s.t += delta
+		var mi: MeshInstance3D = s.node
+		mi.position += s.dir * SHOOT_SPEED * delta
+		var k := s.t / SHOOT_LIFE
+		var fade := 0.0
+		if k < 0.15:
+			fade = k / 0.15
+		elif k < 0.6:
+			fade = 1.0
+		else:
+			fade = 1.0 - (k - 0.6) / 0.4
+		mi.modulate = Color(1.0, 1.0, 1.0, fade)
+		if k >= 1.0:
+			mi.queue_free()
+	for i in range(_shooting.size() - 1, -1, -1):
+		if _shooting[i].t >= SHOOT_LIFE:
+			_shooting.remove_at(i)
+
+
+func _spawn_shooting_star() -> void:
+	var a := rng.randf_range(0.0, TAU)
+	var e := rng.randf_range(0.3, 1.2)
+	var dir := Vector3(cos(a) * cos(e), sin(e), sin(a) * cos(e)).normalized()
+	var start := dir * SHOOT_RADIUS
+	var speed_dir := Vector3(-sin(a), 0.15, cos(a)).normalized()
+
+	var mi := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.5, 11.0)
+	quad.orientation = QuadMesh.FACE_Z
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	mat.albedo_color = Color(1.0, 1.0, 1.0, 0.0)
+	quad.material = mat
+	mi.mesh = quad
+	mi.position = start
+	mi.look_at(start + speed_dir, Vector3.UP)
+	add_child(mi)
+	_shooting.append({"node": mi, "dir": speed_dir, "t": 0.0})

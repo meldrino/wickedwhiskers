@@ -72,6 +72,7 @@ func _build_world() -> void:
 		var z := -config.extent + iz * cell
 		for ix in range(size):
 			var x := -config.extent + ix * cell
+			st.set_uv(Vector2(x, z) * 0.25)
 			st.set_color(colors[iz * size + ix])
 			st.add_vertex(Vector3(x, heights[iz * size + ix], z))
 	for iz in range(size - 1):
@@ -97,6 +98,9 @@ func _build_world() -> void:
 	var mat := StandardMaterial3D.new()
 	mat.vertex_color_use_as_albedo = true
 	mat.albedo_color = Color.WHITE
+	mat.albedo_texture = preload("res://assets/grass_ground.png")
+	mat.texture_repeat = BaseMaterial3D.TEXTURE_REPEAT_ENABLED
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	mi.material_override = mat
 	ground.add_child(mi)
 

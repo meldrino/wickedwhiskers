@@ -20,7 +20,7 @@ var hill_max := 60.0
 var edge_start := 26.8
 var edge_end := 28.0
 
-var grass_color := Color(0.35, 0.55, 0.2)
+var grass_color := Color(0.16, 0.29, 0.10)
 var dirt_color := Color(0.45, 0.33, 0.2)
 var rock_color := Color(0.52, 0.52, 0.54)
 var water_edge_color := Color(0.3, 0.43, 0.21)
