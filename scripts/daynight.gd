@@ -232,7 +232,7 @@ func _process_shooting_stars(delta: float, night: float) -> void:
 		s.t += delta
 		var mi: MeshInstance3D = s.node
 		mi.position += s.dir * SHOOT_SPEED * delta
-		var k := s.t / SHOOT_LIFE
+		var k: float = s.t / SHOOT_LIFE
 		var fade := 0.0
 		if k < 0.15:
 			fade = k / 0.15
