@@ -478,3 +478,34 @@ render the SAME full-geometry tufts as near (grass_chunk _full_mesh_far), one sh
 - NOT yet verified: user eyes on whether 0.32m far meadow + 10m chunk seams read OK at the horizon.
 Screenshots: fpsbench_diag.txt (bench log), screenshots/29_lakeshore_pinkground.png +
 30_lakeshore_pinkground_90.png + 31_lakeshore_map.png + 32/33 (disc-bright lake + catclose shots).
+
+## 2026-08-12 (night shift) - grass chunks back to 5x5 + socket investigation + autonomy session
+USER (in-game): "when ww turns around the grass disappears altogether sometimes" + suspicion of the
+big macro chunks. USER DECISION: "put all the chunks back to 5x5... if we don't need to then lets not
+fuck about with them".
+- REVERTED macro far chunks (10x10) back to 5x5 EVERYWHERE: grass_system.gd _chunk_key() now always
+  emits "cx,cz,1"; MACRO_SIZE const deleted; _update_tiers = pure distance tiers on 5x5 chunks
+  (0 adaptive <= NEAR_RADIUS 18, 1 grid @0.2 <= FAR_RADIUS 40, 2 grid @0.32 >40). TUFT_SPACING_FAR
+  0.32 + STREAM_RADIUS 70 kept. NOTE: 5x5 far chunks = ~4x more far MultiMesh draw calls than the
+  10x10 macro merge (fpsbench re-check pending).
+- DISAPPEARING-ON-TURN root-cause hypothesis (NOT yet fixed): _update_chunks spawns chunks sorted by
+  camera+mouse distance; grass_chunk _rebuild() sets _mm.visible=false until the whole MultiMesh
+  array is placed (BUILD_PER_FRAME 6000). A fast turn sweeps the Mouse point across the field -> a
+  wave of freshly-spawned INVISIBLE-while-building chunks, plus tier flips that rebuild chunks
+  (invisible again during rebuild). Fix candidates (for later): keep _mm.visible=true during rebuild,
+  raise BUILD_PER_FRAME, or don't key chunk streaming on the mouse position.
+- SOCKET: recurring "Cannot connect to API: The socket connection was closed unexpectedly" (user saw
+  it constantly; also filled ~/.local/share/opencode/log/opencode.log).
+  - 138 drops this session log, providerID=opencode modelID=big-pickle, roughly ONE PER GENERATION.
+  - stream-start -> error delta measured: 6-69 s, variable (NOT a fixed 30 s timer) => mid-stream
+    SSE reset, NOT idle timeout.
+  - opencode auto-retries ~2 s later and ALWAYS succeeds => no data loss, cosmetic-but-noisy.
+  - Suspects: opencode API server / CDN resetting SSE, or Avast Web Shield proxying + killing
+    long-lived HTTPS streams (this laptop's known Avast behaviour).
+  - ACTION: added "logLevel": "DEBUG" to C:\Users\Andy\.config\opencode\opencode.jsonc. Needs an
+    opencode RESTART to apply. Next drop after restart will log the fetch-level cause (exact host +
+    ECONNRESET/socket-hangup/TLS) so the blame lands on the server or the AV.
+- AUTONOMY: user went to sleep and authorised unattended work. Night-shift task list in
+  PROJECT_STATE.yaml (todo section): chunks in lake, Dumbleclaw's beard, animations, placeholder
+  beautification. Verify with smoke test + --noon screenshots before committing. This session is
+  writing everything to YAML/worklog/git as it goes (recovery ritual).

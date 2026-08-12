@@ -3,7 +3,6 @@ extends Node3D
 const CHUNK_SIZE := 5.0
 const NEAR_RADIUS := 18.0
 const FAR_RADIUS := 40.0
-const MACRO_SIZE := 2
 const STREAM_RADIUS := 70.0
 const TERRAIN_CELLS := 12
 const FAR_HSCALE := 1.0
@@ -127,13 +126,8 @@ func _update_chunks(centers: Array) -> void:
 			_chunks.erase(key)
 
 
-func _chunk_key(cx: int, cz: int, c: Vector3) -> String:
-	var d := Vector2((cx + 0.5) * CHUNK_SIZE - c.x, (cz + 0.5) * CHUNK_SIZE - c.z).length()
-	if d <= FAR_RADIUS:
-		return "%d,%d,1" % [cx, cz]
-	var bx := floori(cx / MACRO_SIZE) * MACRO_SIZE
-	var bz := floori(cz / MACRO_SIZE) * MACRO_SIZE
-	return "%d,%d,%d" % [bx, bz, MACRO_SIZE]
+func _chunk_key(cx: int, cz: int, _c: Vector3) -> String:
+	return "%d,%d,1" % [cx, cz]
 
 
 func _key_dist(key: String, cam: Vector3) -> float:
@@ -164,9 +158,9 @@ func _update_tiers(centers: Array) -> void:
 		for c in centers:
 			var d := Vector2(c.x - cpos.x, c.z - cpos.z).length()
 			best = minf(best, d)
-		var tier := 1
-		if chunk.size_m > CHUNK_SIZE + 0.01:
-			tier = 2
-		elif best <= NEAR_RADIUS:
+		var tier := 2
+		if best <= NEAR_RADIUS:
 			tier = 0
+		elif best <= FAR_RADIUS:
+			tier = 1
 		chunk.set_tier(tier)

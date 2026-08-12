@@ -244,7 +244,17 @@ build_status:
 # GRASS RENDERING - OPTION B REBUILD: FULL-GEOMETRY <=2CM LAWN (2026-08-11)
 # =============================================================================
 grass_rendering:
-  current_state_2026_08_11_afternoon:  # SUPERSEDES the 08-11-morning rebuild below
+  current_state_2026_08_12:  # NIGHT SHIFT - SUPERSEDES the 08-11-afternoon block below
+    chunks: ALL 5x5 AGAIN (user decision: "put all the chunks back to 5x5"). _chunk_key() always
+      emits "cx,cz,1"; MACRO_SIZE deleted. Tiers stay distance-based: 0 adaptive <=18m, 1 grid
+      @0.2 <=40m, 2 grid @0.32 >40m (TUFT_SPACING_FAR 0.32 + STREAM_RADIUS 70 kept).
+      Perf note: 5x5 far chunks = ~4x more far draw calls vs 10x10 macro (fpsbench re-check pending).
+    disappearing_on_turn: user saw grass vanish when WW turns. Root cause hypothesis = _rebuild()
+      sets _mm.visible=false until the MultiMesh array is fully placed (BUILD_PER_FRAME 6000);
+      fast turns sweep the Mouse point -> wave of invisible-while-building spawns + tier-flip
+      rebuilds. Fix candidates: keep visible during rebuild / raise budget / drop mouse-keyed streaming.
+    status: NOT yet re-verified after revert (smoke + screenshots pending this shift).
+  current_state_2026_08_11_afternoon:  # SUPERSEDED by current_state_2026_08_12
     look: far field now renders the SAME full-geometry tufts as near (impostor/small-tufts
       approach is DEAD). Dark far band gone; grass reads as grass to the horizon.
     stream: STREAM_RADIUS 70 (terrain caps at +-60 so 70 == full coverage; 100 dropped the
@@ -336,12 +346,10 @@ grass_rendering:
     open_decision: game cap <=2cm = the carpet read. Approved 05 look was 3.5-6.5cm.
       Options: relax cap to ~8cm (reads as grass, zero perf cost) OR keep 2cm + much denser
       geometry (expensive, far field still hard). USER MUST DECIDE.
-  next_when_resumed:  # current_state_2026_08_11_afternoon block above is the live state
-    1) USER EYES in-game: macro-chunk far meadow @0.32m + 10m seams + the 50x50 field
-       (the far look is the one thing NOT yet human-reviewed this session).
-    2) Then decide: tune TUFT_SPACING_FAR / FAR_RADIUS, or commit+push is already done.
-    3) Re-check --pond grass near the shore with the new system (old issue, still open).
-    4) After each change re-capture --noon screenshots into `small grass\`.
+  next_when_resumed:  # live state = current_state_2026_08_12 (night shift)
+    1) Re-verify after the 5x5 chunk revert: headless --smoketest + --fpsbench + --noon screenshots.
+    2) Then tackle disappearing-on-turn (visible-during-rebuild / mouse-keyed streaming, see above).
+    3) USER EYES in-game for the far meadow + seams once back.
 
 # =============================================================================
 # GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs
@@ -438,6 +446,16 @@ todo:
     far impostor, 05_game_catclose.png approved). See grass_rendering.
   - [NEXT -> ISLE OF WIGHT] Fix 06_game_pond.png: water missing from the --pond frame
     + near-pond grass too sparse. Goal = everything matches 05_game_catclose.png.
+  - [NIGHT SHIFT 2026-08-12 - user asleep, authorized autonomy] priority list:
+      1. grass chunks in lake (user-reported) - investigate why tufts appear in/on the water
+         despite GrassExclusion (h < water_level + lake radius + slope + RECTS checks)
+      2. Dumbleclaw's beard (currently 2 tiny box/cylinder placeholders - make it a proper
+         procedural wizard beard)
+      3. animations: walk is a procedural sine; idle is breathing/sway/tail. Try a nicer trot +
+         head-bob without breaking the approved look
+      4. placeholder beautification (trees/rocks/fence/padlock/tractor) as time allows
+      Rules: verify each change (smoke + --noon screenshots), commit+push each task, update this
+      YAML + worklog as I go.
 
 # =============================================================================
 # KNOWN ISSUES

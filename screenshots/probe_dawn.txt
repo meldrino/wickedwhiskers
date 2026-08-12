@@ -1,0 +1,168 @@
+Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org
+Vulkan 1.4.325 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4070 Laptop GPU
+
+WARNING: Godot 3.x SpatialMaterial remapped parameter not found: normal_map
+   at: _set (scene/resources/material.cpp:4096)
+   GDScript backtrace (most recent call first):
+       [0] _build_water (res://scripts/lake.gd:68)
+       [1] _ready (res://scripts/lake.gd:24)
+       [2] _build_lake (res://scripts/main.gd:498)
+       [3] _ready (res://scripts/main.gd:59)
+MAYBESCREEN START
+MAYBESCREEN got player
+CALLING PROBE
+PROBE camera_height=0.40 pitch=0.0
+PROBE cam_world=(0.0, 0.463153, 12.0) cur_cam=(0.0, 0.463153, 12.0) same=true day=4144.9 is_day=true
+PROBE refpix top=(0.451, 0.694, 0.941) center=(0.282, 0.322, 0.424) bottom=(0.553, 0.486, 0.396)
+STRIP y=0 (0.447, 0.694, 0.941)
+STRIP y=40 (0.275, 0.325, 0.439)
+STRIP y=80 (0.573, 0.533, 0.522)
+STRIP y=120 (0.561, 0.510, 0.459)
+STRIP y=160 (0.447, 0.408, 0.357)
+STRIP y=200 (0.325, 0.353, 0.443)
+STRIP y=240 (0.329, 0.357, 0.443)
+STRIP y=280 (0.337, 0.361, 0.443)
+STRIP y=320 (0.286, 0.325, 0.424)
+STRIP y=360 (0.282, 0.322, 0.424)
+STRIP y=400 (0.282, 0.322, 0.424)
+STRIP y=440 (0.275, 0.318, 0.420)
+STRIP y=480 (0.192, 0.255, 0.380)
+STRIP y=520 (0.533, 0.467, 0.373)
+STRIP y=560 (0.537, 0.467, 0.376)
+STRIP y=600 (0.541, 0.475, 0.380)
+STRIP y=640 (0.545, 0.478, 0.384)
+STRIP y=680 (0.549, 0.482, 0.388)
+ROW y=240 0:(0.780, 0.820, 0.922) 160:(0.757, 0.808, 0.925) 320:(0.729, 0.792, 0.925) 480:(0.459, 0.412, 0.341) 640:(0.329, 0.357, 0.443) 800:(0.545, 0.475, 0.388) 960:(0.467, 0.416, 0.345) 1120:(0.761, 0.804, 0.925) 
+ROW y=300 0:(0.290, 0.835, 0.867) 160:(0.839, 0.847, 0.914) 320:(0.490, 0.427, 0.349) 480:(0.475, 0.420, 0.345) 640:(0.314, 0.341, 0.435) 800:(0.400, 0.408, 0.478) 960:(0.478, 0.424, 0.349) 1120:(0.839, 0.847, 0.914) 
+ROW y=360 0:(0.667, 0.827, 0.702) 160:(0.647, 0.816, 0.690) 320:(0.494, 0.431, 0.353) 480:(0.494, 0.431, 0.353) 640:(0.282, 0.322, 0.424) 800:(0.369, 0.384, 0.463) 960:(0.490, 0.431, 0.349) 1120:(0.490, 0.431, 0.349) 
+ROW y=500 0:(0.259, 0.549, 0.286) 160:(0.522, 0.451, 0.361) 320:(0.482, 0.761, 0.710) 480:(0.196, 0.263, 0.392) 640:(0.192, 0.255, 0.388) 800:(0.192, 0.255, 0.384) 960:(0.522, 0.455, 0.365) 1120:(0.518, 0.451, 0.361) 
+ROW y=640 0:(0.345, 0.624, 0.620) 160:(0.541, 0.467, 0.373) 320:(0.549, 0.475, 0.376) 480:(0.545, 0.478, 0.380) 640:(0.545, 0.478, 0.384) 800:(0.545, 0.478, 0.384) 960:(0.545, 0.475, 0.380) 1120:(0.541, 0.471, 0.376) 
+PROBE terrain water_level=-0.760 water_radius=5.3 lake=-11.0,-16.0 r6.8
+PROBE geom dist=2.0m world=(0.0,0.189,14.0) h=0.039 slope=0.005 excluded=false
+PROBE dist=2.0m rgb=(0.279, 0.320, 0.422) lum=0.340 dark_flecks=8/9 screen=640,424
+PROBE geom dist=3.0m world=(0.0,0.194,15.0) h=0.044 slope=0.013 excluded=false
+PROBE dist=3.0m rgb=(0.285, 0.324, 0.424) lum=0.345 dark_flecks=6/9 screen=640,402
+PROBE geom dist=4.0m world=(0.0,0.187,16.0) h=0.037 slope=0.015 excluded=false
+PROBE dist=4.0m rgb=(0.287, 0.325, 0.424) lum=0.345 dark_flecks=6/9 screen=640,392
+PROBE geom dist=5.0m world=(0.0,0.189,17.0) h=0.039 slope=0.006 excluded=false
+PROBE dist=5.0m rgb=(0.288, 0.326, 0.425) lum=0.347 dark_flecks=6/9 screen=640,385
+PROBE geom dist=6.0m world=(0.0,0.195,18.0) h=0.045 slope=0.033 excluded=false
+PROBE dist=6.0m rgb=(0.291, 0.326, 0.426) lum=0.348 dark_flecks=5/9 screen=640,380
+PROBE geom dist=7.0m world=(0.0,0.227,19.0) h=0.077 slope=0.018 excluded=false
+PROBE dist=7.0m rgb=(0.292, 0.328, 0.426) lum=0.348 dark_flecks=5/9 screen=640,375
+PROBE geom dist=8.0m world=(0.0,0.245,20.0) h=0.095 slope=0.018 excluded=false
+PROBE dist=8.0m rgb=(0.291, 0.327, 0.426) lum=0.348 dark_flecks=4/9 screen=640,372
+PROBE geom dist=9.0m world=(0.0,0.262,21.0) h=0.112 slope=0.018 excluded=false
+PROBE dist=9.0m rgb=(0.292, 0.329, 0.427) lum=0.349 dark_flecks=4/9 screen=640,370
+PROBE geom dist=10.0m world=(0.0,0.278,22.0) h=0.128 slope=0.028 excluded=false
+PROBE dist=10.0m rgb=(0.292, 0.330, 0.427) lum=0.350 dark_flecks=3/9 screen=640,368
+PROBE geom dist=11.0m world=(0.0,0.297,23.0) h=0.147 slope=0.013 excluded=false
+PROBE dist=11.0m rgb=(0.292, 0.329, 0.427) lum=0.350 dark_flecks=3/9 screen=640,367
+PROBE geom dist=12.0m world=(0.0,0.302,24.0) h=0.152 slope=0.033 excluded=false
+PROBE dist=12.0m rgb=(0.290, 0.328, 0.426) lum=0.348 dark_flecks=5/9 screen=640,366
+PROBE geom dist=13.0m world=(0.0,0.333,25.0) h=0.183 slope=0.022 excluded=false
+PROBE dist=13.0m rgb=(0.292, 0.328, 0.427) lum=0.349 dark_flecks=4/9 screen=640,364
+PROBE geom dist=14.0m world=(0.0,0.324,26.0) h=0.174 slope=0.030 excluded=false
+PROBE dist=14.0m rgb=(0.292, 0.328, 0.427) lum=0.349 dark_flecks=4/9 screen=640,364
+PROBE geom dist=15.0m world=(0.0,0.294,27.0) h=0.144 slope=0.144 excluded=false
+PROBE dist=15.0m rgb=(0.294, 0.329, 0.427) lum=0.350 dark_flecks=4/9 screen=640,365
+PROBE geom dist=16.0m world=(0.0,0.150,28.0) h=0.000 slope=0.000 excluded=false
+PROBE dist=16.0m rgb=(0.291, 0.328, 0.427) lum=0.348 dark_flecks=4/9 screen=640,369
+PROBE geom dist=17.0m world=(0.0,0.150,29.0) h=0.000 slope=0.000 excluded=false
+PROBE dist=17.0m rgb=(0.292, 0.330, 0.427) lum=0.350 dark_flecks=3/9 screen=640,368
+PROBE geom dist=18.0m world=(0.0,0.150,30.0) h=0.000 slope=0.030 excluded=false
+PROBE dist=18.0m rgb=(0.292, 0.330, 0.427) lum=0.350 dark_flecks=3/9 screen=640,368
+PROBE geom dist=19.0m world=(0.0,0.120,31.0) h=-0.030 slope=0.062 excluded=false
+PROBE dist=19.0m rgb=(0.292, 0.330, 0.427) lum=0.350 dark_flecks=3/9 screen=640,368
+PROBE geom dist=20.0m world=(0.0,0.058,32.0) h=-0.092 slope=0.057 excluded=false
+PROBE dist=20.0m rgb=(0.291, 0.328, 0.427) lum=0.348 dark_flecks=4/9 screen=640,369
+PROBE geom dist=21.0m world=(0.0,0.001,33.0) h=-0.149 slope=0.263 excluded=false
+PROBE dist=21.0m rgb=(0.292, 0.329, 0.427) lum=0.349 dark_flecks=4/9 screen=640,370
+PROBE geom dist=22.0m world=(0.0,-0.267,34.0) h=-0.417 slope=0.326 excluded=false
+PROBE dist=22.0m rgb=(0.292, 0.328, 0.426) lum=0.348 dark_flecks=5/9 screen=640,375
+PROBE geom dist=23.0m world=(0.0,-0.595,35.0) h=-0.745 slope=0.316 excluded=false
+PROBE dist=23.0m rgb=(0.292, 0.327, 0.426) lum=0.348 dark_flecks=5/9 screen=640,381
+PROBE geom dist=24.0m world=(0.0,-0.871,36.0) h=-1.021 slope=0.231 excluded=true
+PROBE dist=24.0m rgb=(0.291, 0.327, 0.426) lum=0.348 dark_flecks=4/9 screen=640,386
+PROBE geom dist=25.0m world=(0.0,-1.033,37.0) h=-1.183 slope=0.266 excluded=true
+PROBE dist=25.0m rgb=(0.288, 0.325, 0.426) lum=0.346 dark_flecks=5/9 screen=640,388
+PROBE geom dist=26.0m world=(0.0,-0.971,38.0) h=-1.121 slope=0.124 excluded=true
+PROBE dist=26.0m rgb=(0.288, 0.326, 0.425) lum=0.347 dark_flecks=6/9 screen=640,385
+PROBE geom dist=27.0m world=(0.0,-1.093,39.0) h=-1.243 slope=0.186 excluded=true
+PROBE dist=27.0m rgb=(0.286, 0.324, 0.424) lum=0.345 dark_flecks=5/9 screen=640,387
+PROBE geom dist=28.0m world=(0.0,-1.275,40.0) h=-1.425 slope=0.095 excluded=true
+PROBE dist=28.0m rgb=(0.288, 0.325, 0.425) lum=0.346 dark_flecks=6/9 screen=640,389
+PROBE geom dist=29.0m world=(0.0,-1.218,41.0) h=-1.368 slope=0.144 excluded=true
+PROBE dist=29.0m rgb=(0.286, 0.324, 0.424) lum=0.345 dark_flecks=5/9 screen=640,387
+PROBE geom dist=30.0m world=(0.0,-1.150,42.0) h=-1.300 slope=0.142 excluded=true
+PROBE dist=30.0m rgb=(0.288, 0.326, 0.425) lum=0.347 dark_flecks=6/9 screen=640,385
+PROBE geom dist=31.0m world=(0.0,-1.014,43.0) h=-1.164 slope=0.250 excluded=true
+PROBE dist=31.0m rgb=(0.288, 0.325, 0.425) lum=0.346 dark_flecks=6/9 screen=640,382
+PROBE geom dist=32.0m world=(0.0,-0.859,44.0) h=-1.009 slope=0.279 excluded=true
+PROBE dist=32.0m rgb=(0.289, 0.325, 0.426) lum=0.347 dark_flecks=5/9 screen=640,379
+PROBE geom dist=33.0m world=(0.0,-0.618,45.0) h=-0.768 slope=0.220 excluded=true
+PROBE dist=33.0m rgb=(0.292, 0.328, 0.426) lum=0.348 dark_flecks=5/9 screen=640,375
+PROBE geom dist=34.0m world=(0.0,-0.399,46.0) h=-0.549 slope=0.252 excluded=false
+PROBE dist=34.0m rgb=(0.289, 0.326, 0.425) lum=0.347 dark_flecks=5/9 screen=640,371
+PROBE geom dist=35.0m world=(0.0,-0.145,47.0) h=-0.295 slope=0.175 excluded=false
+PROBE dist=35.0m rgb=(0.292, 0.330, 0.427) lum=0.350 dark_flecks=3/9 screen=640,368
+PROBE geom dist=36.0m world=(0.0,0.032,48.0) h=-0.118 slope=0.099 excluded=false
+PROBE dist=36.0m rgb=(0.294, 0.329, 0.427) lum=0.350 dark_flecks=4/9 screen=640,365
+PROBE geom dist=37.0m world=(0.0,-0.004,49.0) h=-0.154 slope=0.089 excluded=false
+PROBE dist=37.0m rgb=(0.294, 0.329, 0.427) lum=0.350 dark_flecks=4/9 screen=640,365
+PROBE geom dist=38.0m world=(0.0,-0.064,50.0) h=-0.214 slope=0.084 excluded=false
+PROBE dist=38.0m rgb=(0.290, 0.328, 0.426) lum=0.348 dark_flecks=5/9 screen=640,366
+PROBE geom dist=39.0m world=(0.0,0.013,51.0) h=-0.137 slope=0.080 excluded=false
+PROBE dist=39.0m rgb=(0.294, 0.329, 0.427) lum=0.350 dark_flecks=4/9 screen=640,365
+PROBE geom dist=40.0m world=(0.0,0.085,52.0) h=-0.065 slope=0.059 excluded=false
+PROBE dist=40.0m rgb=(0.292, 0.328, 0.427) lum=0.349 dark_flecks=4/9 screen=640,364
+PROBE DONE
+SCREENSHOT SAVED: res://screenshots/screenshot_grass.png
+ERROR: 8 RID allocations of type 'N10RendererRD11MeshStorage4MeshE' were leaked at exit.
+ERROR: 8 RID allocations of type 'N10RendererRD15MaterialStorage8MaterialE' were leaked at exit.
+ERROR: 1 RID allocations of type 'N10RendererRD15MaterialStorage6ShaderE' were leaked at exit.
+ERROR: 4 RID allocations of type 'N17RendererSceneCull8InstanceE' were leaked at exit.
+ERROR: Pages in use exist at exit in PagedAllocator: N33RendererSceneRenderImplementation22RenderForwardClustered32GeometryInstanceSurfaceDataCacheE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+ERROR: Pages in use exist at exit in PagedAllocator: N33RendererSceneRenderImplementation22RenderForwardClustered32GeometryInstanceForwardClusteredE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+ERROR: 1 shaders of type SceneForwardClusteredShaderRD were never freed
+   at: ~ShaderRD (servers/rendering/renderer_rd/shader_rd.cpp:1236)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: 8 RIDs of type "UniformBuffer" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 16 RIDs of type "IndexArray" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 16 RIDs of type "IndexBuffer" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 8 RIDs of type "VertexArray" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 24 RIDs of type "VertexBuffer" were leaked.
+   at: _free_rids (servers/rendering/rendering_device.cpp:8686)
+WARNING: 24 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 16 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
