@@ -329,9 +329,9 @@ def build_armature() -> bpy.types.Object:
     bone("Head", (0, 0, 1.78), (0, 0, 2.05), "Neck")
     for side in (1, -1):
         s = "L" if side > 0 else "R"
-        bone("UpperArm." + s, (side * 0.48, 0.12, 1.52), (side * 0.52, 0.06, 1.28), "Chest")
-        bone("Forearm." + s, (side * 0.52, 0.06, 1.28), (side * 0.50, -0.06, 1.04), "UpperArm." + s)
-        bone("Hand." + s, (side * 0.50, -0.06, 1.04), (side * 0.50, -0.12, 0.92), "Forearm." + s)
+        bone("UpperArm." + s, (side * 0.68, 0.12, 1.58), (side * 0.74, 0.04, 1.34), "Chest")
+        bone("Forearm." + s, (side * 0.74, 0.04, 1.34), (side * 0.76, -0.04, 1.10), "UpperArm." + s)
+        bone("Hand." + s, (side * 0.76, -0.04, 1.10), (side * 0.76, -0.10, 1.00), "Forearm." + s)
         bone("Thigh." + s, (side * 0.30, 0.05, 0.92), (side * 0.33, 0.05, 0.62), "Pelvis")
         bone("Shin." + s, (side * 0.33, 0.05, 0.62), (side * 0.34, 0.05, 0.28), "Thigh." + s)
         bone("Foot." + s, (side * 0.34, 0.05, 0.28), (side * 0.40, 0.10, 0.18), "Shin." + s)
