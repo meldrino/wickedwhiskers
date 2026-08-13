@@ -561,3 +561,14 @@ done well. we can have a look later as it is 5am now".
   "need some work" - likely the fbm threshold gradient looks blobby/unnatural; try softer/grainier
   cover, fewer but larger puffs, or lower modulate strength.
 - User then went to sleep; this entry closes the save5 night shift.
+
+## 2026-08-13 09:00 - USER DECISION: Kenney-only asset look (no cross-pack mixing)
+USER asked whether to fetch more replacement assets (KayKit/Quaternius were suggested), then
+immediately questioned it: "or do we really want to? we do want a constant look across the game".
+DECISION: NO new asset packs. Audit confirmed the game's props ALREADY all come from the Kenney
+Nature Kit (names match exactly: rock_smallA-D, log/log_stack, tree_oak/default/fat/thin, crops,
+stump_round/square, sign, fence_*). The full kit is on disk at C:\crypto\world\kenneys nature kit
+(OBJ + STL + Side-textures) and includes same-style upgrades if ever needed (fence_corner/bend/gate,
+corn/wheat crops, flowers, bushes, mushrooms, tents, campfire, bridge). Rule going forward: any new
+prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Character/NPC upgrades
+(Dumbleclaw beard etc.) are code-built primitives, not asset-pack - unaffected.
