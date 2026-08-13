@@ -50,7 +50,7 @@ func get_interaction_point() -> Vector3:
 
 
 func get_interaction_points() -> Array[Vector3]:
-	var pts := [get_interaction_point()]
+	var pts: Array[Vector3] = [get_interaction_point()]
 	for extra in interaction_points_extra:
 		pts.append(to_global(extra))
 	return pts

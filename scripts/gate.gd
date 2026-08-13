@@ -28,11 +28,12 @@ func get_interaction_point() -> Vector3:
 
 
 func get_interaction_points() -> Array[Vector3]:
-	return [
+	var pts: Array[Vector3] = [
 		_pivot.to_global(Vector3(0.0, 0.6, 0.0)),
 		_pivot.to_global(Vector3(1.45, 0.6, 0.0)),
 		_pivot.to_global(Vector3(2.9, 0.6, 0.0)),
 	]
+	return pts
 
 
 func _build_gate() -> void:

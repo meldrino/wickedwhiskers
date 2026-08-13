@@ -61,6 +61,9 @@ const ANIM_BONES := [
 @onready var camera_holder: Node3D = $CameraHolder
 @onready var mesh_root: Node3D = $MeshRoot
 
+var _pick_item: Interactable = null
+var _pick_point := Vector3.ZERO
+
 
 func _ready() -> void:
 	add_to_group("player")
@@ -138,6 +141,26 @@ func set_interactable(item) -> void:
 
 func _pick_interactable(screen_pos: Vector2) -> Interactable:
 	var from := camera.project_ray_origin(screen_pos)
+	var dir := camera.project_ray_normal(screen_pos)
+	_pick_item = null
+	_pick_point = Vector3.ZERO
+	# 1. Direct hit on an object's collider: clickable anywhere on its surface
+	# (the gate panel, a door, the tractor body). The hit point drives range.
+	var qa0 := PhysicsRayQueryParameters3D.create(from, from + dir * 50.0)
+	qa0.collide_with_areas = false
+	qa0.collide_with_bodies = true
+	qa0.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(qa0)
+	if not hit.is_empty():
+		var node := hit.get("collider") as Node
+		while node != null:
+			if node is Interactable:
+				_pick_item = node
+				_pick_point = hit.get("position")
+				return node
+			node = node.get_parent()
+	# 2. Point-based fallback: cursor near a projected interaction point even
+	# when the click lands beside the object (ground next to it).
 	var best: Interactable = null
 	var best_d := INF
 	var best_wp := Vector3.ZERO
@@ -174,8 +197,8 @@ func _pick_interactable(screen_pos: Vector2) -> Interactable:
 	wps2.sort_custom(func(a: Vector3, b: Vector3) -> bool:
 		return camera.unproject_position(a).distance_to(screen_pos) < camera.unproject_position(b).distance_to(screen_pos))
 	for wp in wps2:
-		var dir := (wp - from).normalized()
-		var qa := PhysicsRayQueryParameters3D.create(from, wp + dir * 0.3)
+		var dir2 := (wp - from).normalized()
+		var qa := PhysicsRayQueryParameters3D.create(from, wp + dir2 * 0.3)
 		qa.collide_with_areas = false
 		qa.collide_with_bodies = true
 		var rids: Array[RID] = [get_rid()]
@@ -183,9 +206,13 @@ func _pick_interactable(screen_pos: Vector2) -> Interactable:
 		qa.exclude = rids
 		var hb := get_world_3d().direct_space_state.intersect_ray(qa)
 		if hb.is_empty():
+			_pick_item = best
+			_pick_point = wp
 			return best
 		var body_dist := from.distance_to(hb.get("position"))
 		if body_dist >= from.distance_to(wp) - 0.2:
+			_pick_item = best
+			_pick_point = wp
 			return best
 	return null
 
@@ -464,10 +491,15 @@ func _wet_cat(wet: bool) -> void:
 
 
 func _within_interact_range(item: Interactable) -> bool:
-	for p in item.get_interaction_points():
-		var q := p
+	if _pick_item == item and _pick_point != Vector3.ZERO:
+		var q := _pick_point
 		q.y = global_position.y
 		if global_position.distance_to(q) <= item.interaction_range:
+			return true
+	for p in item.get_interaction_points():
+		var q2 := p
+		q2.y = global_position.y
+		if global_position.distance_to(q2) <= item.interaction_range:
 			return true
 	return false
 
