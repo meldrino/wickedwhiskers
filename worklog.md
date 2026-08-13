@@ -626,3 +626,12 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
 - NOTE: clicks near the gate's lake edge can be claimed by fish (_pick_fish runs before interactables in
   _handle_click_at) - that is the designed fish-catching priority, not a gate bug.
 - --gate screenshot camera mode added to main.gd.
+
+## 2026-08-13 gate click fix (session 2)
+- interaction_point moved to panel center (0.005,0.6,-25), opens/closes from hinge or far end (extras -1.445/+1.455), covers full 2.9m gate.
+- fish-vs-gate: _pick_interactable now runs BEFORE _pick_fish - gate clicks win, no more lake pounce.
+- console errors fixed: lake.gd normal_map -> normal_enabled+normal_texture (Godot 4); player.gd mi.surface_get_material -> mi.mesh.surface_get_material.
+- GRASSDBG tier-count spam removed (grass_system.gd).
+- shooting-star crash: add_child(mi) before look_at (daynight.gd).
+- gate_test now re-aims camera at close step (was stale-camera artifact). All 4 scenarios pass headless.
+- import + --smoketest clean. commit 2f0f423.
