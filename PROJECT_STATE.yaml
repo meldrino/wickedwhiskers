@@ -16,8 +16,10 @@ project:
     Pipe output to a log file first (piping live to Select-String made Godot error). Do NOT pass
     args through Play Wicked Whiskers.bat. Windowed (NOT --headless) when screenshots are wanted.
   vision_tooling: Qwen Vision WORKS for reviewing screenshots (qwen2.5vl:7b in Ollama, needs
-    ~11.8 GiB!). Helper: C:\Users\Andy\AppData\Local\Temp\opencode\vision_expert.ps1
-    -ImagePath <png/jpg> -Prompt "...". REQUIRES free RAM (~12 GiB: killed Chrome/Brave/
+    ~11.8 GiB!). Helper: C:\crypto\bigpickle\vision_expert.ps1
+    -Prompt "<text>" -Image <png>[,<png>...] (invoke with & not pwsh -File - array params don't
+    bind under -File; keep to 1-2 downscaled 640x360 images per call - full-res times out at
+    the script's 300s HTTP cap). REQUIRES free RAM (~12 GiB: killed Chrome/Brave/
     Omen/GooglePlayGamesServices/MuseHub/AvastUI/NVIDIA overlay), num_ctx=1024, and a shell
     timeout >= 5-6 min (the call can exceed 240 s even after returning its answer).
     NEVER kill opencode, pwsh (PowerShell 7), or Windows' "Secure System" process.
@@ -167,6 +169,14 @@ build_status:
     door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes; loot now lives in
       the shed scene) / farmhouse night-locked then once-day catfood + scene-2 tease; box
       interaction volume
+    cutaway.gd (2026-08-13): cinematic padlock unlock played by door.gd._on_combo on success -
+      letterbox bars + camera push-in on the real padlock, procedural orange paws (fur color
+      SAMPLED at runtime from player WW.glb Paw_L material so a cat recolor auto-updates),
+      right paw spins Dial2->Dial0 (rotation:z +0.38/notch, CC0 click1.wav per notch), beat of
+      tension, shackle flips open (rotation:x PI/2+1.8) + pop (click2.wav pitch 0.65), padlock
+      tilts/drops and is freed. GameState.cinematic_active locks player input. Verify:
+      -- --cutawaytest (windowed, saves screenshots/cw_1..6.png); quenn-reviewed green.
+      Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
     shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
       spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,
       plus a --smoketest check (loot counts + portal present)

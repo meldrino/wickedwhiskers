@@ -707,3 +707,24 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   ~7x): measured shed/cat = 3.205m ridge / 0.458m cat = 6.97x - the vision model measured the
   ROOF PEAK. Walls are 2.5m = 5.4x cat. No bug; if the user wants the whole shed ~2.5m total,
   that's walls ~1.9m + door 1.7m - pending user call.
+
+## 2026-08-13 CUTAWAY: cinematic padlock unlock (commits 9fef302)
+- User: "do an orchestrated Godot cutaway, not an mp4" - so recolor-proof: procedurally built
+  every frame, nothing baked. Fur color SAMPLED at runtime from the player's WW.glb Paw_L
+  material (probe: #f9ad59 orange, roughness 0.5; pad #816f5d) - a cat recolor auto-updates.
+- scripts/cutaway.gd: letterbox bars (CanvasLayer ColorRects) + Camera3D current=true push-in
+  on the real padlock (16.4,1.0,-8.7) + 2 procedural paws (capsule forearm, sphere + 3 beans,
+  big pad). Right paw spins Dial2->Dial0 (rotation:z +0.38/notch, 3 notches, click per notch).
+  Beat of tension, shackle flips (rotation:x PI/2+1.8), padlock tilts/drops, freed. Bars out,
+  player cam restored, GameState.cinematic_active=false, then door._finish_unlock swings.
+- door.gd: named parts (Dial0-2/Shackle/LockBody), _on_combo success -> cutaway -> _finish_unlock
+  (toast + door swing tween). player.gd: input + physics locked while cinematic_active.
+- Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup via OpenGameArt direct zip). Dials
+  use click1; pop/drop use click2 pitched down. Imported; --import exit 0.
+- Verification: main smoke green (exercises full cutaway, 0 errors); gate_test DONE; door_test
+  DONE (padlock pick unaffected). NEW --cutawaytest arg (windowed, real renderer) -> saves
+  screenshots/cw_1..6.png; quenn (qwen2.5vl) review: paws ON dials during spins, shackle
+  visibly sprung, padlock falls, clean return, letterbox works. Minor nits only ("slight
+  clipping", "dead space") - cosmetic.
+- quenn ops notes (state file updated): invoke vision_expert.ps1 with & (pwsh -File breaks
+  array params); downscale to 640x360, 1-2 images/call (full-res 6-image call >300s HTTP cap).
