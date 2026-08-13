@@ -79,7 +79,7 @@ func _spawn_player() -> void:
 	if pl == null:
 		return
 	if GameState.spawn_near_shed:
-		pl.global_position = Vector3(16, Terrain.height_at(16, -7.2), -7.2)
+		pl.global_position = Vector3(16, Terrain.height_at(16, -7.8), -7.8)
 		GameState.spawn_near_shed = false
 	pl.global_position.y = Terrain.height_at(pl.global_position.x, pl.global_position.z)
 
@@ -365,15 +365,15 @@ func _build_shed(shed_pos: Vector3) -> void:
 	var wood_dark := Color(0.36, 0.24, 0.14)
 	var roof_col := Color(0.32, 0.22, 0.13)
 	var frame_col := Color(0.25, 0.17, 0.11)
-	var half_w := 2.3
-	var half_d := 1.7
-	var wall_h := 3.0
+	var half_w := 1.5
+	var half_d := 1.2
+	var wall_h := 2.5
 
 	# Solid exterior box (the interior now lives in its own scene: scenes/shed.tscn)
 	_add_mesh(shed, "box", Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0), wood)
 	_add_collider(shed, Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0))
 	# Vertical plank seams (proud of the walls, front + back)
-	for x in range(-2, 3):
+	for x in range(-1, 2):
 		if x == 0:
 			continue
 		_add_mesh(shed, "box", Vector3(0.03, wall_h, 0.02), Vector3(x * 0.9, wall_h / 2.0, half_d + 0.01), wood_dark)
@@ -387,41 +387,58 @@ func _build_shed(shed_pos: Vector3) -> void:
 		for sz in [-1, 1]:
 			_add_mesh(shed, "box", Vector3(0.22, wall_h + 0.1, 0.22),
 				Vector3(sx * (half_w - 0.1), (wall_h + 0.1) / 2.0, sz * (half_d - 0.1)), frame_col)
-	# Gabled roof (two sloped slabs) + ridge cap
-	_add_mesh(shed, "box", Vector3(2.6, 0.25, half_d * 2.0 + 0.6), Vector3(1.28, 3.45, 0), roof_col)
-	shed.get_child(-1).rotation.z = -0.62
-	_add_mesh(shed, "box", Vector3(2.6, 0.25, half_d * 2.0 + 0.6), Vector3(-1.28, 3.45, 0), roof_col)
-	shed.get_child(-1).rotation.z = 0.62
-	_add_mesh(shed, "box", Vector3(0.42, 0.42, half_d * 2.0 + 0.6), Vector3(0, 3.95, 0), roof_col)
+	# Gabled roof (two sloped slabs) + ridge cap — derived from the box size
+	var roof_over := 0.35
+	var rise := 0.5
+	var roof_d := half_d * 2.0 + 0.8
+	var slab_len := sqrt((half_w + roof_over) * (half_w + roof_over) + rise * rise)
+	var slope_ang := atan(rise / (half_w + roof_over))
+	var slab_cx := (half_w + roof_over) / 2.0
+	_add_mesh(shed, "box", Vector3(slab_len, 0.22, roof_d), Vector3(slab_cx, wall_h + rise / 2.0, 0), roof_col)
+	shed.get_child(-1).rotation.z = -slope_ang
+	_add_mesh(shed, "box", Vector3(slab_len, 0.22, roof_d), Vector3(-slab_cx, wall_h + rise / 2.0, 0), roof_col)
+	shed.get_child(-1).rotation.z = slope_ang
+	_add_mesh(shed, "box", Vector3(0.45, 0.45, roof_d), Vector3(0, wall_h + rise - 0.02, 0), roof_col)
 	# Gable triangles filling the roof ends (triangular prisms, flat side down)
+	var gable_h := rise + 0.15
 	var gable := PrismMesh.new()
-	gable.size = Vector3(half_w * 2.0, 1.1, 0.4)
+	gable.size = Vector3(half_w * 2.0, gable_h, 0.35)
 	var gmi := MeshInstance3D.new()
 	gmi.mesh = gable
 	var gmat := StandardMaterial3D.new()
 	gmat.albedo_color = wood_dark
 	gmi.material_override = gmat
-	gmi.position = Vector3(0, wall_h + 0.5, half_d + 0.1)
+	gmi.position = Vector3(0, wall_h + gable_h / 2.0 - 0.1, half_d + 0.05)
 	shed.add_child(gmi)
 	var gmi2 := gmi.duplicate()
-	gmi2.position.z = -half_d - 0.1
+	gmi2.position.z = -half_d - 0.05
 	shed.add_child(gmi2)
-	# Small window on each side wall with a wooden frame
+	# Small window on each side wall with a wooden frame + alpha-blended glass pane
 	for sx in [-1, 1]:
-		_add_mesh(shed, "box", Vector3(0.1, 0.85, 0.85), Vector3(sx * (half_w - 0.05), 1.9, 0), Color(0.75, 0.83, 0.9))
-		_add_mesh(shed, "box", Vector3(0.16, 0.06, 0.95), Vector3(sx * (half_w - 0.05), 1.53, 0), frame_col)
-		_add_mesh(shed, "box", Vector3(0.16, 0.95, 0.06), Vector3(sx * (half_w - 0.05), 1.9, -0.42), frame_col)
-		_add_mesh(shed, "box", Vector3(0.16, 0.95, 0.06), Vector3(sx * (half_w - 0.05), 1.9, 0.42), frame_col)
+		var wx: float = sx * (half_w - 0.04)
+		var glass := StandardMaterial3D.new()
+		glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glass.albedo_color = Color(0.72, 0.83, 0.9, 0.4)
+		glass.metallic = 0.2
+		glass.roughness = 0.1
+		var pane := _mesh("box", Vector3(0.04, 0.56, 0.56), Color(1, 1, 1))
+		pane.material_override = glass
+		pane.position = Vector3(wx - sx * 0.06, 1.6, 0)
+		shed.add_child(pane)
+		_add_mesh(shed, "box", Vector3(0.1, 0.7, 0.7), Vector3(wx, 1.6, 0), frame_col)
+		_add_mesh(shed, "box", Vector3(0.14, 0.08, 0.76), Vector3(wx, 1.2, 0), frame_col)
+		_add_mesh(shed, "box", Vector3(0.14, 0.72, 0.08), Vector3(wx, 1.6, -0.3), frame_col)
+		_add_mesh(shed, "box", Vector3(0.14, 0.72, 0.08), Vector3(wx, 1.6, 0.3), frame_col)
 	# Door frame + dark door (door mesh swings open on unlock)
-	_add_mesh(shed, "box", Vector3(1.9, 2.2, 0.15), Vector3(0, 1.1, half_d - 0.05), wood_dark)
-	_add_mesh(shed, "box", Vector3(0.1, 2.2, 0.05), Vector3(-1.0, 1.1, half_d - 0.02), frame_col)
-	_add_mesh(shed, "box", Vector3(0.1, 2.2, 0.05), Vector3(1.0, 1.1, half_d - 0.02), frame_col)
+	_add_mesh(shed, "box", Vector3(0.9, 2.0, 0.12), Vector3(0, 1.0, half_d - 0.05), wood_dark)
+	_add_mesh(shed, "box", Vector3(0.08, 2.0, 0.05), Vector3(-0.55, 1.0, half_d - 0.02), frame_col)
+	_add_mesh(shed, "box", Vector3(0.08, 2.0, 0.05), Vector3(0.55, 1.0, half_d - 0.02), frame_col)
 	# Planks on the door itself
-	_add_mesh(shed, "box", Vector3(1.66, 0.06, 0.05), Vector3(0, 0.6, half_d + 0.01), frame_col)
-	_add_mesh(shed, "box", Vector3(1.66, 0.06, 0.05), Vector3(0, 1.6, half_d + 0.01), frame_col)
-	var door_mesh := _mesh("box", Vector3(1.7, 2.0, 0.1), Color(0.1, 0.08, 0.06))
+	_add_mesh(shed, "box", Vector3(0.8, 0.06, 0.05), Vector3(0, 0.6, half_d + 0.01), frame_col)
+	_add_mesh(shed, "box", Vector3(0.8, 0.06, 0.05), Vector3(0, 1.5, half_d + 0.01), frame_col)
+	var door_mesh := _mesh("box", Vector3(0.9, 2.0, 0.1), Color(0.1, 0.08, 0.06))
 	door_mesh.name = "Door"
-	door_mesh.position = Vector3(0, 1.1, half_d - 0.02)
+	door_mesh.position = Vector3(0, 1.0, half_d - 0.02)
 	shed.add_child(door_mesh)
 
 	var door := _make_door("shed")
@@ -436,10 +453,10 @@ func _build_shed_portal(shed: Node3D) -> void:
 	portal.name = "ShedPortal"
 	var col := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(1.7, 2.2, 0.7)
+	box.size = Vector3(1.1, 2.1, 0.7)
 	col.shape = box
 	portal.add_child(col)
-	portal.position = Vector3(0, 1.0, 2.0)
+	portal.position = Vector3(0, 1.0, 1.5)
 	_shed_portal = portal
 	shed.add_child(portal)
 

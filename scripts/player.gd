@@ -268,7 +268,7 @@ func _clamp_camera_in_room() -> void:
 	if scene == null or scene.name != "Shed":
 		return
 	var cam := camera_holder.to_global(camera.position)
-	var half := Vector3(2.25, 1.35, 1.65)
+	var half := Vector3(1.35, 1.05, 1.05)
 	var clamped := Vector3(
 		clampf(cam.x, -half.x, half.x),
 		clampf(cam.y, 0.25, half.y),
