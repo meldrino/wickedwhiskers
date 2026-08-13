@@ -653,3 +653,34 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   old ray could deaden the click (intermittent far_end_pick=null in tests).
 - gate_test: added open-far-tip click + hinge-click scenarios. Import + smoketest
   clean; 6/6 consecutive runs pass. commit <next>.
+
+- commit 7297365 (whole panel clickable, pivot-relative points) + 4f8b14b (raycast pick + hit-point range).
+- 6/6 headless gate_test runs green (retested 2026-08-13 session 4, still DONE).
+
+## 2026-08-13 shed: shrink to person scale (session 4)
+- USER: shed ~9x the cat (measured 4.82x4.31x4.0m) - "sheds made for people". Approved: 0.9x2.0m
+  door, 2.5m walls, ~3.0x2.4m footprint, ridge ~3.2m. Calibration locked: 1 cat height = 0.5m
+  (measured cat AABB 0.36x0.458x0.34). Never trust Blender units as metres (WW.glb ~2 units scaled 0.33).
+- main.gd _build_shed: half_w 1.5, half_d 1.2, wall_h 2.5. Roof now DERIVED from the box (roof_over 0.35,
+  rise 0.5, slab_len = hypot(half_w+roof_over, rise), slope_ang = atan2(rise, half_w+roof_over),
+  roof_d = 2*half_d+0.8, slabs at +-slab_cx, ridge cap (0.45,0.45,roof_d) at wall_h+rise-0.02).
+  Door frame 0.9x2.0 with 0.8-wide plank door + posts. Portal box (1.1,2.1,0.7).
+- Windows: fixed z-fighting flicker (glass pane was flush with wall face at +-1.5). Glass is now a
+  recessed alpha-blended pane (TRANSPARENCY_ALPHA, Color(0.72,0.83,0.9,0.4), metallic 0.2, rough 0.1,
+  centred wx - sx*0.06, wx = sx*(half_w-0.04)) + proud wooden frame + crossbars. Gemini cross-checked:
+  alpha-blend is the right approach for stylised glass (its response was truncated twice by API timeout,
+  but core answer confirmed).
+- shed.gd interior: floor 3.0x2.4, wall_h 2.5, lint_h = wall_h-2.0, jambs 0.16x2.0 at +-0.62, roof
+  (3.4,0.45,2.9) + ridge (3.4,0.3,0.6), light y1.8 r5.5. Props pulled in (crates/loot at +-1.05, boot,
+  hay, trap, lantern, rake, rope). Exit portal (1.1,2.0,0.4) at (0,1.0,1.1).
+- GOTCHA FIXED: shed.tscn Player spawns at (0,0,0.6); moved exit portal from z 1.55 to z 1.05 and it
+  OVERLAPPED the player's collision body at spawn -> instant body_entered -> scene switch during smoke
+  test ("Removing CollisionObject during physics callback" + null tree crash). Fix: spawn -> (0,0,0.2),
+  portal -> z 1.1 (straddles doorway). Shed smoke test now green: string=1 key=1 exit_portal=true.
+- player.gd:271 clamp half (2.25,1.35,1.65) -> (1.35,1.05,1.05). main.gd:82 spawn z -7.2 -> -7.8.
+- grass_exclusion.gd RECTS[1] (shed) hx 3.2->1.7, hz 2.6->1.35 (rect-based, chunk-independent).
+- VERIFIED: measure (temp, deleted) shed AABB 3.757 x 3.2 (incl roof) x 3.205 tall; door 0.9x2.0;
+  gate_test DONE; shed smoke + main smoke green; --import exit 0. commit 0bb790e.
+- NEXT: padlock clicks still on hold (planned: add StaticBody3D collider to door/padlock + padlock
+  interaction point + headless test mirroring gate_test). Visual queue: stones ~20x too big, trees,
+  fish, tractor, Dumbleclaw. Gemini glass response was truncated - retry with longer timeout if needed.
