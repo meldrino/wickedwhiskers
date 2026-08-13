@@ -75,6 +75,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if GameState.cinematic_active:
+		return
 	if _pouncing():
 		return
 	if event is InputEventMouseButton:
@@ -578,6 +580,8 @@ func _try_eat() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if GameState.cinematic_active:
+		return
 	if _pounce_t >= 0.0:
 		_update_pounce(delta)
 		_animate_cat(delta)

@@ -53,15 +53,25 @@ func _on_combo(val: int) -> void:
 	if val == GameState.combo:
 		unlocked = true
 		GameState.shed_unlocked = true
-		Hud.toast("CLICK! The padlock springs open. The shed is yours!")
-		if _door_mesh != null:
-			var t := create_tween()
-			t.tween_property(_door_mesh, "rotation:y", 2.4, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		if _padlock != null:
-			_padlock.queue_free()
-		Hud.toast("Step inside to reach the string and the spare tractor keys.")
+		if _padlock != null and get_tree().current_scene != null:
+			Hud.toast("The dials click into place...")
+			var cw: Node3D = (preload("res://scripts/cutaway.gd") as Script).new()
+			get_tree().current_scene.add_child(cw)
+			cw.play_padlock_unlock(self, _finish_unlock)
+		else:
+			_finish_unlock()
 	else:
 		Hud.toast("The padlock stays stubborn. (Hint: the number's on the tractor's plate.)")
+
+
+func _finish_unlock() -> void:
+	Hud.toast("CLICK! The padlock springs open. The shed is yours!")
+	if _door_mesh != null:
+		var t := create_tween()
+		t.tween_property(_door_mesh, "rotation:y", 2.4, 0.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if _padlock != null:
+		_padlock.queue_free()
+	Hud.toast("Step inside to reach the string and the spare tractor keys.")
 
 
 func _build_padlock() -> void:
@@ -114,6 +124,7 @@ func _build_padlock() -> void:
 
 	# shackle - loop standing above the body, through the door staple
 	var shackle := MeshInstance3D.new()
+	shackle.name = "Shackle"
 	var torus := TorusMesh.new()
 	torus.inner_radius = 0.045
 	torus.outer_radius = 0.07
@@ -127,6 +138,7 @@ func _build_padlock() -> void:
 
 	# lock body - rounded slab with a raised front panel, sitting on the plate
 	var body := MeshInstance3D.new()
+	body.name = "LockBody"
 	var bm := BoxMesh.new()
 	bm.size = Vector3(0.24, 0.34, 0.12)
 	bm.material = brass
@@ -137,6 +149,7 @@ func _build_padlock() -> void:
 	# three rotating dials on the front face, with number grooves
 	for i in range(3):
 		var dial := MeshInstance3D.new()
+		dial.name = "Dial%d" % i
 		var dm := CylinderMesh.new()
 		dm.top_radius = 0.05
 		dm.bottom_radius = 0.05

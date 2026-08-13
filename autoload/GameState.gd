@@ -35,6 +35,7 @@ var spawn_near_shed := false
 var quest := "meet"
 var first_dawn := false
 var chase_active := false
+var cinematic_active := false
 
 var day_index := 1
 var day_time := 0.0
@@ -69,6 +70,7 @@ func new_game() -> void:
 	quest = "meet"
 	first_dawn = false
 	chase_active = false
+	cinematic_active = false
 	day_index = 1
 	day_time = 0.0
 	is_day = false

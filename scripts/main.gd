@@ -98,6 +98,9 @@ func _maybe_screenshot() -> void:
 	if "--smoketest" in args:
 		_run_smoke()
 		return
+	if "--cutawaytest" in args:
+		_run_cutawaytest()
+		return
 	if "--fpsbench" in args:
 		_run_fpsbench()
 		return
@@ -535,6 +538,23 @@ func _run_smoke() -> void:
 	Hud.close_dialogue()
 	print("SMOKE is_day=%s catfood_used=%s food=%d" % [GameState.is_day, GameState.catfood_used, GameState.food_count])
 	print("SMOKE DONE")
+	get_tree().quit()
+
+
+func _run_cutawaytest() -> void:
+	print("CUTAWAY start")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var shed_door := get_node("Shed/Door_shed")
+	shed_door._on_combo(GameState.combo)
+	var shots := [1.5, 2.6, 3.7, 4.5, 5.15, 6.2]
+	for i in range(shots.size()):
+		await get_tree().create_timer(shots[i]).timeout
+		var img := get_viewport().get_texture().get_image()
+		var p := "res://screenshots/cw_%d.png" % (i + 1)
+		img.save_png(p)
+		print("CUTAWAY shot " + p)
+	print("CUTAWAY DONE")
 	get_tree().quit()
 
 
