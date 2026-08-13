@@ -794,3 +794,19 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
     approach (gemini's swat/POV insert with a simplified paw). Pose-loop alone is a dead end.
   - Overnight run: paw-iter.ps1 launched detached (60 iters max, gemini w/ quenn fallback) to
     gather data + jitter explorations; results in screenshots/pawtest_*.png + logs.
+
+- OVERNIGHT RUN RESULTS (60 iters, 23:40-00:17, driver paw-iter.ps1 -MaxIter 60 -Model auto):
+  - gemini (14 grades): 3/10 EVERY time. Flat plateau confirmed - "plain/beige sphere, lacks cat
+    features/claws/anatomy" at every pose, scale, camera. The real Paw_L mesh cannot read as a
+    paw to a critical reviewer. Geometry is the blocker, NOT pose (settles the loop question).
+  - gemini free tier hit 429 Too Many Requests at ~23:42 (iter 8-9) -> auto-fallback to quenn
+    triggered as designed (3 fails). USER'S "limits" CONCERN CONFIRMED - plan B was necessary.
+  - quenn degenerated: total=0, scale=0.5, cam=0.25, move=[0,0,0] for ~50 iters - not following
+    the JSON schema (grade_raw log has the raw output). It also 429'd once at handoff (busy?).
+    quenn fallback is mechanically fine but its grades are USELESS - do not waste iterations on
+    it for grading; consider dropping to a hard stop after gemini 429s instead.
+  - Loop design proven: render/grade/apply/jitter/logging all worked; godot never hung; best
+    saved; every frame archived (pawtest_seq_*.png). Final param state in pawtest_params.json.
+  - CONCLUSION: any next step REQUIRES new paw GEOMETRY (toe bumps on the real Paw_L, a better
+    paw mesh, or a stylized silhouette paw). Pose loop alone is a confirmed dead end. User is
+    the aesthetic gatekeeper - present the 3 options on wake.
