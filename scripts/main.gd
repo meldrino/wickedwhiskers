@@ -97,7 +97,7 @@ func _maybe_screenshot() -> void:
 	print("MAYBESCREEN START")
 	var args := OS.get_cmdline_user_args()
 	_log_debug("maybe_screenshot args=" + str(args))
-	if "--bare" in args:
+	if "--bare" in args and "--screenshot" in args:
 		var p0 = get_tree().get_first_node_in_group("player")
 		if p0 != null:
 			var mr := p0.get_node_or_null("MeshRoot")

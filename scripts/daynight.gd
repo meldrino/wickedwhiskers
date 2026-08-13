@@ -240,7 +240,11 @@ func _process_shooting_stars(delta: float, night: float) -> void:
 			fade = 1.0
 		else:
 			fade = 1.0 - (k - 0.6) / 0.4
-		mi.modulate = Color(1.0, 1.0, 1.0, fade)
+		var mat := mi.mesh.surface_get_material(0) as StandardMaterial3D
+		if mat != null:
+			var c: Color = mat.albedo_color
+			c.a = fade
+			mat.albedo_color = c
 		if k >= 1.0:
 			mi.queue_free()
 	for i in range(_shooting.size() - 1, -1, -1):

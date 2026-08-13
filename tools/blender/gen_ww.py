@@ -64,7 +64,7 @@ def sphere(name: str, radius: float, loc, scale=(1.0, 1.0, 1.0), mat=None) -> bp
     return obj
 
 
-def capsule(name: str, p1, p2, r: float) -> list:
+def capsule(name: str, p1, p2, r: float, mat=None) -> list:
     p1v = Vector(p1)
     p2v = Vector(p2)
     direction = p2v - p1v
@@ -74,8 +74,10 @@ def capsule(name: str, p1, p2, r: float) -> list:
     cyl = bpy.context.active_object
     cyl.name = name
     cyl.rotation_euler = Vector((0.0, 0.0, 1.0)).rotation_difference(direction.normalized()).to_euler()
-    s1 = sphere(name + "_cap1", r, p1v)
-    s2 = sphere(name + "_cap2", r, p2v)
+    if mat is not None:
+        set_mat(cyl, mat)
+    s1 = sphere(name + "_cap1", r, p1v, mat=mat)
+    s2 = sphere(name + "_cap2", r, p2v, mat=mat)
     return [cyl, s1, s2]
 
 
@@ -207,14 +209,15 @@ def build_geometry() -> None:
         inner_ears.append(tapered_tube("InnerEar." + s, inner_pts, inner_r, dark,
                                        segments=14, flat=0.45, cap_tip=False))
 
-    # arms (chunky cartoon limbs, paws forward of the body)
+    # arms (chunky cartoon limbs held OUTSIDE the body, paws forward of the body;
+    # kept as SEPARATE meshes so automatic weights pin them cleanly to the arm bones)
+    arm_meshes = []
     for side in (1, -1):
-        add_part(capsule("UpperArm." + ("L" if side > 0 else "R"),
-                         (side * 0.48, 0.12, 1.52), (side * 0.52, 0.06, 1.28), 0.14))
-        add_part(capsule("Forearm." + ("L" if side > 0 else "R"),
-                         (side * 0.52, 0.06, 1.28), (side * 0.50, -0.06, 1.04), 0.12))
-        add_part(sphere("Hand." + ("L" if side > 0 else "R"), 1.0,
-                        (side * 0.50, -0.12, 0.92), (0.20, 0.15, 0.18), fur))
+        s = "L" if side > 0 else "R"
+        upper = capsule("UpperArm." + s, (side * 0.68, 0.12, 1.58), (side * 0.74, 0.04, 1.34), 0.14, fur)
+        fore = capsule("Forearm." + s, (side * 0.74, 0.04, 1.34), (side * 0.76, -0.04, 1.10), 0.12, fur)
+        hand = sphere("Hand." + s, 1.0, (side * 0.76, -0.10, 1.00), (0.16, 0.13, 0.15), fur)
+        arm_meshes += upper + fore + [hand]
 
     # legs
     for side in (1, -1):
@@ -241,15 +244,15 @@ def build_geometry() -> None:
     # --- separate feature meshes ---
     nose = sphere("Nose", 0.05, (0, -0.46, 1.78), mat=dark)
 
-    # big cute eyes + pupils + white glints
+    # big cute almond eyes + pupils + white glints (flattened lens, not balls)
     eyes = []
     for side in (1, -1):
-        eye_obj = sphere("Eye." + ("L" if side > 0 else "R"), 0.11,
-                         (side * 0.20, -0.36, 1.94), mat=eye)
-        pupil_obj = sphere("Pupil." + ("L" if side > 0 else "R"), 0.05,
-                           (side * 0.20, -0.42, 1.97), mat=pupil)
-        glint_obj = sphere("Glint." + ("L" if side > 0 else "R"), 0.02,
-                           (side * 0.16, -0.46, 1.99), mat=glint)
+        eye_obj = sphere("Eye." + ("L" if side > 0 else "R"), 0.13,
+                         (side * 0.21, -0.38, 1.94), (0.75, 0.22, 0.85), mat=eye)
+        pupil_obj = sphere("Pupil." + ("L" if side > 0 else "R"), 0.045,
+                           (side * 0.21, -0.435, 1.95), (0.55, 0.3, 0.9), mat=pupil)
+        glint_obj = sphere("Glint." + ("L" if side > 0 else "R"), 0.016,
+                           (side * 0.17, -0.47, 1.99), mat=glint)
         eyes += [eye_obj, pupil_obj, glint_obj]
 
     # satchel box + diagonal strap
@@ -270,19 +273,19 @@ def build_geometry() -> None:
     strap.rotation_euler = Vector((0.0, 1.0, 0.0)).rotation_difference(strap_dir.normalized()).to_euler()
     set_mat(strap, satchel)
 
-    # whiskers — thin tapered strands fanning out from each cheek
+    # whiskers — thin tapered strands fanning out from the cheeks (below the eyes)
     whiskers = []
     for side in (1, -1):
         s = "L" if side > 0 else "R"
         starts = [
-            (0.24, -0.38, 1.80),
-            (0.24, -0.38, 1.86),
-            (0.22, -0.36, 1.92),
+            (0.22, -0.34, 1.72),
+            (0.23, -0.33, 1.78),
+            (0.21, -0.32, 1.84),
         ]
         tips = [
-            (0.50, -0.64, 1.82),
-            (0.56, -0.48, 1.90),
-            (0.52, -0.34, 2.02),
+            (0.52, -0.60, 1.72),
+            (0.58, -0.44, 1.80),
+            (0.54, -0.30, 1.94),
         ]
         for k in range(3):
             start = (starts[k][0] * side, starts[k][1], starts[k][2])
@@ -299,7 +302,7 @@ def build_geometry() -> None:
     bpy.context.view_layer.objects.active = body
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
-    return body, feature_meshes
+    return body, feature_meshes, arm_meshes
 
 
 def build_armature() -> bpy.types.Object:
@@ -393,13 +396,15 @@ def main() -> None:
     log("start")
     clear_scene()
     enable_gltf()
-    body, feature_meshes = build_geometry()
+    body, feature_meshes, arm_meshes = build_geometry()
     arm = build_armature()
 
-    all_meshes = [body] + feature_meshes
+    all_meshes = [body] + feature_meshes + arm_meshes
     apply_armature(all_meshes, arm)
 
     apply_subdivision(body, level=3)
+    for arm_mesh in arm_meshes:
+        apply_subdivision(arm_mesh, level=2)
     log("painting cream faces")
     paint_cream_faces(body, [
         ((0, -0.34, 1.75), 0.20),   # muzzle

@@ -675,12 +675,12 @@ func _animate_cat(delta: float) -> void:
 		poses["Toe.L"] = Vector3(0.03 * sw_l, 0.0, 0.0)
 		poses["Toe.R"] = Vector3(0.03 * sw_r, 0.0, 0.0)
 		# front legs diagonal to the hind legs
-		poses["UpperArm.L"] = Vector3(-0.35 * s, 0.0, -0.03 * s)
-		poses["UpperArm.R"] = Vector3(0.35 * s, 0.0, 0.03 * s)
-		poses["Forearm.L"] = Vector3(0.12 * sw_l, 0.0, 0.0)
-		poses["Forearm.R"] = Vector3(0.12 * sw_r, 0.0, 0.0)
-		poses["Hand.L"] = Vector3(0.04 * sw_l, 0.0, 0.0)
-		poses["Hand.R"] = Vector3(0.04 * sw_r, 0.0, 0.0)
+		poses["UpperArm.L"] = Vector3(-0.5 * s, 0.0, -0.05 * s)
+		poses["UpperArm.R"] = Vector3(0.5 * s, 0.0, 0.05 * s)
+		poses["Forearm.L"] = Vector3(0.18 * sw_l, 0.0, 0.0)
+		poses["Forearm.R"] = Vector3(0.18 * sw_r, 0.0, 0.0)
+		poses["Hand.L"] = Vector3(0.06 * sw_l, 0.0, 0.0)
+		poses["Hand.R"] = Vector3(0.06 * sw_r, 0.0, 0.0)
 		# body rock + tail swish; body sinks so the stance paws stay planted
 		poses["Spine"] = Vector3(0.06 * s, 0.0, 0.0)
 		poses["Tail01"] = Vector3(0.0, 0.0, 0.14 * s)
