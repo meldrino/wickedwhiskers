@@ -27,6 +27,14 @@ func get_interaction_point() -> Vector3:
 	return _pivot.to_global(Vector3(1.45, 0.6, 0.0))
 
 
+func get_interaction_points() -> Array[Vector3]:
+	return [
+		_pivot.to_global(Vector3(0.0, 0.6, 0.0)),
+		_pivot.to_global(Vector3(1.45, 0.6, 0.0)),
+		_pivot.to_global(Vector3(2.9, 0.6, 0.0)),
+	]
+
+
 func _build_gate() -> void:
 	# Fills: short fence sections either side of the opening (scaled fence2).
 	_add_fill(-2.345)

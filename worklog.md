@@ -635,3 +635,21 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
 - shooting-star crash: add_child(mi) before look_at (daynight.gd).
 - gate_test now re-aims camera at close step (was stale-camera artifact). All 4 scenarios pass headless.
 - import + --smoketest clean. commit 2f0f423.
+
+## 2026-08-13 gate pick: all-panel clickable, animal-proof (session 3)
+- USER BUG: in-game only the middle of the gate toggled; hinge/far ends did nothing.
+  Cause: _pick_interactable projected only the SINGLE primary interaction point
+  (panel middle) and required the click within 40px of it - interaction_points_extra
+  were range-only, never used for picking.
+- FIX 1 (player.gd): _pick_interactable now evaluates ALL of an interactable's
+  interaction points and takes the nearest-to-click one.
+- FIX 2 (interactable.gd + gate.gd): new get_interaction_points() base method =
+  primary + extras (world space). Gate overrides it with THREE pivot-relative points
+  (hinge 0.0 / middle 1.45 / far end 2.9, pivot-local x) so they SWING WITH THE PANEL
+  - the gate is clickable at both ends whether open or closed (the old gate-local
+  extras were stale once the panel rotated).
+- FIX 3 (player.gd): occlusion ray now tries the points nearest the click first and
+  accepts the pick if ANY ray is clear - a fish/mouse wandering across the single
+  old ray could deaden the click (intermittent far_end_pick=null in tests).
+- gate_test: added open-far-tip click + hinge-click scenarios. Import + smoketest
+  clean; 6/6 consecutive runs pass. commit <next>.

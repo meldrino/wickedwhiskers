@@ -140,42 +140,54 @@ func _pick_interactable(screen_pos: Vector2) -> Interactable:
 	var from := camera.project_ray_origin(screen_pos)
 	var best: Interactable = null
 	var best_d := INF
+	var best_wp := Vector3.ZERO
 	var vp_size := get_viewport().get_visible_rect().size
 	for item in get_tree().get_nodes_in_group("interactable"):
 		var it := item as Interactable
 		if it == null:
 			continue
-		var wp := it.get_interaction_point()
-		var to_item: Vector3 = wp - from
-		if to_item.length() > 50.0:
-			continue
-		if to_item.normalized().dot(camera.global_transform.basis.z) >= -0.05:
-			continue
-		var sp := camera.unproject_position(wp)
-		if sp.x < 0.0 or sp.y < 0.0 or sp.x > vp_size.x or sp.y > vp_size.y:
-			continue
-		var d := sp.distance_to(screen_pos)
-		if d < best_d:
-			best_d = d
+		var item_d := INF
+		var item_wp := Vector3.ZERO
+		for wp in it.get_interaction_points():
+			var to_item: Vector3 = wp - from
+			if to_item.length() > 50.0:
+				continue
+			if to_item.normalized().dot(camera.global_transform.basis.z) >= -0.05:
+				continue
+			var sp := camera.unproject_position(wp)
+			if sp.x < 0.0 or sp.y < 0.0 or sp.x > vp_size.x or sp.y > vp_size.y:
+				continue
+			var d := sp.distance_to(screen_pos)
+			if d < item_d:
+				item_d = d
+				item_wp = wp
+		if item_d < best_d:
+			best_d = item_d
+			best_wp = item_wp
 			best = it
 	if best == null or best_d > 40.0:
 		return null
 	# Occlusion: a solid wall/fence between the camera and the object blocks the
-	# click — but never the object's own colliders (e.g. the gate panel).
-	var wp2 := best.get_interaction_point()
-	var dir := (wp2 - from).normalized()
-	var qa := PhysicsRayQueryParameters3D.create(from, wp2 + dir * 0.3)
-	qa.collide_with_areas = false
-	qa.collide_with_bodies = true
-	var rids: Array[RID] = [get_rid()]
-	_collect_rids(best, rids)
-	qa.exclude = rids
-	var hb := get_world_3d().direct_space_state.intersect_ray(qa)
-	if not hb.is_empty():
+	# click — but never the object's own colliders (e.g. the gate panel). Try the
+	# points nearest the click first; a passing animal must not deaden the click.
+	var wps2 := best.get_interaction_points()
+	wps2.sort_custom(func(a: Vector3, b: Vector3) -> bool:
+		return camera.unproject_position(a).distance_to(screen_pos) < camera.unproject_position(b).distance_to(screen_pos))
+	for wp in wps2:
+		var dir := (wp - from).normalized()
+		var qa := PhysicsRayQueryParameters3D.create(from, wp + dir * 0.3)
+		qa.collide_with_areas = false
+		qa.collide_with_bodies = true
+		var rids: Array[RID] = [get_rid()]
+		_collect_rids(best, rids)
+		qa.exclude = rids
+		var hb := get_world_3d().direct_space_state.intersect_ray(qa)
+		if hb.is_empty():
+			return best
 		var body_dist := from.distance_to(hb.get("position"))
-		if body_dist < from.distance_to(wp2) - 0.2:
-			return null
-	return best
+		if body_dist >= from.distance_to(wp) - 0.2:
+			return best
+	return null
 
 
 func _collect_rids(node: Node, rids: Array[RID]) -> void:
@@ -452,12 +464,8 @@ func _wet_cat(wet: bool) -> void:
 
 
 func _within_interact_range(item: Interactable) -> bool:
-	var p := item.get_interaction_point()
-	p.y = global_position.y
-	if global_position.distance_to(p) <= item.interaction_range:
-		return true
-	for extra in item.interaction_points_extra:
-		var q := item.to_global(extra)
+	for p in item.get_interaction_points():
+		var q := p
 		q.y = global_position.y
 		if global_position.distance_to(q) <= item.interaction_range:
 			return true

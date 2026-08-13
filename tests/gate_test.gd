@@ -81,6 +81,34 @@ func _ready() -> void:
 		player.call("_handle_click_at", sp4)
 		await get_tree().create_timer(3.0).timeout
 		print("TEST after_far_end_click: gate_open=", gate.get("_open"), " player_pos=", player.global_position)
+		# Click the far tip of the swung-open panel (pivot-local x=2.9).
+		var far_tip: Vector3 = pivot.to_global(Vector3(2.9, 0.6, 0.0))
+		player.global_position = Vector3(-1.7, 0.5, -23.0)
+		var to_tip: Vector3 = far_tip - player.global_position
+		to_tip.y = 0.0
+		player.set("yaw", atan2(-to_tip.x, -to_tip.z))
+		player.set("pitch", -0.2)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var sp_tip: Vector2 = cam.unproject_position(far_tip)
+		print("TEST open_far_tip: screen=", sp_tip, " within_range=", player.call("_within_interact_range", gate))
+		player.call("_handle_click_at", sp_tip)
+		await get_tree().create_timer(3.0).timeout
+		print("TEST after_open_far_tip: gate_open=", gate.get("_open"), " pivot_rot_y=%.3f" % (pivot.rotation.y if pivot != null else 0.0))
+		# Click the hinge end (pivot-local x=0) of the now-closed gate.
+		var hinge: Vector3 = pivot.to_global(Vector3(0.0, 0.6, 0.0))
+		player.global_position = Vector3(-2.0, 0.5, -24.5)
+		var to_h: Vector3 = hinge - player.global_position
+		to_h.y = 0.0
+		player.set("yaw", atan2(-to_h.x, -to_h.z))
+		player.set("pitch", -0.2)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var sp_hinge: Vector2 = cam.unproject_position(hinge)
+		print("TEST hinge_click: screen=", sp_hinge, " within_range=", player.call("_within_interact_range", gate))
+		player.call("_handle_click_at", sp_hinge)
+		await get_tree().create_timer(3.0).timeout
+		print("TEST after_hinge_click: gate_open=", gate.get("_open"), " pivot_rot_y=%.3f" % (pivot.rotation.y if pivot != null else 0.0))
 	else:
 		gate.interact()
 		await get_tree().create_timer(1.3).timeout
