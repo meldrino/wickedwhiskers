@@ -125,14 +125,18 @@ build_status:
   scene1_layout:
     player start: (0,0,12), yaw 0.6, ground 60x60 + WorldBoundaryShape collision
     farmhouse: (0,0,-24), box build, gable roof, porch, door/windows on +Z, night-locked
-    shed: (16,0,-10), EXTERIOR ONLY (solid box + overhang roof, door frame, dark door that
-      swings open on unlock, padlock). Entry portal (ShedPortal, area in the doorway) switches
-      to the shed's own scene (S1.5) once unlocked, with a 0.7s beat so the door swing reads.
-      Return spawns the player near the shed door at (16,0,-7.2).
+    shed: (16,0,-10), EXTERIOR ONLY, PERSON-SCALE (2026-08-13: walls 2.5m, 0.9x2.0m door,
+      3.0x2.4m footprint, ridge 3.2m; measured AABB 3.76x3.2x3.21m incl roof). Box build +
+      overhang roof derived from box, door frame + 0.8m plank door, alpha-blend glass windows,
+      dark door that swings open on unlock, padlock. Entry portal (ShedPortal, area in the
+      doorway) switches to the shed's own scene (S1.5) once unlocked, with a 0.7s beat so the
+      door swing reads. Return spawns the player near the shed door at (16,0,-7.8).
     shed_interior: scenes/shed.tscn = own scene (S1.5). Interior walls (doorway gap on +Z),
       floor, overhang roof, warm OmniLight, props: loot crates, boot-with-sprout, hay pile,
-      sprung mousetrap, glowing lantern, rake, rope coil. Player spawns inside at (0,0,0.6)
-      facing the door. Loot = string + spare tractor keys on the crates (one-time, tracked via
+      sprung mousetrap, glowing lantern, rake, rope coil. Player spawns inside at (0,0,0.2)
+      facing the door (was 0.6; moved back so the exit portal at z 1.1 doesn't overlap his
+      collision body at spawn - the old portal at z 1.55 cleared it). Loot = string + spare
+      tractor keys on the crates (one-time, tracked via
       shed_string_taken/shed_key_taken so re-entering can't farm them). Exit portal
       (ShedExitPortal) returns to the farm. DayNight runs here too so hunger/tiredness continue.
     tractor: (10,0,-20), red box build + 4 wheels + number plate
