@@ -35,7 +35,7 @@ func _physics_process(delta: float) -> void:
 
 	if _jump > 0.0:
 		_jump += delta
-		var p := clamp(_jump / JUMP_DUR, 0.0, 1.0)
+		var p: float = clamp(_jump / JUMP_DUR, 0.0, 1.0)
 		var rise := sin(p * PI) * JUMP_HEIGHT
 		fish.position = Vector3(_jump_dir.x * p * JUMP_ARC, wl - SUBMERGE + rise, _jump_dir.z * p * JUMP_ARC)
 		fish.rotation.y = _jump_dir_angle()

@@ -5,15 +5,9 @@ const HALF := WORLD_SIZE / 2.0
 const FENCE_HALF := 25.0
 
 const TREE_SCENES := [
-	preload("res://assets/tree_default.glb"),
-	preload("res://assets/tree_detailed.glb"),
-	preload("res://assets/tree_fat.glb"),
-	preload("res://assets/tree_oak.glb"),
-	preload("res://assets/tree_simple.glb"),
-	preload("res://assets/tree_tall.glb"),
-	preload("res://assets/tree_thin.glb"),
-	preload("res://assets/tree_cone.glb"),
-	preload("res://assets/tree_blocks.glb"),
+	preload("res://assets/tree_ww_round.glb"),
+	preload("res://assets/tree_ww_cone.glb"),
+	preload("res://assets/tree_ww_fat.glb"),
 ]
 const FENCE_PANEL := preload("res://assets/fence2.glb")
 const FENCE_PANEL_WIDTH := 5.89
