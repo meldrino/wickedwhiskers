@@ -254,10 +254,6 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 		return
 	if _pouncing():
 		return
-	var fish := _pick_fish(screen_pos)
-	if fish != null:
-		_try_fish(fish)
-		return
 	if has_destination:
 		return
 	_waiting_cam = false
@@ -268,6 +264,10 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 			item.interact()
 		elif item.walk_to_interact:
 			_go_interact(item)
+		return
+	var fish := _pick_fish(screen_pos)
+	if fish != null:
+		_try_fish(fish)
 		return
 	var from := camera.project_ray_origin(screen_pos)
 	var dir := camera.project_ray_normal(screen_pos)
@@ -433,7 +433,7 @@ func _wet_cat(wet: bool) -> void:
 			for i in range(mi.mesh.get_surface_count()):
 				if i in orig:
 					continue
-				var src: Material = mi.surface_get_material(i)
+				var src: Material = mi.mesh.surface_get_material(i)
 				orig[i] = src
 				if src is StandardMaterial3D:
 					var m: StandardMaterial3D = src.duplicate()

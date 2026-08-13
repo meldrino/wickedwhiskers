@@ -270,6 +270,6 @@ func _spawn_shooting_star() -> void:
 	quad.material = mat
 	mi.mesh = quad
 	mi.position = start
-	mi.look_at(start + speed_dir, Vector3.UP)
 	add_child(mi)
+	mi.look_at(start + speed_dir, Vector3.UP)
 	_shooting.append({"node": mi, "dir": speed_dir, "t": 0.0})

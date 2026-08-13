@@ -65,7 +65,8 @@ func _build_water() -> void:
 	nt.as_normal_map = true
 	nt.width = 256
 	nt.height = 256
-	_water_mat.normal_map = nt
+	_water_mat.normal_enabled = true
+	_water_mat.normal_texture = nt
 	_water_mat.refraction_enabled = true
 	_water_mat.refraction_texture = nt
 	_water_mat.refraction_scale = 0.07

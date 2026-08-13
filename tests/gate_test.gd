@@ -48,6 +48,10 @@ func _ready() -> void:
 		await get_tree().create_timer(3.0).timeout
 		print("TEST after_far_click: gate_open=", gate.get("_open"), " player_pos=", player.global_position)
 		player.global_position = Vector3(-1.7, 0.5, -24.2)
+		var to_c: Vector3 = gate.get_interaction_point() - player.global_position
+		to_c.y = 0.0
+		player.set("yaw", atan2(-to_c.x, -to_c.z))
+		player.set("pitch", -0.2)
 		await get_tree().process_frame
 		await get_tree().process_frame
 		print("TEST close: within_range=", player.call("_within_interact_range", gate))
