@@ -454,3 +454,98 @@ FIX: grass_system.gd default hscale 1.0 -> 8.0 (--hscale flag still overrides).
 VERIFIED default launch at noon vs 13_game_catclose_h8: sky 165/209/242 vs 165/203/235, grass bands 142.5/126 vs 144/108, GreenFrac 0.59 vs 0.584. Matches.
 Night start (day_time := 0.0) unchanged - intentional day/night cycle.
 Screenshots: screenshots/17_game_noon_h8default.png (default camera, noon, hscale=8 default).
+
+## 2026-08-11 - REAL far grass everywhere + field 50x50 + macro far chunks (LOD)
+USER: far field still read dark / not real grass. The old far-impostor path is dead - far chunks now
+render the SAME full-geometry tufts as near (grass_chunk _full_mesh_far), one shared shader.
+- Far tier = full tufts (no impostor, no "small tufts"): the dark far band is gone; grass reads as
+  grass to the horizon. STREAM_RADIUS: 92 -> 100 made the grazing bench drop 43.7 -> 26.2 fps, so
+  settled on 70 (terrain caps at +-60 anyway, so 70 == full coverage with no waste).
+- Near adaptive tier 4x density (commit 8af0dde) so coverage is complete even looking straight down.
+- FIELD SHRINK (user-approved, "50 x 50 is plenty"): WORLD_SIZE 60 -> 54 -> fence at HALF-2 = 25
+  -> field is exactly 50 x 50 = 10 WHOLE 5m chunks (chunk-aligned). Lake/tractor/bird tree all
+  still fit inside the new fence (verified). Fence build auto-derives from HALF - no position edits.
+- MACRO FAR CHUNKS (user's "bigger chunks far away" idea, TESTED): beyond FAR_RADIUS 40m, chunks
+  are true 10x10m (MACRO_SIZE 2 = four 5m cells merged into ONE real chunk, key "cx,cz,size"),
+  tufts at TUFT_SPACING_FAR 0.32 vs 0.2 near. Fewer MultiMesh draw calls AND ~4x less far fill
+  (the GPU cost that dominates). Chunk key format changed to "x,z,size" everywhere (desired map,
+  _key_dist, _spawn, _update_tiers). Tier: 0 adaptive <= 18m, 1 grid @0.2 <= 40m, 2 macro @0.32 >40m.
+- fpsbench at the grazing view: avg 41.1 / p95 55.0 / min 1.0 (min = first-frame grass build hitch).
+  vs the pre-regression reach-92 baseline of 43.7 - effectively flat, but now with real far tufts.
+  GOTCHA (cost me ~10 min): Godot user args need the `--` separator: `--path <proj> -- --fpsbench`
+  (without `--` the flag never reaches the game and it just idles forever). Windowed, NOT --headless.
+- Verified: parse/boot clean (--quit-after 240, no SCRIPT errors); fpsbench exit code 0.
+- NOT yet verified: user eyes on whether 0.32m far meadow + 10m chunk seams read OK at the horizon.
+Screenshots: fpsbench_diag.txt (bench log), screenshots/29_lakeshore_pinkground.png +
+30_lakeshore_pinkground_90.png + 31_lakeshore_map.png + 32/33 (disc-bright lake + catclose shots).
+
+## 2026-08-12 (night shift) - grass chunks back to 5x5 + socket investigation + autonomy session
+USER (in-game): "when ww turns around the grass disappears altogether sometimes" + suspicion of the
+big macro chunks. USER DECISION: "put all the chunks back to 5x5... if we don't need to then lets not
+fuck about with them".
+- REVERTED macro far chunks (10x10) back to 5x5 EVERYWHERE: grass_system.gd _chunk_key() now always
+  emits "cx,cz,1"; MACRO_SIZE const deleted; _update_tiers = pure distance tiers on 5x5 chunks
+  (0 adaptive <= NEAR_RADIUS 18, 1 grid @0.2 <= FAR_RADIUS 40, 2 grid @0.32 >40). TUFT_SPACING_FAR
+  0.32 + STREAM_RADIUS 70 kept. NOTE: 5x5 far chunks = ~4x more far MultiMesh draw calls than the
+  10x10 macro merge (fpsbench re-check pending).
+- DISAPPEARING-ON-TURN root-cause hypothesis (NOT yet fixed): _update_chunks spawns chunks sorted by
+  camera+mouse distance; grass_chunk _rebuild() sets _mm.visible=false until the whole MultiMesh
+  array is placed (BUILD_PER_FRAME 6000). A fast turn sweeps the Mouse point across the field -> a
+  wave of freshly-spawned INVISIBLE-while-building chunks, plus tier flips that rebuild chunks
+  (invisible again during rebuild). Fix candidates (for later): keep _mm.visible=true during rebuild,
+  raise BUILD_PER_FRAME, or don't key chunk streaming on the mouse position.
+- SOCKET: recurring "Cannot connect to API: The socket connection was closed unexpectedly" (user saw
+  it constantly; also filled ~/.local/share/opencode/log/opencode.log).
+  - 138 drops this session log, providerID=opencode modelID=big-pickle, roughly ONE PER GENERATION.
+  - stream-start -> error delta measured: 6-69 s, variable (NOT a fixed 30 s timer) => mid-stream
+    SSE reset, NOT idle timeout.
+  - opencode auto-retries ~2 s later and ALWAYS succeeds => no data loss, cosmetic-but-noisy.
+  - Suspects: opencode API server / CDN resetting SSE, or Avast Web Shield proxying + killing
+    long-lived HTTPS streams (this laptop's known Avast behaviour).
+  - ACTION: added "logLevel": "DEBUG" to C:\Users\Andy\.config\opencode\opencode.jsonc. Needs an
+    opencode RESTART to apply. Next drop after restart will log the fetch-level cause (exact host +
+    ECONNRESET/socket-hangup/TLS) so the blame lands on the server or the AV.
+- AUTONOMY: user went to sleep and authorised unattended work. Night-shift task list in
+  PROJECT_STATE.yaml (todo section): chunks in lake, Dumbleclaw's beard, animations, placeholder
+  beautification. Verify with smoke test + --noon screenshots before committing. This session is
+  writing everything to YAML/worklog/git as it goes (recovery ritual).
+
+## 2026-08-13 (night shift) - ground overhaul + sky + fence/gate/tree collision (todo list)
+Night-shift to-do list completed this session (user approved the list then slept):
+- GROUND COLOUR: TerrainConfig.grass_color (0.35,0.55,0.2) -> (0.16,0.29,0.10) much darker green.
+  grass_ground.png re-tinted as a BRIGHT detail map (mean 0.844,0.85,0.797) so texture * vertex
+  grass = (0.135,0.247,0.08) rich dark green. Terrain material keeps vertex_color_use_as_albedo
+  (slope-rock/water-edge blends intact); albedo_color white; texture_repeat stays default (ENABLED).
+- TERRAIN UVs + texture wiring: Terrain.gd _build_world() set_uv(Vector2(x,z)*0.25) = 1 tile per 4m;
+  material albedo_texture = grass_ground.png, linear+mipmaps filter. NOTE: TEXTURE_REPEAT_ENABLED
+  const does NOT exist in Godot 4 BaseMaterial3D (repeat is the default) - first smoketest run hit
+  a parse error, fixed by dropping the line.
+- TREE COLLISION = trunk only: colliders were children of scaled trees so the 0.6x2.0x0.6 box grew
+  with tree scale (2.6-4.4) into canopy-wide blockers. Now TRUNK_COLLIDER_SIZE = Vector3(0.5,1.8,0.5)
+  world-space, divided by tree scale (bird tree /4.0 at 1.2m up).
+- FENCE: north edge (farmhouse) was missing a segment - gate placed at x=0 but the old per-edge loop
+  put panel i=4 center at x=3.125 (overlap + ~3.5m gap east of gate). New _build_gate_edge() builds
+  the whole edge symmetric around the gate: panels at +-6.25, +-12.5, +-18.75, +-25 (9 items, 6.25m
+  pitch - same as other edges). Gate fixes: latch moved from pivot-local (1.4,0.95,0) (floating, near
+  west post) to (2.85,0.95,0) (meets east post at world x=1.455); swing +PI/2 -> -PI/2 so it opens
+  INTO the yard per the comment (was opening out toward the farmhouse). NOTE for user: north corner
+  panels at +-25 overhang ~3m past the east/west fence lines (+-24.82) - eyeball in morning.
+- GRASS CULLING: grass_system.gd only spawns chunks whose center is inside FENCE_HALF (absf <= 25).
+  This KILLS all tier-1 discs - outside the fence is now bare textured terrain. _update_tiers still
+  runs (all chunks end up tier 0), GRASSDBG still prints for the morning check.
+- SKY: daynight.gd - runtime cloud cover (FastNoiseLite fbm, threshold gradient, 1024x512 seamless
+  NoiseTexture2D) set as ProceduralSkyMaterial.sky_cover; day/night "fader" via sky_cover_modulate
+  (white at day -> dim blue-grey Color(0.3,0.34,0.55) at night). Stars improved: 320 pts with
+  per-vertex brightness, twinkle via albedo alpha sin(time_s*2.1). NEW shooting stars: spawn every
+  22-55s at night, thin additive QuadMesh streak, 1.4s life, fade in/out (not overdone).
+- FIXED during smoketest: daynight.gd `var k := s.t / SHOOT_LIFE` failed type inference (dict value
+  is Variant) -> explicit `var k: float`. Smoke + all --noon screenshots pass with ZERO script errors.
+- ASSET AUDIT via gemini-expert.ps1 (MoE wrapper, text-only): keep fence_corner/bend/gate/crops/
+  sign/tree_oak_fall; prune fence_planks/fence_simple/stump_square. WW.glb 37MB = likely embedded
+  uncompressed textures or dense keyframes (check in Blender). Free CC0 packs: Kenney Agriculture
+  Kit, KayKit Farm Bits, Quaternius Ultimate Farming.
+- VERIFICATION: headless+windowed --smoketest PASS (SMOKE DONE, 0 SCRIPT errors; exit RID-leak
+  noise is normal). Screenshots: flyover/catclose/pond/ground/dumbleclaw (noon) + base (night).
+- GIT: save5 committed twice (6222240 = parse-error fix on 6293524), tag save5 force-moved. Push
+  still impossible on detached HEAD (master diverged at b52b495) - left for the user, no force-push.
+  screenshots/ debug.log + .import files + grass_compare/ stay UNTRACKED (scratch).
