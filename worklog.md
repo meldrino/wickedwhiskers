@@ -684,3 +684,26 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
 - NEXT: padlock clicks still on hold (planned: add StaticBody3D collider to door/padlock + padlock
   interaction point + headless test mirroring gate_test). Visual queue: stones ~20x too big, trees,
   fish, tractor, Dumbleclaw. Gemini glass response was truncated - retry with longer timeout if needed.
+
+## 2026-08-13 padlock locks the door at click height + exit-portal warning (session 5)
+- USER: the padlock visual floated at world ~2.05m ("way out of reach") because the door Area3D
+  pivot is at world y=1.0 and the padlock was at local y 1.05. Clicking it did nothing (1m above
+  the 1.0m interaction point); clicking ~1m high on the door DID open the combo.
+- door.gd _build_padlock rewritten as latch hardware: mounting plate straddling the door edge at
+  x 0.40, door staple + brass shackle loop, lock body + 3 dials + keyhole, jamb staple at x 0.15
+  (reaches the frame post at door-local x 0.55). Padlock node at local (0.40, 0.0, 0.12) =
+  world (16.4, 1.0, -8.7) - exactly the click height.
+- CLICKABILITY: added StaticBody3D "PadlockHit" (BoxShape 0.3x0.42x0.2) on collision_layer 2 -
+  raycast pick (bodies, default mask) hits it and walks up to the Door_shed Interactable; the
+  player (mask layer 1) walks through the doorway unimpeded. The door-face fallback pick still
+  works (interaction_center stays at door centre).
+- tests/door_test.tscn/gd (committed, mirrors gate_test): padlock at (16.4,1.0,-8.7), PadlockHit
+  layer 2, click padlock -> _pick_interactable=Door_shed + Hud.combo_open=true walking=false,
+  click door face -> still picks. DONE headless.
+- shed.gd _on_exit: change_scene_to_file -> call_deferred - silences "Removing a CollisionObject
+  node during a physics callback" (body_entered fires inside a physics step). Was benign, now clean.
+- Re-ran: gate_test DONE, shed smoke green (no warning), main smoke exit 0. commit d886f0c.
+- SHED HEIGHT RECONCILIATION (user asked a vision model "shed vs cat" from a screenshot; it said
+  ~7x): measured shed/cat = 3.205m ridge / 0.458m cat = 6.97x - the vision model measured the
+  ROOF PEAK. Walls are 2.5m = 5.4x cat. No bug; if the user wants the whole shed ~2.5m total,
+  that's walls ~1.9m + door 1.7m - pending user call.
