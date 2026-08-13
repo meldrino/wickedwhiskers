@@ -57,7 +57,19 @@ func _build_mesh() -> void:
 			bm.size = Vector3(0.09, 0.09, 1.0)
 			mesh = bm
 			mat.albedo_color = Color(0.55, 0.38, 0.22)
+			mat.roughness = 0.6
 			mi.rotation = Vector3(0, 0.6, 0.1)
+			var tip := MeshInstance3D.new()
+			var tm := SphereMesh.new()
+			tm.radius = 0.06
+			tm.height = 0.1
+			var tmat := StandardMaterial3D.new()
+			tmat.albedo_color = Color(0.62, 0.44, 0.26)
+			tmat.roughness = 0.6
+			tm.material = tmat
+			tip.mesh = tm
+			tip.position = Vector3(0.6, 0.0, 0.0)
+			add_child(tip)
 		"food":
 			var sm := SphereMesh.new()
 			sm.radius = 0.16

@@ -97,39 +97,55 @@ func _catch(by_tractor := false) -> void:
 
 func _build_bird() -> void:
 	var blue := StandardMaterial3D.new()
-	blue.albedo_color = Color(0.3, 0.5, 0.85)
+	blue.albedo_color = Color(0.30, 0.52, 0.86)
+	blue.roughness = 0.55
 	var white := StandardMaterial3D.new()
-	white.albedo_color = Color(0.95, 0.95, 0.92)
+	white.albedo_color = Color(0.97, 0.96, 0.92)
+	white.roughness = 0.55
 	var orange := StandardMaterial3D.new()
 	orange.albedo_color = Color(0.95, 0.6, 0.2)
+	orange.roughness = 0.5
 	var dark := StandardMaterial3D.new()
 	dark.albedo_color = Color(0.1, 0.1, 0.1)
+	dark.roughness = 0.4
 
-	var body := _mesh("sphere", Vector3(0.24, 0.2, 0.28), blue)
+	var body := _mesh("sphere", Vector3(0.26, 0.22, 0.3), blue)
 	body.position = Vector3(0, 0, 0)
 	add_child(body)
 
-	var head := _mesh("sphere", Vector3(0.16, 0.15, 0.16), blue)
-	head.position = Vector3(0, 0.14, 0.12)
+	var belly := _mesh("sphere", Vector3(0.18, 0.14, 0.2), white)
+	belly.position = Vector3(0, -0.06, 0.04)
+	add_child(belly)
+
+	var head := _mesh("sphere", Vector3(0.17, 0.16, 0.17), blue)
+	head.position = Vector3(0, 0.16, 0.14)
 	add_child(head)
 
-	var beak := _mesh("box", Vector3(0.04, 0.035, 0.09), orange)
-	beak.position = Vector3(0, 0.14, 0.24)
+	var crest := _mesh("sphere", Vector3(0.07, 0.09, 0.06), blue)
+	crest.position = Vector3(0, 0.24, 0.1)
+	crest.rotation.x = -0.5
+	add_child(crest)
+
+	var beak := _mesh("box", Vector3(0.045, 0.035, 0.1), orange)
+	beak.position = Vector3(0, 0.15, 0.27)
 	add_child(beak)
 
-	var eye := _mesh("sphere", Vector3(0.045, 0.045, 0.03), dark)
-	eye.position = Vector3(0.05, 0.18, 0.19)
+	var eye := _mesh("sphere", Vector3(0.05, 0.05, 0.03), dark)
+	eye.position = Vector3(0.055, 0.2, 0.21)
 	add_child(eye)
+	var glint := _mesh("sphere", Vector3(0.018, 0.018, 0.01), white)
+	glint.position = Vector3(0.075, 0.215, 0.225)
+	add_child(glint)
 
 	for x in [-1, 1]:
-		var wing := _mesh("box", Vector3(0.3, 0.03, 0.14), white)
-		wing.position = Vector3(x * 0.22, 0.02, 0.0)
-		wing.rotation = Vector3(0, 0, x * 0.25)
+		var wing := _mesh("sphere", Vector3(0.32, 0.05, 0.16), blue)
+		wing.position = Vector3(x * 0.24, 0.03, 0.02)
+		wing.rotation = Vector3(0, 0, x * 0.3)
 		add_child(wing)
 
-	var tail := _mesh("box", Vector3(0.06, 0.03, 0.2), white)
-	tail.position = Vector3(0, 0.04, -0.24)
-	tail.rotation = Vector3(-0.2, 0, 0)
+	var tail := _mesh("sphere", Vector3(0.08, 0.04, 0.24), white)
+	tail.position = Vector3(0, 0.05, -0.26)
+	tail.rotation = Vector3(-0.3, 0, 0)
 	add_child(tail)
 
 

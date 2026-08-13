@@ -14,12 +14,9 @@ const FENCE_PANEL_WIDTH := 5.89
 const FENCE_PANEL_HEIGHT := 1.1
 const TRUNK_COLLIDER_SIZE := Vector3(0.5, 1.8, 0.5)
 const ROCK_SCENES := [
-	preload("res://assets/rock_smallA.glb"),
-	preload("res://assets/rock_smallB.glb"),
-	preload("res://assets/rock_smallC.glb"),
-	preload("res://assets/rock_smallD.glb"),
-	preload("res://assets/rock_largeA.glb"),
-	preload("res://assets/rock_largeB.glb"),
+	preload("res://assets/rock_ww_a.glb"),
+	preload("res://assets/rock_ww_b.glb"),
+	preload("res://assets/rock_ww_c.glb"),
 ]
 const CROP_SCENES := [
 	preload("res://assets/crop_carrot.glb"),
@@ -358,9 +355,10 @@ func _build_shed(shed_pos: Vector3) -> void:
 	shed.name = "Shed"
 	add_child(shed)
 
-	var wood := Color(0.45, 0.3, 0.18)
+	var wood := Color(0.47, 0.31, 0.18)
 	var wood_dark := Color(0.36, 0.24, 0.14)
-	var roof_col := Color(0.3, 0.2, 0.12)
+	var roof_col := Color(0.32, 0.22, 0.13)
+	var frame_col := Color(0.25, 0.17, 0.11)
 	var half_w := 2.3
 	var half_d := 1.7
 	var wall_h := 3.0
@@ -368,11 +366,53 @@ func _build_shed(shed_pos: Vector3) -> void:
 	# Solid exterior box (the interior now lives in its own scene: scenes/shed.tscn)
 	_add_mesh(shed, "box", Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0), wood)
 	_add_collider(shed, Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0))
-	# Roof (overhang) + ridge cap
-	_add_mesh(shed, "box", Vector3(half_w * 2.0 + 0.5, 0.5, half_d * 2.0 + 0.5), Vector3(0, wall_h + 0.25, 0), roof_col)
-	_add_mesh(shed, "box", Vector3(half_w * 2.0 + 0.5, 0.3, 0.7), Vector3(0, wall_h + 0.65, 0), roof_col)
+	# Vertical plank seams (proud of the walls, front + back)
+	for x in range(-2, 3):
+		if x == 0:
+			continue
+		_add_mesh(shed, "box", Vector3(0.03, wall_h, 0.02), Vector3(x * 0.9, wall_h / 2.0, half_d + 0.01), wood_dark)
+		_add_mesh(shed, "box", Vector3(0.03, wall_h, 0.02), Vector3(x * 0.9, wall_h / 2.0, -half_d - 0.01), wood_dark)
+	# Horizontal plank seams on the side walls
+	for y in range(3):
+		_add_mesh(shed, "box", Vector3(0.02, 0.03, half_d * 2.0), Vector3(half_w + 0.01, 0.5 + y * 1.0, 0), wood_dark)
+		_add_mesh(shed, "box", Vector3(0.02, 0.03, half_d * 2.0), Vector3(-half_w - 0.01, 0.5 + y * 1.0, 0), wood_dark)
+	# Corner posts
+	for sx in [-1, 1]:
+		for sz in [-1, 1]:
+			_add_mesh(shed, "box", Vector3(0.22, wall_h + 0.1, 0.22),
+				Vector3(sx * (half_w - 0.1), (wall_h + 0.1) / 2.0, sz * (half_d - 0.1)), frame_col)
+	# Gabled roof (two sloped slabs) + ridge cap
+	_add_mesh(shed, "box", Vector3(2.6, 0.25, half_d * 2.0 + 0.6), Vector3(1.28, 3.45, 0), roof_col)
+	shed.get_child(-1).rotation.z = -0.62
+	_add_mesh(shed, "box", Vector3(2.6, 0.25, half_d * 2.0 + 0.6), Vector3(-1.28, 3.45, 0), roof_col)
+	shed.get_child(-1).rotation.z = 0.62
+	_add_mesh(shed, "box", Vector3(0.42, 0.42, half_d * 2.0 + 0.6), Vector3(0, 3.95, 0), roof_col)
+	# Gable triangles filling the roof ends (triangular prisms, flat side down)
+	var gable := PrismMesh.new()
+	gable.size = Vector3(half_w * 2.0, 1.1, 0.4)
+	var gmi := MeshInstance3D.new()
+	gmi.mesh = gable
+	var gmat := StandardMaterial3D.new()
+	gmat.albedo_color = wood_dark
+	gmi.material_override = gmat
+	gmi.position = Vector3(0, wall_h + 0.5, half_d + 0.1)
+	shed.add_child(gmi)
+	var gmi2 := gmi.duplicate()
+	gmi2.position.z = -half_d - 0.1
+	shed.add_child(gmi2)
+	# Small window on each side wall with a wooden frame
+	for sx in [-1, 1]:
+		_add_mesh(shed, "box", Vector3(0.1, 0.85, 0.85), Vector3(sx * (half_w - 0.05), 1.9, 0), Color(0.75, 0.83, 0.9))
+		_add_mesh(shed, "box", Vector3(0.16, 0.06, 0.95), Vector3(sx * (half_w - 0.05), 1.53, 0), frame_col)
+		_add_mesh(shed, "box", Vector3(0.16, 0.95, 0.06), Vector3(sx * (half_w - 0.05), 1.9, -0.42), frame_col)
+		_add_mesh(shed, "box", Vector3(0.16, 0.95, 0.06), Vector3(sx * (half_w - 0.05), 1.9, 0.42), frame_col)
 	# Door frame + dark door (door mesh swings open on unlock)
 	_add_mesh(shed, "box", Vector3(1.9, 2.2, 0.15), Vector3(0, 1.1, half_d - 0.05), wood_dark)
+	_add_mesh(shed, "box", Vector3(0.1, 2.2, 0.05), Vector3(-1.0, 1.1, half_d - 0.02), frame_col)
+	_add_mesh(shed, "box", Vector3(0.1, 2.2, 0.05), Vector3(1.0, 1.1, half_d - 0.02), frame_col)
+	# Planks on the door itself
+	_add_mesh(shed, "box", Vector3(1.66, 0.06, 0.05), Vector3(0, 0.6, half_d + 0.01), frame_col)
+	_add_mesh(shed, "box", Vector3(1.66, 0.06, 0.05), Vector3(0, 1.6, half_d + 0.01), frame_col)
 	var door_mesh := _mesh("box", Vector3(1.7, 2.0, 0.1), Color(0.1, 0.08, 0.06))
 	door_mesh.name = "Door"
 	door_mesh.position = Vector3(0, 1.1, half_d - 0.02)
@@ -491,7 +531,7 @@ func _build_lake() -> void:
 
 
 func _build_bird_tree() -> void:
-	var scene: PackedScene = preload("res://assets/tree_detailed.glb")
+	var scene: PackedScene = preload("res://assets/tree_ww_round.glb")
 	var tree: Node3D = scene.instantiate()
 	tree.position = Vector3(BIRD_TREE_POS.x, Terrain.height_at(BIRD_TREE_POS.x, BIRD_TREE_POS.z), BIRD_TREE_POS.z)
 	tree.scale = Vector3.ONE * 4.0
