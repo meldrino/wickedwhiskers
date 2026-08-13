@@ -572,3 +572,40 @@ stump_round/square, sign, fence_*). The full kit is on disk at C:\crypto\world\k
 corn/wheat crops, flowers, bushes, mushrooms, tents, campfire, bridge). Rule going forward: any new
 prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Character/NPC upgrades
 (Dumbleclaw beard etc.) are code-built primitives, not asset-pack - unaffected.
+
+## 2026-08-13 ~13:00 - WW-style asset rework (trees/rocks/shed/padlock/fish) + heartbeat enforcement
+
+- HEARTBEAT: user caught big-pickle ignoring the ticker protocol twice. Structural fix: new opencode
+  plugin C:\Users\Andy\.config\opencode\plugins\heartbeat.ts (auto-loads at startup; needs opencode
+  restart). It appends a "HEARTBEAT OVERDUE (N min)" banner to every tool result once 10 min pass
+  without a tick, injects the reminder into the system prompt each turn, and exposes a 	ick tool.
+  State file: C:\crypto\bigpickle\heartbeat-state.json (stamped by the tick tool / chat TICK lines).
+- CAT (gen_ww.py): arms are now SEPARATE meshes (not unioned) held outside the body so auto-weights
+  pin them to the arm bones; shoulders raised (arm x range 0.68-0.76, shoulder z=1.58), hands smaller;
+  capsule() takes a mat param (fixes white cap spheres); eyes flattened to almond (scale 0.75,0.22,0.85);
+  whiskers lowered to cheek level; pot-belly + vibrant colours applied. WW.glb regenerated (32.8MB,
+  32 meshes, 26 bones) + reimported + smoke PASS. NOTE: build_armature() bone positions still at
+  OLD arm coords (0.48-0.52) - MUST be updated to match the 0.68-0.76 arm meshes on next cat pass.
+- LAUNCHER: new wickedwhiskers.bat alias (calls Play Wicked Whiskers.bat). Launch gotcha: Start-Process
+  needs embedded quotes for the space in "wicked whiskers": -ArgumentList '--path \"C:\crypto\wicked whiskers\" -- --bare --nograss'.
+- main.gd:100: --bare no longer hides cat/HUD unless --screenshot is also present (was hiding the cat
+  in bare play). daynight.gd:243: shooting-star 'modulate' crash fixed (material albedo alpha).
+- FISH (scripts/fish.gd): 5 circling fish -> ONE fish at the lake centre (local origin = lake centre).
+  Periodically (3.5-6s) leaps out of the water in an arc (~2.2m), forward motion + roll for visibility;
+  clicking it triggers an instant jump. Added dorsal fin. Fixed a Variant-inference parse warning.
+- TREES: new procedural pipeline tools/blender/ww_style.py (shared palette/helpers = the style spec)
+  + tools/blender/gen_trees.py -> assets/tree_ww_round.glb, tree_ww_cone.glb, tree_ww_fat.glb.
+  main.gd TREE_SCENES now points at these (Kenney trees retired). Bird tree (main.gd _build_bird_tree)
+  also uses tree_ww_round. Trees chunky subdiv-smoothed spheres/capsules in the WW palette.
+- ROCKS: tools/blender/gen_rocks.py -> assets/rock_ww_a/b/c.glb (boulder, paddy rock, pebble stack);
+  main.gd ROCK_SCENES now uses them (Kenney rocks retired).
+- SHED (main.gd _build_shed): gabled roof (2 sloped slabs + ridge cap + PrismMesh gable triangles),
+  vertical plank seams, corner posts, framed side windows, framed door with plank lines.
+- PADLOCK (scripts/door.gd _build_padlock): real brass combo padlock - torus shackle loop, 3 brass
+  dials with black grooves, white keyhole plate + hole, positioned (0, 1.05, 0.14).
+- BIRD (scripts/bird.gd): blue crest, white belly, glint on eye, rounded wings (spheres not boxes),
+  rough materials. MOUSE/TRACTOR: rough materials for style consistency. STICK pickup: branch tip +
+  rough wood.
+- All verified: --import clean, smoke PASS, committed in 4 commits (739ccdb..1a10663).
+- OPEN: armature bone coords fix; commit+push (still detached HEAD, master diverged at b52b495);
+  worklog commit below.
