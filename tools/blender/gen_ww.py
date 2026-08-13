@@ -209,15 +209,18 @@ def build_geometry() -> None:
         inner_ears.append(tapered_tube("InnerEar." + s, inner_pts, inner_r, dark,
                                        segments=14, flat=0.45, cap_tip=False))
 
-    # arms (chunky cartoon limbs held OUTSIDE the body, paws forward of the body;
-    # kept as SEPARATE meshes so automatic weights pin them cleanly to the arm bones)
+    # arms (smooth tapered tubes from shoulder to paw; the shoulder end is sunk
+    # into the chest so the limb reads as attached, then it tilts gently out and
+    # forward. Single tube per arm so it reads as flesh, not stacked spheres.)
     arm_meshes = []
     for side in (1, -1):
         s = "L" if side > 0 else "R"
-        upper = capsule("UpperArm." + s, (side * 0.68, 0.12, 1.58), (side * 0.74, 0.04, 1.34), 0.14, fur)
-        fore = capsule("Forearm." + s, (side * 0.74, 0.04, 1.34), (side * 0.76, -0.04, 1.10), 0.12, fur)
-        hand = sphere("Hand." + s, 1.0, (side * 0.76, -0.10, 1.00), (0.16, 0.13, 0.15), fur)
-        arm_meshes += upper + fore + [hand]
+        arm_pts = [(side * 0.44, 0.10, 1.58), (side * 0.55, 0.07, 1.44),
+                   (side * 0.62, 0.02, 1.30), (side * 0.65, -0.01, 1.16),
+                   (side * 0.66, -0.03, 1.05)]
+        arm_r = [0.18, 0.15, 0.13, 0.12, 0.11]
+        arm_meshes.append(tapered_tube("Arm." + s, arm_pts, arm_r, fur, cap_tip=True))
+        arm_meshes.append(sphere("Paw." + s, 1.0, (side * 0.65, -0.07, 0.97), (0.17, 0.13, 0.16), fur))
 
     # legs
     for side in (1, -1):
@@ -329,9 +332,9 @@ def build_armature() -> bpy.types.Object:
     bone("Head", (0, 0, 1.78), (0, 0, 2.05), "Neck")
     for side in (1, -1):
         s = "L" if side > 0 else "R"
-        bone("UpperArm." + s, (side * 0.68, 0.12, 1.58), (side * 0.74, 0.04, 1.34), "Chest")
-        bone("Forearm." + s, (side * 0.74, 0.04, 1.34), (side * 0.76, -0.04, 1.10), "UpperArm." + s)
-        bone("Hand." + s, (side * 0.76, -0.04, 1.10), (side * 0.76, -0.10, 1.00), "Forearm." + s)
+        bone("UpperArm." + s, (side * 0.44, 0.10, 1.58), (side * 0.60, 0.04, 1.32), "Chest")
+        bone("Forearm." + s, (side * 0.60, 0.04, 1.32), (side * 0.66, -0.02, 1.08), "UpperArm." + s)
+        bone("Hand." + s, (side * 0.66, -0.02, 1.08), (side * 0.65, -0.07, 0.97), "Forearm." + s)
         bone("Thigh." + s, (side * 0.30, 0.05, 0.92), (side * 0.33, 0.05, 0.62), "Pelvis")
         bone("Shin." + s, (side * 0.33, 0.05, 0.62), (side * 0.34, 0.05, 0.28), "Thigh." + s)
         bone("Foot." + s, (side * 0.34, 0.05, 0.28), (side * 0.40, 0.10, 0.18), "Shin." + s)
