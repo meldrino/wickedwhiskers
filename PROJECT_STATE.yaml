@@ -423,6 +423,22 @@ todo:
     far impostor, 05_game_catclose.png approved). See grass_rendering.
   - [NEXT -> ISLE OF WIGHT] Fix 06_game_pond.png: water missing from the --pond frame
     + near-pond grass too sparse. Goal = everything matches 05_game_catclose.png.
+  - [DONE] Night-shift to-do list (08-13, see worklog): ground darkened + bright detail
+    texture wired (texture * vertex = 0.135,0.247,0.08); tree collision trunk-only
+    (TRUNK_COLLIDER_SIZE 0.5x1.8x0.5, scale-compensated); fence north edge rebuilt via
+    _build_gate_edge (gate at x=0, panels +-6.25..+-25) + gate latch/swing fixed; grass
+    culled to FENCE_HALF so all tier-1 discs are gone (outside = bare textured terrain);
+    sky = runtime cloud cover + improved stars + shooting stars. Smoke PASS, --noon
+    screenshots captured. Git tag save5. SEE WORKLOG for the north-corner fence overhang
+    (panels at +-25 stick ~3m past the east/west fence lines) - needs user eyes.
+  - [USER REVIEW] 08-13 screenshots: flyover/catclose/pond/ground/dumbleclaw (noon) +
+    base (night) - verify darker ground, cloud sky, fence enclosure, trunk-only collision.
+  - [NEXT] Fence corners: fence_corner.glb + fence_bend.glb exist and are unused - add
+    proper 90-degree corner pieces to close the fence enclosure (fixes the +-25 overhang).
+  - [NEXT] WW.glb is 37MB - gemini audit suspects embedded uncompressed textures or dense
+    keyframes; check in Blender (resize to 1024, prune keyframes) before shipping.
+  - [NEXT] Asset sweep per gemini audit: delete fence_planks/fence_simple/stump_square;
+    keep crops/sign/tree_oak_fall for future use.
 
 # =============================================================================
 # KNOWN ISSUES
