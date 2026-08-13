@@ -609,3 +609,20 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
 - All verified: --import clean, smoke PASS, committed in 4 commits (739ccdb..1a10663).
 - OPEN: armature bone coords fix; commit+push (still detached HEAD, master diverged at b52b495);
   worklog commit below.
+
+## 08-13 GATE FIX (committed c418517)
+- USER RULE: gate only opens/closes when WW is within 2 cat lengths (1m) of the gate; far clicks = nothing.
+- Range is now PER-INTERACTABLE (interactable.gd interaction_range, default 1.8m). Gate sets 1.0m.
+- Gate exposes TWO interaction points (interactable.gd interaction_points_extra): hinge (-1.75,0.6,0.5)
+  + far end (1.455,0.6,0.5) - the gate is 2.9m wide, so 1m from either end covers it. _within_interact_range
+  (player.gd) checks primary point OR any extra point.
+- walk_to_interact flag (interactable.gd, default true): gate sets false so WW never auto-walks to open
+  it from afar - far clicks are no-ops.
+- interaction_center moved to hinge side (-1.75,0.6,0.5): after the swinging panel carries WW to the west,
+  he can push it shut (was blocked by the open panel at the old center point).
+- gate_test.tscn/gd: close-range open+close cycle, far-click no-op, far-end proximity. VERIFIED headless:
+  far 5m=within_range false, close=open (-PI/2 into yard, WW shoved to (-1.75,-24.19)), second click=close,
+  far end (1.45,-24.3)=within_range true.
+- NOTE: clicks near the gate's lake edge can be claimed by fish (_pick_fish runs before interactables in
+  _handle_click_at) - that is the designed fish-catching priority, not a gate bug.
+- --gate screenshot camera mode added to main.gd.
