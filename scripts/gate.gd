@@ -15,7 +15,10 @@ const GATE_W := 2.9
 func _ready() -> void:
 	prompt = "Click — gate"
 	interaction_box = Vector3(3.4, 1.4, 0.6)
-	interaction_center = Vector3(0, 0.6, 0)
+	interaction_center = Vector3(-1.75, 0.6, 0.5)
+	interaction_points_extra = [Vector3(1.455, 0.6, 0.5)]
+	interaction_range = 1.0
+	walk_to_interact = false
 	super()
 	_build_gate()
 

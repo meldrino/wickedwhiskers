@@ -266,7 +266,7 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 	if item != null:
 		if _within_interact_range(item):
 			item.interact()
-		else:
+		elif item.walk_to_interact:
 			_go_interact(item)
 		return
 	var from := camera.project_ray_origin(screen_pos)
@@ -292,7 +292,7 @@ func _try_start_walk() -> void:
 	_wait_target = Vector3.ZERO
 	var item := _pick_interactable(get_viewport().get_mouse_position())
 	if item != null:
-		if not _within_interact_range(item):
+		if not _within_interact_range(item) and item.walk_to_interact:
 			_go_interact(item)
 		return
 	_walk_to_screen_point(get_viewport().get_mouse_position())
@@ -454,7 +454,14 @@ func _wet_cat(wet: bool) -> void:
 func _within_interact_range(item: Interactable) -> bool:
 	var p := item.get_interaction_point()
 	p.y = global_position.y
-	return global_position.distance_to(p) <= INTERACT_RANGE
+	if global_position.distance_to(p) <= item.interaction_range:
+		return true
+	for extra in item.interaction_points_extra:
+		var q := item.to_global(extra)
+		q.y = global_position.y
+		if global_position.distance_to(q) <= item.interaction_range:
+			return true
+	return false
 
 
 func _walk_to_screen_point(screen_pos: Vector2) -> bool:

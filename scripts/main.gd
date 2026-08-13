@@ -162,11 +162,17 @@ func _maybe_screenshot() -> void:
 		player.camera_holder.position = Vector3(4.2, 1.1, -12.4)
 		player.camera.position = Vector3(0, 0, 0)
 		player.camera.look_at(Vector3(4, 0.45, -14), Vector3.UP)
+	elif "--gate" in args and player != null:
+		player.camera_frozen = true
+		player.global_position = Vector3(0, 0.5, -19)
+		player.camera_holder.position = Vector3(0, 0.5, 0)
+		player.camera.position = Vector3(0, 0, 0)
+		player.camera.look_at(Vector3(0, 0.8, -25), Vector3.UP)
 	else:
 		for i in range(30):
 			await get_tree().process_frame
 	var mode := "base"
-	for flag in ["catclose", "flyover", "pond", "ground", "grass", "dumbleclaw"]:
+	for flag in ["catclose", "flyover", "pond", "ground", "grass", "dumbleclaw", "gate"]:
 		if "--%s" % flag in args:
 			mode = flag
 			break
