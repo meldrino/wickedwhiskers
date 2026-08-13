@@ -728,3 +728,36 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   clipping", "dead space") - cosmetic.
 - quenn ops notes (state file updated): invoke vision_expert.ps1 with & (pwsh -File breaks
   array params); downscale to 640x360, 1-2 images/call (full-res 6-image call >300s HTTP cap).
+
+## 2026-08-13 CUTAWAY v2->v4: real finger anatomy (NOT committed before save-out)
+- USER (repeatedly): "you are waving a paw or 3 around the lock", "I do not think you have even
+  got the anatomy right, we have agreed 4 fingers (including thumb) but have you actually made
+  them?" and "the reason it is a mess is that you cannot see what you are doing" -> the session
+  has NO image input (read tool rejects images) and quenn (qwen2.5vl:7b) was too lenient.
+  TRUSTED VISION REVIEWER SWITCHED TO gemini-flash-latest via NEW C:\crypto\bigpickle\gemini-vision.ps1
+  (GEMINI_API_KEY set; -Prompt + -Image arrays; verified it correctly tore apart v1 frames:
+  "hotdog arms", "alien-eye toes", floating limb disconnected from the frame edge).
+- v2 (done earlier this session, tested): _snatch_player teleports the real cat away during the
+  cutaway (camera was so far/wide the player cat entered frame = "multiple paws"), tight camera
+  (fov 70, ~0.5m at padlock), 4 claw-hook toes, numeric overlap debug _debug_toe_overlap proved
+  dials in frame + toes within 21-23px of dial centre vs 57-60px radius.
+- v3/v4 REWRITE in progress (scripts/cutaway.gd, current on disk):
+  - _add_segment uses look_at_from_position (works pre-insertion; look_at fails "Node not inside
+    tree" -> capsules stayed vertical = the blob look). This fixed the orientation bug.
+  - _make_paw builds 4 digits = 3 FINGERS + 1 THUMB (2-segment capsule digits, knuckle bend,
+    pink pad sphere tips) curling DOWN over the dial face; thumb offset/tucked shorter;
+    2-segment tapered arm down-right off-frame; left paw mirrored (scale.x=-1), planted on the
+    lock body, ZERO motion during the whole cutaway (kills the "waving" read).
+  - GRIP-TURN mechanic (the fix for "waving"): dial AND paw rotate RIGIDLY together around the
+    dial's world-Z axis - paw orbits the dial (wrist offset (0, RISE 0.05, FRONT 0.035), base
+    tilt 0.28) while rotation.z advances +0.38/notch x3. Causal: the paw visibly drives the dial.
+  - --cutawaytest RENDERED (19:34): CUTAWAY fingers debug = Dial2 tips_within 2/4 (closest
+    65px vs radius 60 - orbit end-position), Dial1 4/4 (54px), Dial0 4/4 (43px); frames saved.
+  - NOT YET VERIFIED VISUALLY (gemini review of v4 frames pending) and NOT user-approved.
+    THE USER HAS NOT SEEN A SINGLE GOOD FRAME THIS SESSION - this is the core failure.
+- SAVE-OUT 19:37 (user protocol: YAML -> GitHub -> website -> compact): this worklog entry +
+  PROJECT_STATE.yaml cutaway section rewritten to the v4 reality; commit + push as branch
+  (origin/master = diverged grass line b52b495, detached HEAD = cutaway line; no force-push,
+  master untouched - merge decision still the user's). forai/ww.html then updated + deployed.
+- UNCOMMITTED ARTIFACTS left untracked by design: screenshots/cw_*.png (v2+v4 frames),
+  screenshots/debug.log, "Downloads - Shortcut.lnk".

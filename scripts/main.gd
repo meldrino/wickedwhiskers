@@ -547,7 +547,7 @@ func _run_cutawaytest() -> void:
 	await get_tree().process_frame
 	var shed_door := get_node("Shed/Door_shed")
 	shed_door._on_combo(GameState.combo)
-	var shots := [1.5, 2.6, 3.7, 4.5, 5.15, 6.2]
+	var shots := [1.5, 2.3, 3.1, 3.9, 4.4, 5.2]
 	for i in range(shots.size()):
 		await get_tree().create_timer(shots[i]).timeout
 		var img := get_viewport().get_texture().get_image()

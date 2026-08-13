@@ -24,6 +24,10 @@ project:
     timeout >= 5-6 min (the call can exceed 240 s even after returning its answer).
     NEVER kill opencode, pwsh (PowerShell 7), or Windows' "Secure System" process.
     STOP the model after use: ollama stop qwen2.5vl:7b (it nearly crashed the machine once).
+    TRUSTED VISION REVIEWER (2026-08-13): gemini-flash via C:\crypto\bigpickle\gemini-vision.ps1
+    (-Prompt "..." -Image @('a.png',...); GEMINI_API_KEY set; 180s HTTP cap; auto-appends to
+    inbox). Use gemini for verdicts; quenn only if gemini unavailable (it is too lenient on
+    procedural paws).
   project_dir: "C:\\crypto\\wicked whiskers"
   docs_site: https://meldrino.com/forai/ww.html
   design_doc: "C:\\crypto\\wicked whiskers.docx"
@@ -169,13 +173,18 @@ build_status:
     door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes; loot now lives in
       the shed scene) / farmhouse night-locked then once-day catfood + scene-2 tease; box
       interaction volume
-    cutaway.gd (2026-08-13): cinematic padlock unlock played by door.gd._on_combo on success -
-      letterbox bars + camera push-in on the real padlock, procedural orange paws (fur color
-      SAMPLED at runtime from player WW.glb Paw_L material so a cat recolor auto-updates),
-      right paw spins Dial2->Dial0 (rotation:z +0.38/notch, CC0 click1.wav per notch), beat of
-      tension, shackle flips open (rotation:x PI/2+1.8) + pop (click2.wav pitch 0.65), padlock
-      tilts/drops and is freed. GameState.cinematic_active locks player input. Verify:
-      -- --cutawaytest (windowed, saves screenshots/cw_1..6.png); quenn-reviewed green.
+    cutaway.gd (2026-08-13, SAVE-OUT v4 IN PROGRESS): cinematic padlock unlock played by
+      door.gd._on_combo on success - letterbox bars + camera push-in on the real padlock, the
+      real player cat is SNATCHED away (never in frame), procedural orange paws (fur color
+      SAMPLED at runtime from player WW.glb Paw_L material). v4 = 4-digit anatomy (3 FINGERS
+      + 1 THUMB, 2-segment capsules, pink tips) curling DOWN over the dial face + GRIP-TURN:
+      dial and paw rotate rigidly together around the dial's world-Z axis so the paw visibly
+      drives the dial (+0.38/notch x3, CC0 click1.wav). Left paw mirrors, planted on the lock
+      body, motionless. Shackle flips (rotation:x PI/2+1.8) + pop, padlock tilts/drops, freed.
+      GameState.cinematic_active locks player input. Verify: -- --cutawaytest (windowed, saves
+      screenshots/cw_1..6.png) + CUTAWAY fingers debug (Dial1/0 = 4/4 tips within dial).
+      STATUS: rendered 19:34 but NOT visually verified / NOT user-approved. Vision reviewer =
+      gemini-flash via C:\crypto\bigpickle\gemini-vision.ps1 (NOT quenn - too lenient).
       Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
     shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
       spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,
