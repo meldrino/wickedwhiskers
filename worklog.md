@@ -549,3 +549,15 @@ Night-shift to-do list completed this session (user approved the list then slept
 - GIT: save5 committed twice (6222240 = parse-error fix on 6293524), tag save5 force-moved. Push
   still impossible on detached HEAD (master diverged at b52b495) - left for the user, no force-push.
   screenshots/ debug.log + .import files + grass_compare/ stay UNTRACKED (scratch).
+
+## 2026-08-13 05:00 - USER MORNING REVIEW of save5
+USER (first look at the game): "well done. ground colour is much better, outside ground is great,
+tree collision is fixed. The gate is better but not right, the clouds need some work but you have
+done well. we can have a look later as it is 5am now".
+- APPROVED / ship as-is: dark ground colour, bare textured terrain outside the fence, trunk-only
+  tree collision.
+- NEEDS MORE WORK (deferred, user going to sleep): (1) the gate is "better but not right" - re-check
+  panel placement/latch/swing geometry against the fence line when we next work on it; (2) clouds
+  "need some work" - likely the fbm threshold gradient looks blobby/unnatural; try softer/grainier
+  cover, fewer but larger puffs, or lower modulate strength.
+- User then went to sleep; this entry closes the save5 night shift.
