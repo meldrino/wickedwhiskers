@@ -163,7 +163,7 @@ func _on_exit(body: Node3D) -> void:
 		return
 	_leaving = true
 	GameState.spawn_near_shed = true
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/main.tscn")
 
 
 func _run_smoke_check() -> void:
