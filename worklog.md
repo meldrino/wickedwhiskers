@@ -761,3 +761,36 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   master untouched - merge decision still the user's). forai/ww.html then updated + deployed.
 - UNCOMMITTED ARTIFACTS left untracked by design: screenshots/cw_*.png (v2+v4 frames),
   screenshots/debug.log, "Downloads - Shortcut.lnk".
+
+- PAWTEST session (22:50-23:40): user asked for ONE frame of a paw on the lock before committing
+  to the full cutaway. Investigated WW.glb for real: 25-bone skeleton (UpperArm/Forearm/Hand per
+  front leg), Paw_L/Paw_R MESHES exist (4,906 tris each, 14,720 verts) but NO finger/toe bones on
+  the front paws - the paw is a single low-poly blob. It is NOT prehensile. This validated gemini
+  -s advice: use the real paw mesh + a SWAT motion (cats cannot pinch dials), not procedural fingers.
+  - Built --pawtest harness in main.gd: instances WW.glb, hides all meshes except Paw_L (then later
+    Paw_L+Arm_L), rigid-shifts the whole model so Hand.L lands on a dial (target = dial centre +
+    offset), close-up camera, renders screenshots/pawtest*.png. Params now read from
+    screenshots/pawtest_params.json (target_offset, model_rot_x/y_deg, hand_bend_deg, model_scale,
+    cam_offset, cam_fov, out).
+  - FIRST FRAMES WERE BROKEN: (1) unquoted path space in a repro lost "whiskers" from the project
+    path; (2) a real hang: main.gd had a GDScript parse error (var := JSON.parse_string = Variant
+    inference, "warning treated as error" project) -> main.tscn failed to load -> window stayed
+    open forever; fixed by typing it `var j: Variant`.
+  - Vision-loop infrastructure built: C:\crypto\bigpickle\paw-iter.ps1 = autonomous loop
+    (render -> downscale 640 -> gemini-flash JSON grade -> apply clamped corrections -> repeat),
+    with quenn (qwen2.5vl:7b) AUTO-FALLBACK after 3 gemini failures (user's Plan B ask - gemini
+    free tier limits uploads/requests), per-iteration timeout+kill so godot can never hang the
+    loop, raw grade output logged (pawtest_grade_raw.log), every frame archived
+    (pawtest_seq_NN.png), best saved (pawtest_best.png), plateau jitter after 5 flat iters.
+    JSON parsing gotcha fixed: multi-line string piped to ConvertFrom-Json enumerates chars;
+    use ConvertFrom-Json -InputObject + regex extract + truncated-JSON repair.
+  - RESULT (9 pose iterations): plateau at 3-4/10 every time. gemini (and the user) agree: the
+    real Paw_L mesh is a FEATURELESS BLOB - "untextured sphere", "plain cylinder", "lacks cat paw
+    shape and anatomy". Pose/camera/scale tuning cannot fix a mesh with no toe/pad definition.
+    The asset's paw will not read as a cat paw to a critical eye at any angle/size.
+  - DECISION POINT FOR NEXT SESSION (user is the gatekeeper): the paw needs NEW GEOMETRY -
+    either (a) procedural toe bumps added on/under the real Paw_L mesh (hybrid: real fur colour +
+    real shape + added toe definition), (b) a better paw mesh/model, or (c) a stylized/silhouette
+    approach (gemini's swat/POV insert with a simplified paw). Pose-loop alone is a dead end.
+  - Overnight run: paw-iter.ps1 launched detached (60 iters max, gemini w/ quenn fallback) to
+    gather data + jitter explorations; results in screenshots/pawtest_*.png + logs.

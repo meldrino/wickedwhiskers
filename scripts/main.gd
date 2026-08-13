@@ -101,6 +101,13 @@ func _maybe_screenshot() -> void:
 	if "--cutawaytest" in args:
 		_run_cutawaytest()
 		return
+	if "--pawtest" in args:
+		var vi := args.find("--pawtest")
+		var variant := "v1"
+		if vi >= 0 and vi + 1 < args.size():
+			variant = args[vi + 1]
+		_run_pawtest(variant)
+		return
 	if "--fpsbench" in args:
 		_run_fpsbench()
 		return
@@ -555,6 +562,87 @@ func _run_cutawaytest() -> void:
 		img.save_png(p)
 		print("CUTAWAY shot " + p)
 	print("CUTAWAY DONE")
+	get_tree().quit()
+
+
+func _run_pawtest(_variant: String = "v1") -> void:
+	print("PAWTEST start")
+	GameState.day_time = GameState.DAY_SECONDS * 0.75
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var shed_door := get_node("Shed/Door_shed")
+	var padlock: Node3D = shed_door.get("_padlock")
+	if padlock == null:
+		push_error("PAWTEST no padlock")
+		get_tree().quit()
+		return
+	var dials: Array[MeshInstance3D] = []
+	for c in padlock.get_children():
+		if c.name.begins_with("Dial") and c is MeshInstance3D:
+			dials.append(c)
+	if dials.is_empty():
+		push_error("PAWTEST no dials")
+		get_tree().quit()
+		return
+	var dial: Node3D = dials[1]
+	var params := {
+		"target_offset": [0.0, -0.02, 0.018],
+		"model_rot_x_deg": 0.0,
+		"model_rot_y_deg": 0.0,
+		"hand_bend_deg": 0.0,
+		"model_scale": 0.35,
+		"cam_offset": [0.0, 0.02, 0.42],
+		"cam_fov": 42.0,
+		"out": "pawtest_iter.png",
+	}
+	var pf := FileAccess.open("res://screenshots/pawtest_params.json", FileAccess.READ)
+	if pf != null:
+		var j: Variant = JSON.parse_string(pf.get_as_text())
+		if j is Dictionary:
+			for k in j:
+				params[k] = j[k]
+		pf.close()
+	var toff: Array = params["target_offset"]
+	var target: Vector3 = dial.global_position + Vector3(toff[0], toff[1], toff[2])
+	var glb: PackedScene = load("res://assets/WW.glb")
+	var model := glb.instantiate()
+	model.scale = Vector3.ONE * float(params["model_scale"])
+	model.rotation.x = deg_to_rad(float(params["model_rot_x_deg"]))
+	model.rotation.y = deg_to_rad(float(params["model_rot_y_deg"]))
+	add_child(model)
+	await get_tree().process_frame
+	var skel: Skeleton3D = null
+	for sk in model.find_children("*", "Skeleton3D", true, false):
+		skel = sk as Skeleton3D
+		break
+	if skel == null:
+		push_error("PAWTEST no skeleton")
+		get_tree().quit()
+		return
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		m.visible = (m.name == "Paw_L")
+	var hand_i := skel.find_bone("Hand.L")
+	var bend := float(params["hand_bend_deg"])
+	if absf(bend) > 0.01:
+		var rest_q: Quaternion = skel.get_bone_rest(hand_i).basis.get_rotation_quaternion()
+		skel.set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend)))
+		await get_tree().process_frame
+	var hand_w: Vector3 = skel.to_global(skel.get_bone_global_pose(hand_i).origin)
+	model.global_position += target - hand_w
+	await get_tree().process_frame
+	var cam := Camera3D.new()
+	cam.current = true
+	cam.fov = float(params["cam_fov"])
+	add_child(cam)
+	var co: Array = params["cam_offset"] as Array
+	cam.global_position = padlock.global_position + Vector3(co[0], co[1], co[2])
+	cam.look_at(padlock.global_position, Vector3.UP)
+	await get_tree().process_frame
+	var img := get_viewport().get_texture().get_image()
+	var p := "res://screenshots/" + str(params["out"])
+	img.save_png(p)
+	print("PAWTEST saved=" + p)
 	get_tree().quit()
 
 
