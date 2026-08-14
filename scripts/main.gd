@@ -598,6 +598,7 @@ func _run_pawtest(_variant: String = "v1") -> void:
 		"model_rot_z_deg": 0.0,
 		"hand_bend_deg": 0.0,
 		"model_scale": 0.35,
+		"model_glb": "res://assets/WW.glb",
 		"cam_offset": [0.0, 0.02, 0.42],
 		"cam_fov": 42.0,
 		"out": "pawtest_iter.png",
@@ -612,7 +613,11 @@ func _run_pawtest(_variant: String = "v1") -> void:
 	if bool(params["show_paw"]):
 		var toff: Array = params["target_offset"]
 		var target: Vector3 = dial.global_position + Vector3(toff[0], toff[1], toff[2])
-		var glb: PackedScene = load("res://assets/WW.glb")
+		var glb: PackedScene = load(str(params["model_glb"]))
+		if glb == null:
+			push_error("PAWTEST failed to load model_glb=" + str(params["model_glb"]))
+			get_tree().quit()
+			return
 		var model := glb.instantiate()
 		model.scale = Vector3.ONE * float(params["model_scale"])
 		model.rotation.x = deg_to_rad(float(params["model_rot_x_deg"]))
@@ -624,27 +629,31 @@ func _run_pawtest(_variant: String = "v1") -> void:
 		for sk in model.find_children("*", "Skeleton3D", true, false):
 			skel = sk as Skeleton3D
 			break
-		if skel == null:
-			push_error("PAWTEST no skeleton")
-			get_tree().quit()
-			return
+		var standalone: bool = skel == null
+		if standalone:
+			print("PAWTEST standalone model (no skeleton)")
 		var show_fingers: bool = bool(params["fingers"])
 		for mi in model.find_children("*", "MeshInstance3D", true, false):
 			var m := mi as MeshInstance3D
-			if show_fingers:
+			if standalone:
+				m.visible = true
+			elif show_fingers:
 				m.visible = (m.name == "Arm_L")
 			else:
 				m.visible = (m.name == "Paw_L" or m.name == "Arm_L")
-		var hand_i := skel.find_bone("Hand.L")
-		var bend := float(params["hand_bend_deg"])
-		if absf(bend) > 0.01:
-			var rest_q: Quaternion = skel.get_bone_rest(hand_i).basis.get_rotation_quaternion()
-			skel.set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend)))
-			await get_tree().process_frame
-		var hand_w: Vector3 = skel.to_global(skel.get_bone_global_pose(hand_i).origin)
+		var hand_w: Vector3 = Vector3.ZERO
+		if skel != null:
+			var hand_i := skel.find_bone("Hand.L")
+			var bend := float(params["hand_bend_deg"])
+			if absf(bend) > 0.01:
+				var rest_q: Quaternion = skel.get_bone_rest(hand_i).basis.get_rotation_quaternion()
+				skel.set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend)))
+				await get_tree().process_frame
+			hand_w = skel.to_global(skel.get_bone_global_pose(hand_i).origin)
 		if bool(params["path_mode"]):
 			var paw_mi: MeshInstance3D = null
-			for mi in model.find_children("Paw_L", "MeshInstance3D", true, false):
+			var paw_name := "Paw_L" if not standalone else "*"
+			for mi in model.find_children(paw_name, "MeshInstance3D", true, false):
 				paw_mi = mi as MeshInstance3D
 				break
 			var paw_center: Vector3 = Vector3.ZERO
@@ -658,7 +667,17 @@ func _run_pawtest(_variant: String = "v1") -> void:
 			model.global_position += desired - paw_center
 			print("PAWTEST paw_center=" + str(paw_center) + " desired=" + str(desired) + " dial=" + str(dial.global_position))
 		else:
-			model.global_position += target - hand_w
+			if standalone:
+				var paw_mi: MeshInstance3D = null
+				for mi in model.find_children("*", "MeshInstance3D", true, false):
+					paw_mi = mi as MeshInstance3D
+					break
+				var pcenter: Vector3 = Vector3.ZERO
+				if paw_mi != null and paw_mi.mesh != null:
+					pcenter = paw_mi.global_transform * paw_mi.mesh.get_aabb().get_center()
+				model.global_position += target - pcenter
+			else:
+				model.global_position += target - hand_w
 		if bool(params["fingers"]):
 			_pawtest_fingers(model, dial)
 		await get_tree().process_frame
