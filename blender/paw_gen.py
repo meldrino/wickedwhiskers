@@ -8,6 +8,11 @@ def arg(name, default=None):
 VARIANT = arg('--variant', 'classic')
 OUT = arg('--out', r'C:\crypto\wicked whiskers\screenshots\paw_preview.png')
 EXPORT = '--export' in args
+FLIP = '--flip' in args
+SCALE = float(arg('--scale', '1'))
+SHARP = '--sharp' in args
+SEG = 28 if SHARP else 14
+RES = 900 if SHARP else 640
 
 PRESETS = {
     'quenn':   dict(palm_r=0.028, palm_scale=(1.25, 0.8, 0.9), spread=0.016, base_y=0.022,
@@ -48,7 +53,7 @@ def seg(a, b, r1, r2, mat):
     d = (b - a)
     length = d.length
     me = bmesh.new()
-    bmesh.ops.create_cone(me, segments=14, radius1=r1, radius2=r2, depth=length, cap_ends=True)
+    bmesh.ops.create_cone(me, segments=SEG, radius1=r1, radius2=r2, depth=length, cap_ends=True)
     mesh = bpy.data.meshes.new("m")
     me.to_mesh(mesh)
     o = bpy.data.objects.new("s", mesh)
@@ -63,7 +68,7 @@ def seg(a, b, r1, r2, mat):
 
 def sphere(loc, r, scale, mat):
     me = bmesh.new()
-    bmesh.ops.create_uvsphere(me, u_segments=16, v_segments=10, radius=r)
+    bmesh.ops.create_uvsphere(me, u_segments=SEG, v_segments=SEG, radius=r)
     mesh = bpy.data.meshes.new("m")
     me.to_mesh(mesh)
     o = bpy.data.objects.new("s", mesh)
@@ -118,7 +123,13 @@ for o in bpy.data.objects:
 if bpy.context.selected_objects:
     bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
     bpy.ops.object.join()
-    bpy.context.active_object.name = "Paw"
+    paw = bpy.context.active_object
+    paw.name = "Paw"
+    if FLIP:
+        paw.rotation_euler = (0.0, 0.0, math.radians(180))
+    if SCALE != 1:
+        paw.scale = (SCALE, SCALE, SCALE)
+    bpy.ops.object.transform_apply(location=False, rotation=FLIP, scale=(SCALE != 1))
 
 if EXPORT:
     glb = r'C:\crypto\wicked whiskers\assets\paw_' + VARIANT + '.glb'
@@ -128,17 +139,30 @@ if EXPORT:
 # ---- camera + lights + render (TOP-DOWN) ----
 scene = bpy.context.scene
 scene.render.engine = 'BLENDER_EEVEE'
-scene.render.resolution_x = 640
-scene.render.resolution_y = 640
+scene.render.resolution_x = RES
+scene.render.resolution_y = RES
 scene.render.film_transparent = False
+try:
+    scene.eevee.samples = 64 if SHARP else 16
+except Exception:
+    pass
+bpy.context.view_layer.update()
+corners = [paw.matrix_world @ Vector(c) for c in paw.bound_box]
+bb_max = Vector((max(c[i] for c in corners) for i in range(3)))
+bb_min = Vector((min(c[i] for c in corners) for i in range(3)))
+bb_center = (bb_max + bb_min) * 0.5
+bb_size = bb_max - bb_min
+paw_center = Vector((0.0, bb_center.y, bb_center.z))
+fov = math.radians(48)
+D = (bb_size.y * 1.15) / (2.0 * math.tan(fov / 2.0))
 cam = bpy.data.objects.new("Cam", bpy.data.cameras.new("Cam"))
 scene.collection.objects.link(cam)
 scene.camera = cam
-cam.data.angle = math.radians(48)
-cam.location = (0.0, 0.35, 0.85)
+cam.data.angle = fov
+cam.location = paw_center + Vector((0.0, 0.0, D))
 tgt = bpy.data.objects.new("Target", None)
 scene.collection.objects.link(tgt)
-tgt.location = (0.0, 0.02, 0.04)
+tgt.location = paw_center
 con = cam.constraints.new('TRACK_TO')
 con.target = tgt
 con.track_axis = 'TRACK_NEGATIVE_Z'
@@ -147,12 +171,12 @@ cam.rotation_euler = (0.0, 0.0, 0.0)
 bpy.context.view_layer.update()
 key = bpy.data.objects.new("Key", bpy.data.lights.new("Key", 'AREA'))
 scene.collection.objects.link(key)
-key.location = (0.4, 0.5, 1.1)
-key.data.energy = 350
+key.location = paw_center + Vector((0.8, 0.8, 1.6))
+key.data.energy = 900
 fill = bpy.data.objects.new("Fill", bpy.data.lights.new("Fill", 'AREA'))
 scene.collection.objects.link(fill)
-fill.location = (-0.5, 0.6, 0.8)
-fill.data.energy = 160
+fill.location = paw_center + Vector((-0.8, 0.9, 1.2))
+fill.data.energy = 400
 world = bpy.data.worlds.new("W")
 scene.world = world
 world.node_tree.nodes["Background"].inputs[0].default_value = (0.14, 0.14, 0.16, 1)
