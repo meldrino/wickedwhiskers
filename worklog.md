@@ -843,3 +843,17 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   (e0bd710), pushed to origin/cutaway-finger-anatomy. Website forai/ww.html update pending this
   save-out. Cutaway is at a decision point (see PROJECT_STATE pawtest block) - resume by
   re-anchoring from melrdrino.yaml + this worklog + git log. Screenshots untracked by design.
+
+- PAW VARIANTS 02:50 (2026-08-14): pivot per user - quenn/Blender makes the paw, agent animates
+  in Godot. quenn (qwen2.5vl:7b) wrote a bpy script on 2nd try (300s local-expert timeout on
+  1st; used direct /api/generate with TimeoutSec 600 + num_predict 2400 instead) - buggy but
+  salvageable conceptually (invalid 4-tuple eulers, fingers along +Z, flat pad circles, arm
+  sideways). Rebuilt generator correctly: blender/paw_gen.py (Blender 5.2 API - meshes via
+  bmesh + me.to_mesh(), render engine BLENDER_EEVEE, export via export_scene.gltf). 6 variants
+  = quenn (quenn's spec), chunky, sleek, kawaii, sharp, stubby. All: 3 fingers + 1 thumb,
+  cream claw on every digit, Wicked Whiskers colours (fur #f9ad59, claw #f5e6d0, pad #c98d7d),
+  pads on palm front, arm hanging -Y. Rendered TOP-DOWN (user requirement: "all of these paws
+  need to be viewed from the top") at 640x640 -> screenshots/paw_preview_<v>.png + labelled
+  sheet paw_variants_sheet.png (opened). GLBs exported assets/paw_<v>.glb. Agent CANNOT verify
+  visually (no image input) - USER PICK of the 6 is the gate. Committed e74a127, pushed.
+  SAVE-OUT note: remaining pending = website forai/ww.html update.
