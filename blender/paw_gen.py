@@ -1,5 +1,5 @@
-import bpy, bmesh, sys
-from mathutils import Vector
+import bpy, bmesh, sys, math
+from mathutils import Vector, Matrix
 
 # ---- CLI: blender --background --python paw_gen.py -- --variant <name> --out <png> ----
 args = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
@@ -134,8 +134,17 @@ scene.render.film_transparent = False
 cam = bpy.data.objects.new("Cam", bpy.data.cameras.new("Cam"))
 scene.collection.objects.link(cam)
 scene.camera = cam
-cam.location = (0.0, 0.45, 0.62)
-cam.rotation_euler = (1.05, 0.0, 0.0)
+cam.data.angle = math.radians(48)
+cam.location = (0.0, 0.35, 0.85)
+tgt = bpy.data.objects.new("Target", None)
+scene.collection.objects.link(tgt)
+tgt.location = (0.0, 0.02, 0.04)
+con = cam.constraints.new('TRACK_TO')
+con.target = tgt
+con.track_axis = 'TRACK_NEGATIVE_Z'
+con.up_axis = 'UP_Y'
+cam.rotation_euler = (0.0, 0.0, 0.0)
+bpy.context.view_layer.update()
 key = bpy.data.objects.new("Key", bpy.data.lights.new("Key", 'AREA'))
 scene.collection.objects.link(key)
 key.location = (0.4, 0.5, 1.1)
