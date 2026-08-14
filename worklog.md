@@ -839,3 +839,7 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
     fingers / model_rot_z_deg params (screenshots/pawtest_params.json); dial target = dials[0]
     (first black circle); frames archived as frame1_lock/frame2_appear/frame3_mid/
     frame4_near/frame5_cover.png + cutaway_seq_v1/v2.png sheets. main.gd changes UNCOMMITTED.
+- SAVE-OUT 02:29 (2026-08-14): user turning the laptop off for a break. Everything committed
+  (e0bd710), pushed to origin/cutaway-finger-anatomy. Website forai/ww.html update pending this
+  save-out. Cutaway is at a decision point (see PROJECT_STATE pawtest block) - resume by
+  re-anchoring from melrdrino.yaml + this worklog + git log. Screenshots untracked by design.
