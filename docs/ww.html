@@ -34,14 +34,14 @@
 <h2>Live Build Status (Aug 2026)</h2>
 <div class="note"><strong>Project:</strong> <code>C:\crypto\wicked whiskers</code> — Godot 4.7.1, GDScript, source on GitHub (meldrino/wickedwhiskers).</div>
 <ul>
-<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, random each game), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle.</li>
-<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys).</li>
+<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, random each game), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle. Correct combo now plays an orchestrated padlock-unlock CUTAWAY (letterbox + camera push-in, the real cat is hidden, two procedural orange paws with 4-digit finger anatomy turn the dials, shackle springs, padlock drops, then the door swings).</li>
+<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys). Shed is PERSON-SCALE (2026-08-13): 0.9x2.0 m door, 2.5 m walls, ~3.0x2.4 m footprint, ridge ~3.2 m.</li>
 <li><strong>S2 farmhouse</strong> — teased only (door locked at night, once-daily catfood at first light); interior not built yet.</li>
 <li><strong>S3 town</strong> — planned (Dick Whittington city, golden fish tease, 30-gold town gates).</li>
 <li><strong>All three catches are craft-only:</strong> convoluted mouse trap / ladder (bird) / fishing rod (fish). No manual catches.</li>
 <li><strong>Dumbleclaw</strong> — quest giver + trader (surplus food → gold), time-of-day aware hints.</li>
 <li><strong>Lake reworked:</strong> sunken pond with a raised bank, reeds + grass shoreline, dark deep bed, and animated rippling water with sky reflections.</li>
-<li><strong>Vegetation:</strong> ~300k real 3D grass tufts across the world, terrain-aware placement (never on water/buildings). A baked-texture "grass plane" experiment (one 1×1 texture on a deformable sheet) was <strong>rejected Aug 2026</strong> — blades rendered as flat blobs; the full 3D-tuft lawn is the working approach.</li>
+<li><strong>Vegetation (Aug 2026):</strong> calibrated 1/10-size grass system — chunked near/mid tiers (5 m chunks streamed around the cat; 1M blades/chunk detailed near + 250k/chunk simple mid, built multi-frame via <code>set_instance_transform</code>) plus a terrain-draped far impostor plane so the LOD seam is never visible. The old flat unlit tufts and the rejected baked-texture "grass plane" are both gone.</li>
 <li>Economy: day = 2 real hours, hunger + tiredness, 9 lives, catchables never respawn.</li>
 <li>Verified by headless smoke tests + screenshots (reviewed by an image-capable model).</li>
 </ul>
@@ -182,8 +182,135 @@
 <li>S1 + S1.5 playable: gather string/sticks, craft, catch mouse/bird/fish, Dumbleclaw quests + trading, day/night + food/tiredness, 9 lives, restart with a fresh combo.</li>
 <li>Control scheme reworked (Aug 2026): always-on mouse-look + WASD + click-to-walk/interact with proximity gating; camera follows behind the cat.</li>
 <li>Lake reworked (Aug 2026): sunken pond, bank + reeds, animated rippling water with sky reflections.</li>
-<li>Grass plane experiment rejected (Aug 2026): baked 1×1 texture sheet looked like blobs in-game; reverted to the ~300k 3D-tuft lawn. Revert path: <code>VegetationGenerator.regen()</code> → <code>_build_species(VEG_GRASS)</code>.</li>
-<li>Next: farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button.</li>
+<li>Grass plane experiment rejected (Aug 2026): baked 1×1 texture sheet looked like blobs in-game; the full 3D-tuft lawn is the working approach. Replaced Aug 2026 by the calibrated 1/10-size chunked grass system (near/mid tiers + far impostor) ported from the hexaquo tutorial; cat-close screenshot approved, pond view still under investigation.</li>
+<li>Gate click fix (Aug 2026): interaction point moved to the panel centre so the gate opens/closes from the hinge end, far end, or panel centre (covers the full 2.9 m width), still only within ~1 m; clicks on the gate beat clicks on fish, so the cat no longer pounces into the lake from beside the gate. Verified headless (far no-op, both ends toggle).</li>
+<li>Console-error cleanup (Aug 2026): water normal map (Godot 4 API), wet-cat surface_get_material, shooting-star look_at ordering, grass debug spam removed.</li>
+<li>Shed person-scale (Aug 2026): 0.9x2.0 m door, 2.5 m walls, 3.2 m ridge; portal + camera clamp re-tuned to the smaller interior.</li>
+<li>Padlock unlock cutaway (Aug 2026): combo success plays a cinematic unlock — letterbox bars, camera push-in on the padlock, player cat parked away from frame, two procedural orange paws (fur colour SAMPLED at runtime from the cat's own WW.glb material so a recolor auto-updates) turn the dials with clicks, shackle springs open, padlock drops, door swings. GameState.cinematic_active locks player input during it. Rendered to screenshots/cw_1..6.png via --cutawaytest; the finger anatomy + grip-turn are still being user-iterated — NOT yet user-approved.</li>
+<li>Vision reviewer switch (Aug 2026): quenn (qwen2.5vl:7b) proved too lenient on procedural paws. Trusted screenshot reviewer is now gemini-flash via C:\crypto\bigpickle\gemini-vision.ps1 (GEMINI_API_KEY set; -Image arrays; auto-appends to the inbox).</li>
+<li>Next: approve/iterate the cutaway paws (user is the final judge), farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button, fix the pond view in the new grass system.</li>
+</ul>
+
+<h2>Grass — how we finally got it right (the nightmare)</h2>
+<p>Grass took DAYS and several rejected approaches. This is the full history plus the
+working recipe so nobody ever re-lives it. Final system = <strong>chunked full-geometry
+tufts, one shared shader, no impostor, no baked texture</strong>. This is what ships.</p>
+<ul>
+<li><strong>DEAD END 1 — baked texture sheet (07/08, REJECTED "blades are just blobs"):</strong>
+cover a 1x1 tile with dense tufts, bake a top-down ortho render to one 1024x1024 texture,
+use it on a deformable plane. FAILED because a top-down ortho bake flattens 3D blades into
+pure vertical projections — at 1 texel/m they crush under the sward discs and read as flat
+green blobs. Do not go back to this.</li>
+<li><strong>DEAD END 2 — impostor far plane (09-10/08, THE ROT):</strong> chunked near/mid blades
++ a terrain-draped far impostor plane with its own shader. The impostor caught full sun while
+real blades self-shadowed, so the far field read LIGHTER (even after distance-darkening
+hacks). Ground was "unacceptable". DELETED.</li>
+<li><strong>THE WIN — one shared full-geometry shader (11/08 onwards):</strong> restored the
+USER-APPROVED tuft look (hexaquo.at tutorial, Karl Bittner, CC-BY-SA, parts 2+3 = the same
+architecture we already had) INSIDE the chunked streamer, engine-native tiers, every chunk
+renders real tufts.</li>
+<li><strong>Per-tuft anatomy (grass_chunk.gd VEG):</strong> flat sward disc (UV.x=2 shader
+marker, radius 0.125, dark = base*0.6, radial vertex shading) + 16 outer + 8 inner thin
+RIBBON blades (4 vertex rings = 6 tris, half the old box) with UV.y = 1 at base / 0 at tip so
+the shader's bottom_to_top gradient works. Tapered tips (half-width * (1 - 0.6*t)).</li>
+<li><strong>The 2 cm cap math:</strong> local blade tip = base_off 0.008 + max_h 0.008 =
+0.016 m, x shader size_large 1.15 = 0.018 m ≈ 2 cm (mowed lawn). disc_off 0.006. If you ever
+raise it, hscale sweeps already proved ~8 cm reads as "a field of grass" and costs nothing.</li>
+<li><strong>Shader (grass.gdshader):</strong> cull_disabled with the
+<code>if (!FRONT_FACING) NORMAL = -NORMAL</code> fix; vertex() sizes by seamless world-space
+patch_noise (clumps), bends tips by <code>blade_bend * pow(bottom_to_top, 2.0)</code>, gusts
+via scrolling wind_noise with direction rotated world→instance by inverse(MODEL_MATRIX);
+fragment() AO = bottom_to_top - wind*affect (tips bright/base dark), 3-scale noise for
+mottle (6 m patch + 1.4 m + 0.3 m + per-pixel turf grain at world_vertex.xz/0.05), BACKLIGHT
+translucency. <strong>Unit trap:</strong> tutorial bend/wind values assume UNIT-height blades;
+ours are metre-scaled, so blade_bend 0.02 and wind_strength 0.01 (not 0.35/0.12).</li>
+<li><strong>Chunked streamer (grass_system.gd):</strong> 5x5 m chunks (CHUNK_SIZE 5.0,
+STREAM_RADIUS 92, FENCE_HALF 25 — grass ONLY inside the 50x50 fence, outside is bare terrain).
+Macro 10x10 far chunks were TRIED and REVERTED (caused grass to disappear on fast turns) —
+stay 5x5 everywhere. Two stream centers: camera + Mouse.</li>
+<li><strong>Placement:</strong> MultiMesh via <code>set_instance_transform</code> — the
+.buffer array path SILENTLY FAILED ("painted grass" bug), never go back. Budget
+BUILD_PER_FRAME 6000, _mm.visible=false until the array is placed (this causes a
+disappearing-on-fast-turn artifact; raise the budget or keep _mm.visible=true if it returns).
+Adaptive probe placement near (PROBE_STEP 0.035, COVER_RADIUS 0.02) + jittered grid far
+(TUFT_SPACING 0.12). Reject terrain above rock_start+0.3, GrassExclusion rects, water.</li>
+<li><strong>Vision loop lesson:</strong> qwen2.5vl:3b "field of grass" read is driven by BLADE
+SIZE IN FRAME. 2 cm = "green carpet"; ~8 cm = "visible blades". Calibrate against a real
+photo before trusting the model. qwen2.5vl:3b is unreliable at describing scenes — pixel/
+probe stats are the primary signal, vision is corroboration only.</li>
+<li><strong>Godot gotchas hit:</strong> FastNoiseLite has no <code>seamless</code> property
+(only NoiseTexture2D); fragment built-in is <code>COLOR</code> not <code>VERTEX_COLOR</code>;
+no <code>return</code> in Godot 4 fragment shaders; SurfaceTool has no
+get_vertex_count() in 4.7.1; user args need the <code>--</code> separator
+(<code>--path X -- --fpsbench</code>).</li>
+<li><strong>Backup rule (user):</strong> every approved look = a committed + pushed
+screenshot (<code>&lt;seq&gt;_&lt;mode&gt;_&lt;camera&gt;_&lt;state&gt;.png</code>, commit
+message = same tag) so any look is fetchable from git history as a revert map.</li>
+</ul>
+
+<h2>Character pipeline — how WW (the cat) was made in Blender</h2>
+<p>WW is built <strong>procedurally in Blender via Python</strong>, not hand-modelled and not
+AI-generated (Meshy/Tripo were evaluated and rejected: no API, user cannot view AI images,
+no licence/consistency control). The generator is fully re-runnable and deterministic. This
+is the path to reuse for Dumbleclaw's rework and any future NPC.</p>
+<ul>
+<li><strong>Files:</strong> <code>tools/blender/gen_ww.py</code> (the cat, v0.3) and
+<code>tools/blender/ww_style.py</code> (SHARED style spec — palette + roughness/metallic +
+primitive helpers: sphere, capsule, tapered_tube, subdiv, glTF export). Trees =
+gen_trees.py, rocks = gen_rocks.py, all built on ww_style.py so everything matches. Unit
+convention: generators build in "cat units" (~2 m tall cat); main.gd scales at placement.</li>
+<li><strong>Run it:</strong> <code>"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
+--background --python gen_ww.py</code> → outputs <code>assets/WW.glb</code> (rigged,
++Y up, forward -Z). <strong>After re-running, reimport in the Godot editor</strong>
+(delete <code>.godot/imported</code> to force a full reimport) — stale zombie Godot
+processes hold the old import; the launcher kills them.</li>
+<li><strong>WW.blend is saved OUTSIDE the project</strong>
+(<code>C:\crypto\wicked-whiskers-blender-out\WW.blend</code>): a .blend inside res:// breaks
+Godot's importer without a configured Blender path.</li>
+<li><strong>How it builds (gen_ww.py):</strong> (1) geometry = one UNIONED fur body (boolean
+EXACT solver on spheres/capsules/tapered tubes: body, head, ears+inner cups, legs, tail
+curve, muzzle, belly) + SEPARATE feature meshes (nose, almond flattened eyes with pupils +
+glints, satchel box + strap, 3 whisker strands per cheek) + SEPARATE arm meshes (tapered
+tubes sunk into the chest, held outside the body so auto-weights pin them to the arm bones);
+(2) armature with stable bone names (Root/Pelvis/Spine/Chest/Neck/Head + L/R UpperArm/
+Forearm/Hand/Thigh/Shin/Foot/Toe/Ear + Tail01-03); (3) parent_set ARMATURE_AUTO (automatic
+weights); (4) subdiv 3 on the body, 2 on arms, shade_smooth; (5) paint_cream_faces assigns
+the CREAM material to faces near ref points (muzzle/belly/toes) AFTER subdiv; (6) glTF export.</li>
+<li><strong>Tail technique (5 spheres → 1 tapered tube):</strong> the tail was originally 5
+spheres stacked on top of each other and looked wrong. It is now ONE tapered_tube following a
+curved 3D path (9 path points, per-point radius shrinking 0.14 → 0.028, from pelvis up over
+the back). Same primitive = the arms (each arm = one tapered tube + a paw sphere, smooth
+surface instead of stacked capsules/spheres) and the whiskers (thin tapered strands). This
+"single tapered tube along a path, radii per point, cap_tip" is THE trick for smooth
+organic limbs — use it for Dumbleclaw's limbs too.</li>
+<li><strong>KNOWN BUG (fix next cat pass):</strong> build_armature() bone positions for the
+arms are still at the OLD coords (0.48-0.52) — the arm MESHES moved to 0.68-0.76. Bones and
+meshes must match or auto-weights drift. The 3b4edf9 commit rebuilt arms as smooth tapered
+tubes at the shoulder (were floating capsules).</li>
+<li><strong>WW.glb is 37 MB</strong> — suspected embedded uncompressed textures or dense
+keyframes; check in Blender (resize to 1024, prune keyframes) before shipping.</li>
+<li><strong>Rigging facts (player.gd):</strong> set_bone_pose_rotation(IDENTITY) aligns a
+bone with its PARENT frame, NOT the rest pose — pass get_bone_rest(idx).basis to return to
+rest. Walk is a procedural sine trot (LF+RH diagonal, knees fold on the swing leg, body
+sinks to keep paws planted) — a keyframed Blender walk cycle is the future upgrade.</li>
+<li><strong>Style consistency rule (user):</strong> new props must come from the Kenney
+Nature Kit (C:\crypto\world\kenneys nature kit) — never mix packs. Character/NPC upgrades
+(like Dumbleclaw's beard) are code-built primitives in dumbleclaw.gd today; the Blender
+pipeline above is the upgrade path for a proper Dumbleclaw model + future NPCs.</li>
+<li><strong>Fallback:</strong> docs/cat_prompts.md keeps the Meshy/Tripo prompts as a
+fallback if AI variants are ever wanted (free tier = CC BY 4.0 + attribution).</li>
+</ul>
+
+<h2>Lessons (recurring mistakes to never repeat)</h2>
+<ul>
+<li><strong>This page is for AI, not the public.</strong> <code>/forai/ww.html</code> is the AI reference; <code>/ww.html</code> is the public marketing page. On 2026-08-13 the public page was found copied over this reference page (same title, public styling, no noindex) — a full overwrite that lost the design/canon/build-status content. Recovery: a .bak saved 60 ms before the overwrite (<code>ww.html.bak.202608111715</code>). Rule: never copy the public page over the forai page; keep .bak before any deploy; the forai page stays dark-styled, noindex, and titled "wicked whiskers reference".</li>
+<li><strong>This page is the durable memory.</strong> big-pickle session context can be lost or compacted and the YAMLs get trimmed. Durable decisions, canon, and build facts live HERE. If this page is ever lost, recovery source = the newest .bak in <code>/var/www/html/forai/</code> and the working copy <code>/home/andy/ww.html</code>.</li>
+<li><strong>Interaction range is not interaction point.</strong> Proximity is measured against specific points (hinge / far end / panel centre), not the whole object. A 2.9 m-wide gate needs all three points or the middle becomes a dead zone. Fix range bugs by checking the pick math, not by assuming the object is one point.</li>
+<li><strong>Godot 4 API is not Godot 3.</strong> <code>normal_map</code> on SpatialMaterial is now <code>normal_enabled</code> + <code>normal_texture</code>; <code>MeshInstance3D.surface_get_material()</code> is on <code>mesh</code>; <code>look_at</code> needs the node added to the tree first. Watch the console, fix each warning — they are real API drifts.</li>
+<li><strong>Click priority: interactables beat animals.</strong> If a fish sits near the gate, a gate click must win or the cat pounces into the lake. Interactable pick runs before fish pick in <code>_handle_click_at</code>.</li>
+<li><strong>No image input, no visual claims (2026-08-13).</strong> An agent that cannot see images must NEVER ship procedural visual work as "done". Render frames, run a vision-capable reviewer (gemini-flash via <code>C:\crypto\bigpickle\gemini-vision.ps1</code>), and let the USER judge aesthetics before claiming a result. The cutaway consumed hours because unverified procedural geometry was built blind and only reviewed by an over-lenient model.</li>
+<li><strong>Paws need finger anatomy, not claws (2026-08-13).</strong> A paw "manipulating" a padlock reads as <em>waving a paw around the lock</em> when the digits are claw-toes hooking up from below, or when the paw and dial move independently. The fix that reads correctly: 3 fingers + 1 thumb wrapping the dial's top edge, and the dial + paw rotate RIGIDLY together around the dial axis so the paw visibly drives the turn (grip-turn).</li>
+<li><strong>Git history two-line save (2026-08-13).</strong> The cutaway work lived on a detached HEAD while origin/master had diverged grass work. Save before a compact = commit + push as a NAMED BRANCH (no force-push needed): <code>cutaway-finger-anatomy</code>. Origin/master was left untouched; reconciling the two lines is still an open user decision. Also: pushing a branch full of committed screenshots packs ~160 MB — allow minutes, don't kill it (each kill restarts the pack).</li>
 </ul>
 
 <hr>
