@@ -584,11 +584,18 @@ func _run_pawtest(_variant: String = "v1") -> void:
 		push_error("PAWTEST no dials")
 		get_tree().quit()
 		return
-	var dial: Node3D = dials[1]
+	var dial: Node3D = dials[0]
 	var params := {
+		"show_paw": true,
+		"path_mode": false,
+		"advance": 0.0,
+		"path_start": [0.20, -0.10, 0.02],
+		"path_end": [0.0, 0.0, 0.02],
+		"fingers": false,
 		"target_offset": [0.0, -0.02, 0.018],
 		"model_rot_x_deg": 0.0,
 		"model_rot_y_deg": 0.0,
+		"model_rot_z_deg": 0.0,
 		"hand_bend_deg": 0.0,
 		"model_scale": 0.35,
 		"cam_offset": [0.0, 0.02, 0.42],
@@ -602,35 +609,59 @@ func _run_pawtest(_variant: String = "v1") -> void:
 			for k in j:
 				params[k] = j[k]
 		pf.close()
-	var toff: Array = params["target_offset"]
-	var target: Vector3 = dial.global_position + Vector3(toff[0], toff[1], toff[2])
-	var glb: PackedScene = load("res://assets/WW.glb")
-	var model := glb.instantiate()
-	model.scale = Vector3.ONE * float(params["model_scale"])
-	model.rotation.x = deg_to_rad(float(params["model_rot_x_deg"]))
-	model.rotation.y = deg_to_rad(float(params["model_rot_y_deg"]))
-	add_child(model)
-	await get_tree().process_frame
-	var skel: Skeleton3D = null
-	for sk in model.find_children("*", "Skeleton3D", true, false):
-		skel = sk as Skeleton3D
-		break
-	if skel == null:
-		push_error("PAWTEST no skeleton")
-		get_tree().quit()
-		return
-	for mi in model.find_children("*", "MeshInstance3D", true, false):
-		var m := mi as MeshInstance3D
-		m.visible = (m.name == "Paw_L")
-	var hand_i := skel.find_bone("Hand.L")
-	var bend := float(params["hand_bend_deg"])
-	if absf(bend) > 0.01:
-		var rest_q: Quaternion = skel.get_bone_rest(hand_i).basis.get_rotation_quaternion()
-		skel.set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend)))
+	if bool(params["show_paw"]):
+		var toff: Array = params["target_offset"]
+		var target: Vector3 = dial.global_position + Vector3(toff[0], toff[1], toff[2])
+		var glb: PackedScene = load("res://assets/WW.glb")
+		var model := glb.instantiate()
+		model.scale = Vector3.ONE * float(params["model_scale"])
+		model.rotation.x = deg_to_rad(float(params["model_rot_x_deg"]))
+		model.rotation.y = deg_to_rad(float(params["model_rot_y_deg"]))
+		model.rotation.z = deg_to_rad(float(params["model_rot_z_deg"]))
+		add_child(model)
 		await get_tree().process_frame
-	var hand_w: Vector3 = skel.to_global(skel.get_bone_global_pose(hand_i).origin)
-	model.global_position += target - hand_w
-	await get_tree().process_frame
+		var skel: Skeleton3D = null
+		for sk in model.find_children("*", "Skeleton3D", true, false):
+			skel = sk as Skeleton3D
+			break
+		if skel == null:
+			push_error("PAWTEST no skeleton")
+			get_tree().quit()
+			return
+		var show_fingers: bool = bool(params["fingers"])
+		for mi in model.find_children("*", "MeshInstance3D", true, false):
+			var m := mi as MeshInstance3D
+			if show_fingers:
+				m.visible = (m.name == "Arm_L")
+			else:
+				m.visible = (m.name == "Paw_L" or m.name == "Arm_L")
+		var hand_i := skel.find_bone("Hand.L")
+		var bend := float(params["hand_bend_deg"])
+		if absf(bend) > 0.01:
+			var rest_q: Quaternion = skel.get_bone_rest(hand_i).basis.get_rotation_quaternion()
+			skel.set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend)))
+			await get_tree().process_frame
+		var hand_w: Vector3 = skel.to_global(skel.get_bone_global_pose(hand_i).origin)
+		if bool(params["path_mode"]):
+			var paw_mi: MeshInstance3D = null
+			for mi in model.find_children("Paw_L", "MeshInstance3D", true, false):
+				paw_mi = mi as MeshInstance3D
+				break
+			var paw_center: Vector3 = Vector3.ZERO
+			if paw_mi != null and paw_mi.mesh != null:
+				paw_center = paw_mi.global_transform * paw_mi.mesh.get_aabb().get_center()
+			var ps: Array = params["path_start"]
+			var pe: Array = params["path_end"]
+			var start: Vector3 = dial.global_position + Vector3(ps[0], ps[1], ps[2])
+			var end: Vector3 = dial.global_position + Vector3(pe[0], pe[1], pe[2])
+			var desired: Vector3 = start.lerp(end, clampf(float(params["advance"]), 0.0, 1.0))
+			model.global_position += desired - paw_center
+			print("PAWTEST paw_center=" + str(paw_center) + " desired=" + str(desired) + " dial=" + str(dial.global_position))
+		else:
+			model.global_position += target - hand_w
+		if bool(params["fingers"]):
+			_pawtest_fingers(model, dial)
+		await get_tree().process_frame
 	var cam := Camera3D.new()
 	cam.current = true
 	cam.fov = float(params["cam_fov"])
@@ -644,6 +675,55 @@ func _run_pawtest(_variant: String = "v1") -> void:
 	img.save_png(p)
 	print("PAWTEST saved=" + p)
 	get_tree().quit()
+
+
+func _pawtest_segment(a: Vector3, b: Vector3, r: float, mat: Material) -> void:
+	var cm := CapsuleMesh.new()
+	cm.radius = r
+	cm.height = maxf(a.distance_to(b) + r * 2.0, 0.002)
+	cm.material = mat
+	var mi := MeshInstance3D.new()
+	mi.mesh = cm
+	add_child(mi)
+	mi.look_at_from_position((a + b) * 0.5, b, Vector3.UP)
+	mi.rotate_object_local(Vector3.RIGHT, PI / 2.0)
+
+
+func _pawtest_fingers(model: Node3D, dial: Node3D) -> void:
+	var fur := StandardMaterial3D.new()
+	fur.albedo_color = Color("#f9ad59")
+	fur.roughness = 0.9
+	for mi in model.find_children("Paw_L", "MeshInstance3D", true, false):
+		var sm := (mi as MeshInstance3D).mesh
+		if sm != null and sm.get_surface_count() > 0:
+			var src := sm.surface_get_material(0)
+			if src is StandardMaterial3D:
+				fur.albedo_color = (src as StandardMaterial3D).albedo_color
+				fur.roughness = (src as StandardMaterial3D).roughness
+				break
+	var claw := StandardMaterial3D.new()
+	claw.albedo_color = Color("#f5e6d0")
+	claw.roughness = 0.5
+	var d: Vector3 = dial.global_position
+	var palm := MeshInstance3D.new()
+	var pm := SphereMesh.new()
+	pm.radius = 0.026
+	pm.height = 0.052
+	pm.material = fur
+	palm.mesh = pm
+	palm.scale = Vector3(1.25, 0.75, 0.85)
+	palm.position = d + Vector3(0.0, -0.006, 0.006)
+	add_child(palm)
+	var spread := [-0.017, -0.006, 0.006, 0.017]
+	for i in 4:
+		var base := d + Vector3(spread[i], 0.010, 0.014)
+		var knuckle := d + Vector3(spread[i] * 0.8, 0.030, 0.008)
+		var tip := d + Vector3(spread[i] * 0.55, 0.044, -0.004)
+		_pawtest_segment(base, knuckle, 0.0058, fur)
+		_pawtest_segment(knuckle, tip, 0.0045, fur)
+		var dir: Vector3 = (tip - knuckle).normalized()
+		var claw_tip: Vector3 = tip + dir * 0.012 + Vector3(0.0, -0.006, -0.004)
+		_pawtest_segment(tip, claw_tip, 0.0022, claw)
 
 
 func _build_tractor() -> void:

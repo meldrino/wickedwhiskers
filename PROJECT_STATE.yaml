@@ -188,11 +188,16 @@ build_status:
       screenshots/pawtest_params.json (target_offset, model_rot_x/y_deg, hand_bend_deg,
       model_scale, cam_offset, cam_fov, out).
       STATUS: 9 pose-iterations PLATEAUED at 3-4/10 (gemini): the real paw mesh is a
-      FEATURELESS BLOB - pose/camera/scale tuning cannot add toe definition. DECISION NEEDED
-      from user (aesthetic gatekeeper): (a) add procedural toe bumps on the real Paw_L (hybrid),
-      (b) better paw model, (c) stylized silhouette paw. Overnight driver
-      C:\crypto\bigpickle\paw-iter.ps1 (render->gemini grade->correct; quenn auto-fallback;
-      plateau jitter; logs + all frames archived in screenshots/) running detached.
+      FEATURELESS BLOB - pose/camera/scale tuning cannot add toe definition. Sequence frames
+      frame1..5 built (Muppet rule: arm end always cropped below frame via z-flip + vertical
+      path); user: "roughly right size/place but still a round blob". Procedural fingers (palm
+      + 4 fingers + claws, blob hidden) tried - USER: "it is just shit". CONCLUSION (02:25):
+      everything built blind reads as bad - STOP blind-procedural. DECISION NEEDED (user is
+      the aesthetic gatekeeper, fresh in the morning): (a) user hand-places/designs the paw,
+      (b) proper paw asset, (c) stylized silhouette, (d) wide swat shot where detail is moot.
+      Overnight driver C:\crypto\bigpickle\paw-iter.ps1 (render->gemini grade->correct; quenn
+      auto-fallback; plateau jitter; logs + all frames archived in screenshots/) ran 60 iters,
+      results committed at 4847d11.
       Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
     shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
       spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,

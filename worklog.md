@@ -810,3 +810,32 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   - CONCLUSION: any next step REQUIRES new paw GEOMETRY (toe bumps on the real Paw_L, a better
     paw mesh, or a stylized silhouette paw). Pose loop alone is a confirmed dead end. User is
     the aesthetic gatekeeper - present the 3 options on wake.
+
+- SEQUENCE FRAMES + FINGERS EXPERIMENT (01:40-02:25): user asked for an opening sequence of
+  stills: frame1 = lock alone, then the paw sliding in until its round bit covers the FIRST
+  dial. Rendered frame1..frame5.
+  - MUPPET RULE enforced: user: "at no stage can the shoulder end of the paw go entirely into
+    frame ... it looks like the arm is not connected to anything". Fix: flip the model 180deg
+    about Z (arm now hangs DOWN out of frame) and drive the paw along a vertical path that keeps
+    the arm end cropped below the bottom frame edge at every advance step.
+  - FIXED a real bug: paw center computed as skel.to_global(paw_mi.global_transform * aabb_center)
+    double-applies the skeleton transform (global_transform is ALREADY global) - the 180deg flip
+    got applied twice and shoved the paw off-screen -> "5 frames with not a paw in sight". Now:
+    paw_center = paw_mi.global_transform * aabb_center.
+  - USER VERDICT on real blob (scale halved to 0.25, arm visible, on dial0): "roughly the right
+    size, roughly the right place but it is still a round blob there are no fingers or claws".
+  - FINGERS EXPERIMENT: real Paw_L blob sits IN FRONT of the dial face, so procedural fingers
+    placed on the dial were hidden inside the blob. Fix: hide Paw_L entirely when fingers=on;
+    paw becomes fully procedural = palm (flattened fur sphere) + 4 fingers arcing over the dial
+    top + cream claws hooking over. Determinstic, dial-relative.
+  - USER VERDICT: "it is just shit. can not deal with it at 2 in the morning, take a break."
+  - PATTERN ACROSS THE WHOLE SESSION: EVERYTHING built blind reads as shit to the user - the v4
+    procedural cutaway, the real Paw_L blob, and the procedural fingers. This is a capability
+    wall: building 3D visuals the agent cannot see does not converge. Recommend stopping
+    blind-procedural entirely and letting the USER hand-place/design the paw (they can see),
+    OR using a proper paw asset, OR the wide-silhouette swat shot (option d) where detail does
+    not matter.
+  - Tech notes: pawtest harness now has show_paw / path_mode / advance / path_start|end /
+    fingers / model_rot_z_deg params (screenshots/pawtest_params.json); dial target = dials[0]
+    (first black circle); frames archived as frame1_lock/frame2_appear/frame3_mid/
+    frame4_near/frame5_cover.png + cutaway_seq_v1/v2.png sheets. main.gd changes UNCOMMITTED.
