@@ -186,7 +186,7 @@
 <li>Gate click fix (Aug 2026): interaction point moved to the panel centre so the gate opens/closes from the hinge end, far end, or panel centre (covers the full 2.9 m width), still only within ~1 m; clicks on the gate beat clicks on fish, so the cat no longer pounces into the lake from beside the gate. Verified headless (far no-op, both ends toggle).</li>
 <li>Console-error cleanup (Aug 2026): water normal map (Godot 4 API), wet-cat surface_get_material, shooting-star look_at ordering, grass debug spam removed.</li>
 <li>Shed person-scale (Aug 2026): 0.9x2.0 m door, 2.5 m walls, 3.2 m ridge; portal + camera clamp re-tuned to the smaller interior.</li>
-<li>Padlock unlock cutaway (Aug 2026): combo success plays a cinematic unlock — letterbox bars, camera push-in on the padlock, player cat parked away from frame, two procedural orange paws (fur colour SAMPLED at runtime from the cat's own WW.glb material so a recolor auto-updates) turn the dials with clicks, shackle springs open, padlock drops, door swings. GameState.cinematic_active locks player input during it. Rendered to screenshots/cw_1..6.png via --cutawaytest; the finger anatomy + grip-turn are still being user-iterated — NOT yet user-approved.</li>
+<li>Padlock unlock cutaway (Aug 2026): combo success plays a cinematic unlock — letterbox bars, camera push-in on the padlock, player cat parked away from frame, the cutaway paw turns the dials with clicks, shackle springs open, padlock drops, door swings. GameState.cinematic_active locks player input during it. The paw itself is the open problem — see the "Cutaway paw — the saga" section below. The one SHIPPED decision from the earlier cutaway work: fur colour is SAMPLED at runtime from the cat's own WW.glb material so a recolor auto-updates.</li>
 <li>Vision reviewer switch (Aug 2026): quenn (qwen2.5vl:7b) proved too lenient on procedural paws. Trusted screenshot reviewer is now gemini-flash via C:\crypto\bigpickle\gemini-vision.ps1 (GEMINI_API_KEY set; -Image arrays; auto-appends to the inbox).</li>
 <li>Next: approve/iterate the cutaway paws (user is the final judge), farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button, fix the pond view in the new grass system.</li>
 </ul>
@@ -299,6 +299,43 @@ Nature Kit (C:\crypto\world\kenneys nature kit) — never mix packs. Character/N
 pipeline above is the upgrade path for a proper Dumbleclaw model + future NPCs.</li>
 <li><strong>Fallback:</strong> docs/cat_prompts.md keeps the Meshy/Tripo prompts as a
 fallback if AI variants are ever wanted (free tier = CC BY 4.0 + attribution).</li>
+</ul>
+
+<h2>Cutaway paw — the saga (the closest we've got so far)</h2>
+<p>The padlock cutaway needs a single cartoon paw that turns the dials. This consumed hours.
+The pipeline that finally made progress: <strong>the USER chats with a browser AI (ChatGPT
+first, then others), pastes the returned Blender (bpy) script back, and the agent runs it
+headless</strong>. Agent-built procedural paws were all rejected by the user's eyes.</p>
+<ul>
+<li><strong>quenn (qwen2.5vl:7b) attempt — FAILED.</strong> quenn wrote a buggy bpy paw script
+(2nd try, needed a rewritten generator anyway) and later its vision grading proved
+UNRELIABLE — it called visibly-broken paws "no visible problems". quenn was already demoted as
+vision reviewer (too lenient).</li>
+<li><strong>Procedural generator (blender/paw_gen.py) — FAILED.</strong> 6 variants (quenn,
+chunky, sleek, kawaii, sharp, stubby), 3 fingers + 1 thumb each, top-down renders
+(paw_variants_sheet.png). User: "still so bad it is never going to be usable". Rejected.</li>
+<li><strong>Browser-AI → bpy → Blender → GLB → Godot (WORKING PROGRESS).</strong> User prompts
+ChatGPT with blender/chatgpt-paw-prompt.txt (self-contained, Blender 5.2 API rules, WW
+colours, exports to assets/paw_ai_v1.glb), pastes the script back, agent runs it headless
+(<code>blender --background --python</code>), renders it STANDALONE with blender/render_glb.py
+(screenshots/paw_ai_vN_standalone.png), and the user judges the shape alone. The script is the
+asset; the render just points a camera at the exact exported GLB.</li>
+<li><strong>Iterations so far (2026-08-14).</strong> v1: 4 fingers + thumb, digits sat ON the
+hand, thumb had open spaces. v2: 3 fingers + chunky thumb, soft joints + pads — "closest yet".
+v3: thicker fingers, buried knuckles, webbing, sharp claws — feedback to ChatGPT: cartoon
+paws are 3 fingers + 1 thumb; digits must attach INTO the hand; knuckles too high (sink them
+in, aligned); claws missing/not sharp; fingers still have air gaps — "use more polygons to
+fill the air gaps". Colour reads white/cream in renders (should be orange #f9ad59) — deferred.
+User also wants to try other models with the same prompt.</li>
+<li><strong>Scripts kept here</strong> so any machine can grab the latest:
+<code>/forai/ww-paw/</code> — <a href="ww-paw/paw_ai_v1.py">paw_ai_v1.py</a>,
+<a href="ww-paw/paw_ai_v2.py">paw_ai_v2.py</a>,
+<a href="ww-paw/paw_ai_v3.py">paw_ai_v3.py</a> (current),
+<a href="ww-paw/chatgpt-paw-prompt.txt">chatgpt-paw-prompt.txt</a>,
+<a href="ww-paw/render_glb.py">render_glb.py</a>.</li>
+<li><strong>User runs scripts directly in Blender:</strong>
+<code>"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python paw.py</code>
+— nothing is altered between the script and the render.</li>
 </ul>
 
 <h2>Lessons (recurring mistakes to never repeat)</h2>

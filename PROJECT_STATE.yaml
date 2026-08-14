@@ -198,6 +198,23 @@ build_status:
       Overnight driver C:\crypto\bigpickle\paw-iter.ps1 (render->gemini grade->correct; quenn
       auto-fallback; plateau jitter; logs + all frames archived in screenshots/) ran 60 iters,
       results committed at 4847d11.
+    paw_pipeline BROWSER-AI (2026-08-14, CURRENT): quenn + paw_gen.py procedural variants ALL
+      rejected ("never going to be usable"). WINNING PIPELINE: user prompts a browser AI
+      (ChatGPT first, Claude/Gemini/others to try - prompt file is model-agnostic) -> user
+      pastes the returned bpy script back -> AGENT RUNS IT VERBATIM headless in Blender 5.2
+      (nothing is altered: the standalone render loads the exact exported GLB) -> user judges
+      the shape. Scripts: blender/paw_ai_v1/v2/v3.py + chatgpt-paw-prompt.txt + render_glb.py.
+      v1 first-try PAW_BUILT (4 fingers+thumb - wrong, digits sat ON the hand). v2
+      3 fingers+chunky thumb+soft joints+pads = "closest yet". v3 thicker fingers/buried
+      knuckles/webbing/sharp claws - REJECTED. ChatGPT feedback to apply next: cartoon = 3
+      fingers + 1 thumb; digits attach INTO the hand (thumb had open spaces); knuckles too high
+      -> sink into hand + align; claws missing/not sharp; fingers have air gaps -> use more
+      polygons. COLOUR reads white/cream in renders (should be orange #f9ad59) - deferred.
+      quenn vision (Ollama /v1/chat/completions, image_url data URI) works for describing
+      renders but is TOO LENIENT a judge - user eyes are the gate. Scripts + prompt + renderer
+      hosted at meldrino.com/forai/ww-paw/ (links from ww.html). RUN DIRECTLY:
+      "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python paw.py.
+      Godot: after re-exporting the GLB, run --import so .import cache refreshes.
       Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
     shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
       spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,

@@ -857,3 +857,19 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   sheet paw_variants_sheet.png (opened). GLBs exported assets/paw_<v>.glb. Agent CANNOT verify
   visually (no image input) - USER PICK of the 6 is the gate. Committed e74a127, pushed.
   SAVE-OUT note: remaining pending = website forai/ww.html update.
+
+- CHATGPT-PAW PIPELINE + SAVE-OUT 06:45 (2026-08-14): user picks a browser-AI-past-its-own-script
+  pipeline (ChatGPT -> paste bpy back -> agent runs headless -> standalone render -> user eyes).
+  Runs this session: paw_ai_v1.py (PAW_BUILT, DIMS 0.0761x0.2305x0.0468, first try), v2
+  (0.0743x0.2368x0.0458), v3 (0.0770x0.2317x0.0480). Agent cannot see images; user is the only
+  judge. v1 = 4 fingers+thumb (wrong, digits on top). v2 = 3 fingers+chunky thumb+soft joints
+  ("closest yet"). v3 = thicker fingers, buried knuckles, webbing, sharp claws -> still rejected:
+  feedback to ChatGPT = cartoon paws have 3 fingers + 1 thumb, digits attach INTO the hand,
+  knuckles sunk lower + aligned, claws missing/not sharp, fill air gaps with more polygons.
+  Colour reads white/cream in renders (should be orange #f9ad59) - deferred. quenn vision via
+  Ollama /v1/chat/completions works for describing renders but is TOO LENIENT a judge. Scripts
+  + prompt + render_glb.py now hosted on the website: /forai/ww-paw/ (verified 200).
+  docs/ww.html updated with the full saga (quenn fail + gpt ongoing + others to try) + script
+  links, deployed to pi2 (bak ww.html.bak.20260814). Committed + pushed (cutaway-finger-anatomy).
+  User suspects agent is altering output (it isn't - standalone render loads the exact GLB).
+  Give the user the direct Blender run command: blender.exe --background --python <script>.
