@@ -873,3 +873,22 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   links, deployed to pi2 (bak ww.html.bak.20260814). Committed + pushed (cutaway-finger-anatomy).
   User suspects agent is altering output (it isn't - standalone render loads the exact GLB).
   Give the user the direct Blender run command: blender.exe --background --python <script>.
+- TRELLIS PAW + Q U E N N 5H INVESTIGATION, 01:20 (2026-08-16): paw.glb downloaded from
+  TRELLIS.2 (huggingface.co/spaces/microsoft/TRELLIS.2, free w/ HF login). color_paw.py -> paw_clean.glb
+  (#f9ad59, stripped textures + vertex colors), shift_paw.py -> paw_hv.glb (hand centered at origin).
+  Blender headless previews render grey/black (broken in this env) -> moved to GODOT previews.
+  First Godot pawtest renders (4 rotations) washed WHITE + polluted: root-caused two renderer bugs -
+  (1) game WorldEnvironment sky ambient + (2) the Terrain AUTOLOAD renders the world's green ground
+  into every scene including new scenes. Paw itself verified clean (single mesh, orange opaque GLB).
+  Built scenes/pawstudio.tscn + scripts/pawstudio.gd: isolated studio (dark bg, 3 lights, params from
+  screenshots/pawstudio_params.json, sweep via model_rot_y). q u e n n reads (via vision_expert.ps1):
+  paw is 3D/readable; back-vs-palm calls UNRELIABLE (flip-flops), per-pane sheet prompts degenerate
+  (template answers) - use it for coarse colour/pose only, not fine judgement. GEOMETRY (blender
+  analyze_growth.py): hand region y-extent asymmetric -0.174..+0.078 -> palm GROWTH confirmed as -Y
+  blob (z -0.15..+0.05). Back of hand = +Y. WINNER POSE: model_rot_x_deg=-90 -> back of hand faces
+  camera, arm hangs DOWN (Muppet crop), growth hidden behind. Palm side (rot_x=+90) blows out WHITE
+  under light = explains "white paw" complaint. bake_roughness.py set material roughness 0.7->0.95 =
+  killed "metallic gold" specular, zero white pixels. Final: rx-90_rough.png (back of cat paw, matte
+  orange, arm down) confirmed by q u e n n as "clearly a cat paw, not human hand". Result sheet:
+  screenshots/paw_investigation_result.png (before/after). NEXT: integrate rx-90 pose into cutaway
+  (pawtest model_rot_x=-90, hand on dial, arm down) + fix cutaway lighting so paw reads orange in-game.
