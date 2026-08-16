@@ -29,3 +29,8 @@ Stop. Do not iterate further on TRELLIS. The parametric model
   range 0.085 vs TRELLIS's lumpy 0.016.
 - studio pose params already tuned (model_rot_x_deg=-90, back to camera,
   arm hanging down) — see screenshots/pawstudio_params.json.
+- IN-GAME cutaway pose (verified, pawtest harness): model_scale 0.55,
+  model_rot_x_deg=-90, model_rot_y_deg=180 (Godot YXZ order; NOT -90+90 —
+  derived via Basis.get_euler), target_offset (0,-0.25,0.018) puts the
+  hand over the dial, arm clipped at frame edge (Muppet rule).
+  Render: screenshots/paw_v4_cutaway.png, params: screenshots/pawtest_params.json.

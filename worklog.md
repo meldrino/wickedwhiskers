@@ -913,3 +913,10 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   user: trellis_retry/ (README.md + prompt.txt + reference.png = v4 back render to feed TRELLIS.2
   instead of the Grok drawing). NEXT: user judges v4 render (visual gate); if rejected, run
   trellis_retry or use WW.glb Paw_L.
+  FOLLOW-UP 08:10 (same session): in-game cutaway pose for v4 SOLVED empirically - game-scene
+  camera sits on the +Z side of the padlock (pawtest cam_offset z=+0.42), so the studio's
+  single rot_x=-90 is NOT enough (shows palm, arm wrong). Godot YXZ euler derived via
+  Basis.get_euler(target basis) = model_rot_x=-90, model_rot_y=180 (NOT -90/+90 which still
+  showed palm). WITH scale 0.55 + target_offset (0,-0.25,0.018): back of paw faces camera,
+  fingers up, over the dial, arm hangs down cropped at frame edge (Muppet rule) - quenn PASS
+  on all 4 checks. Render: paw_v4_cutaway.png. Params saved in pawtest_params.json.
