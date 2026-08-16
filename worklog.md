@@ -892,3 +892,24 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   orange, arm down) confirmed by q u e n n as "clearly a cat paw, not human hand". Result sheet:
   screenshots/paw_investigation_result.png (before/after). NEXT: integrate rx-90 pose into cutaway
   (pawtest model_rot_x=-90, hand on dial, arm down) + fix cutaway lighting so paw reads orange in-game.
+
+- V4 PARAMETRIC PAW + EXPERT INVESTIGATION 07:20-08:00 (2026-08-16): user away (boot sale), 3h
+  autonomous. Dispatched the TRELLIS-lump context to gemini-expert (2x503, then full answer),
+  copilot-expert (full), local qwen (generic/hallucinated CLIs - ignore). VERDICTS: TRELLIS.2
+  collapses thin features (toe knuckles/digit separation) into one convex webbed blob; a flat
+  2D Grok drawing + arm-off-frame breaks its boundary assumptions; BOTH recommend: retry needs
+  an EXAGGERATED 3D RENDER as the reference image, and rank the game's own WW.glb Paw_L or a
+  parametric paw above further TRELLIS retries. Blender headless grey/black bug: CPU Cycles
+  DOES render lit content (GPU is the culprit) - Blender previews partially usable again.
+  BUILT paw_ai_v4.py -> assets/paw_ai_v4.glb: v3 anatomy scaled x2.6 (hand ~0.21m), chunky
+  tapered arm + wrist + elbow, knuckles protruding from the BACK (-Z), webbing pulled into the
+  palm, sharp claws preserved by voxel-remeshing the BODY only then re-adding claws, pads
+  dropped, rotated into paw_hv convention (back=+Y, arm=-Z, fingers=+Z) so the known-good
+  studio pose works. OBJECTIVE VERIFICATION (blender/analyze_silhouette_v4.py): back digit row
+  = 4 peaks (thumb -0.114@0.152 + fingers -0.064/0.000/+0.060 @~0.23), range 0.085 vs TRELLIS
+  lump 0.016 = REAL paw silhouette. Godot studio renders paw_v4_back.png / paw_v4_top.png;
+  quenn: "clearly the back of a cartoon cat paw, not a hand... 4 digits, knuckles protruding".
+  Comparison sheet paw_compare.png (TRELLIS rx-90_rough vs v4 back). TRELLIS REGEN KIT for the
+  user: trellis_retry/ (README.md + prompt.txt + reference.png = v4 back render to feed TRELLIS.2
+  instead of the Grok drawing). NEXT: user judges v4 render (visual gate); if rejected, run
+  trellis_retry or use WW.glb Paw_L.

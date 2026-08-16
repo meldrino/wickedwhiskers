@@ -21,6 +21,7 @@ func _ready() -> void:
 		"cam_pitch_deg": -10.0,
 		"cam_dist": 0.55,
 		"cam_fov": 40.0,
+		"target": [0.0, 0.0, 0.0],
 		"bg": [0.05, 0.06, 0.09],
 		"key_energy": 1.7,
 		"key_yaw_deg": 35.0,
@@ -102,9 +103,11 @@ func _ready() -> void:
 	var yaw := deg_to_rad(float(params["cam_yaw_deg"]))
 	var pitch := deg_to_rad(float(params["cam_pitch_deg"]))
 	var dist := float(params["cam_dist"])
+	var target_arr: Array = params["target"]
+	var target := global_position + Vector3(target_arr[0], target_arr[1], target_arr[2])
 	var dir := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
-	cam.global_position = global_position - dir * dist
-	cam.look_at(global_position, Vector3.UP)
+	cam.global_position = target - dir * dist
+	cam.look_at(target, Vector3.UP)
 	for i in range(4):
 		await get_tree().process_frame
 	var img := get_viewport().get_texture().get_image()

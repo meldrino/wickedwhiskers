@@ -210,12 +210,22 @@ build_status:
       fingers + 1 thumb; digits attach INTO the hand (thumb had open spaces); knuckles too high
       -> sink into hand + align; claws missing/not sharp; fingers have air gaps -> use more
       polygons. COLOUR reads white/cream in renders (should be orange #f9ad59) - deferred.
-      quenn vision (Ollama /v1/chat/completions, image_url data URI) works for describing
-      renders but is TOO LENIENT a judge - user eyes are the gate. Scripts + prompt + renderer
-      hosted at meldrino.com/forai/ww-paw/ (links from ww.html). RUN DIRECTLY:
-      "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python paw.py.
-      Godot: after re-exporting the GLB, run --import so .import cache refreshes.
-      Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
+       quenn vision (Ollama /v1/chat/completions, image_url data URI) works for describing
+       renders but is TOO LENIENT a judge - user eyes are the gate. Scripts + prompt + renderer
+       hosted at meldrino.com/forai/ww-paw/ (links from ww.html). RUN DIRECTLY:
+       "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python paw.py.
+       Godot: after re-exporting the GLB, run --import so .import cache refreshes.
+       Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
+    paw_v4 PARAMETRIC (2026-08-16, CURRENT): blender/paw_ai_v4.py -> assets/paw_ai_v4.glb.
+       TRELLIS lump root-caused via experts (gemini + copilot): single-image generators collapse
+       thin features into blobs; retry needs an EXAGGERATED 3D RENDER reference. v4 = v3 anatomy
+       scaled x2.6, chunky arm+wrist+elbow, back-protruding knuckle row, body voxel-remeshed
+       (claws re-added after), rotated to paw_hv convention (back=+Y, arm=-Z, fingers=+Z) so the
+       known-good studio pose works. VERIFIED (analyze_silhouette_v4.py): back digit row = 4 peaks
+       (thumb + 3 fingers), range 0.085 vs TRELLIS 0.016. quenn: "clearly a cat paw, 4 digits,
+       knuckles protruding". Renders: paw_v4_back/top.png, paw_compare.png (vs TRELLIS).
+       trellis_retry/ = regeneration kit (reference.png = v4 back render + prompt.txt) for if the
+       user rejects v4. USER EYES ARE THE GATE - judge paw_v4_back.png + paw_compare.png.
     shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
       spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,
       plus a --smoketest check (loot counts + portal present)
