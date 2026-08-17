@@ -932,3 +932,12 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
    removed all paw code, added Label3D dial numbers (dial_numbers param), kept camera/lights
    from RP3. Committed b7bea98. Static frame rendered as cutaway_v20.png. NEXT: user
    feedback on static frame, then animate arm sequence.
+   CUTAWAY ANIMATION COMPLETE (2026-08-17): Built cutaway_anim.gd + cutaway_anim.tscn.
+   4-second sequence at 30fps (120 frames): lock shows "000" for 0.5s, paw enters from
+   bottom of screen over 1s to dial 1 (0->2 at 1.5s), slides to dial 2 (0->2 at 2.3s),
+   slides to dial 3 (0->2 at 3.1s), holds "222" until 4s. Smooth-step easing on all
+   movements. Paw uses RP3 config (rot_x=5, rot_y=180, scale=0.35, hand_bend=-15,
+   roughness=0.5). Anchor offset computed at runtime from to_global(ANCHOR). Frames saved
+   to screenshots/cutaway_anim/frame_0000-0119.png, stitched to cutaway_seq.gif via
+   Python/Pillow. Committed 76be488. Combination values hardcoded to "2" for now — will be
+   parametric from tractor plate in future iteration.
