@@ -35,6 +35,16 @@ func _ready() -> void:
 	add_child(model)
 	await get_tree().process_frame
 
+	var bend_deg := float(params.get("hand_bend_deg", 0.0))
+	if absf(bend_deg) > 0.01:
+		for sk in model.find_children("*", "Skeleton3D", true, false):
+			var hand_i: int = (sk as Skeleton3D).find_bone("Hand.L")
+			if hand_i >= 0:
+				var rest_q: Quaternion = (sk as Skeleton3D).get_bone_rest(hand_i).basis.get_rotation_quaternion()
+				(sk as Skeleton3D).set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend_deg)))
+				await get_tree().process_frame
+				break
+
 	var anchor_arr: Array = params.get("anchor", [0.0, 0.3525, -0.0453])
 	var anchor_local := Vector3(anchor_arr[0], anchor_arr[1], anchor_arr[2])
 	var anchor_world := model.to_global(anchor_local)
