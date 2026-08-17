@@ -59,11 +59,16 @@ func _on_combo(val: int) -> void:
 		_finish_unlock()
 		return
 	if _padlock != null and get_tree().current_scene != null:
-		if correct:
-			Hud.toast("The dials click into place...")
 		var cw: Node3D = (preload("res://scripts/cutaway.gd") as Script).new()
 		get_tree().current_scene.add_child(cw)
-		cw.play_padlock_unlock(self, digits, correct, _finish_unlock if correct else Callable())
+		if correct:
+			cw.play_padlock_unlock(self, digits, true, _finish_unlock)
+		else:
+			cw.play_padlock_unlock(self, digits, false, _on_wrong_combo)
+
+
+func _on_wrong_combo() -> void:
+	Hud.toast("The padlock stays shut. That wasn't the right combination.")
 
 
 func _finish_unlock() -> void:
