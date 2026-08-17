@@ -919,4 +919,16 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
   Basis.get_euler(target basis) = model_rot_x=-90, model_rot_y=180 (NOT -90/+90 which still
   showed palm). WITH scale 0.55 + target_offset (0,-0.25,0.018): back of paw faces camera,
   fingers up, over the dial, arm hangs down cropped at frame edge (Muppet rule) - quenn PASS
-  on all 4 checks. Render: paw_v4_cutaway.png. Params saved in pawtest_params.json.
+   on all 4 checks. Render: paw_v4_cutaway.png. Params saved in pawtest_params.json.
+   CUTAWAY2 SESSION (2026-08-17): Locked in paw cutaway through 19 renders (v1-v19) and 3
+   restore points. Key discoveries: paw.glb orientation rot_x=0/rot_y=180 = right paw, back
+   of hand facing camera. hand_bend_deg param works via skeleton "Hand.L" bone (rest_q *
+   Quaternion(Vector3.RIGHT, deg_to_rad(bend))). Final paw config: rot_x=5, rot_y=180,
+   scale=0.35, anchor=[0.0,0.3525,-0.03], hand_bend=-15, roughness=0.5 (matches game).
+   Committed: RP1 c01c372, RP2 8faebb7, RP3 772ce68. Then pivoted to CUTAWAY ANIMATION
+   design: 2-part overhead shot of padlock. Part 1 = 3 dials all showing "0", no arm. Part 2
+   = arm enters from bottom of frame, covers each dial in sequence (0->2), ~4 seconds total.
+   Combination values will be parametric from tractor plate. Rewrote cutaway_build.gd:
+   removed all paw code, added Label3D dial numbers (dial_numbers param), kept camera/lights
+   from RP3. Committed b7bea98. Static frame rendered as cutaway_v20.png. NEXT: user
+   feedback on static frame, then animate arm sequence.
