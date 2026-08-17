@@ -54,6 +54,7 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 			_body = c as MeshInstance3D
 	_snatch_player()
 	_build_camera()
+	_build_environment()
 	_build_letterbox()
 	_build_audio()
 	_build_paw()
@@ -94,6 +95,28 @@ func _build_camera() -> void:
 	var target := _padlock.global_position + Vector3(0.0, 0.02, 0.08)
 	_cam.global_position = _padlock.global_position + Vector3(0.05, 0.0, 0.55)
 	_cam.look_at(target, Vector3.UP)
+
+
+func _build_environment() -> void:
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.05, 0.06, 0.09)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.65, 0.6, 0.55)
+	env.ambient_light_energy = 0.18
+	var we := WorldEnvironment.new()
+	we.environment = env
+	add_child(we)
+	var key := DirectionalLight3D.new()
+	key.light_energy = 0.5
+	key.shadow_enabled = false
+	key.rotation_degrees = Vector3(-40.0, 0.0, 0.0)
+	add_child(key)
+	var fill := DirectionalLight3D.new()
+	fill.light_energy = 0.4
+	fill.shadow_enabled = false
+	fill.rotation_degrees = Vector3(0.0, 180.0, 0.0)
+	add_child(fill)
 
 
 func _build_letterbox() -> void:
