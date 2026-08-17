@@ -41,6 +41,12 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 	_entered_digits = entered_digits
 	_combo_correct = correct
 	_on_done = on_done
+	global_position = Vector3(0.0, 300.0, 0.0)
+	var scene := get_tree().current_scene
+	if scene != null:
+		for c in scene.get_children():
+			if c != self:
+				c.visible = false
 	_snatch_player()
 	# Calculate dial positions
 	for i in range(3):
@@ -378,6 +384,11 @@ func _finish_animation() -> void:
 
 
 func _cleanup() -> void:
+	var scene := get_tree().current_scene
+	if scene != null:
+		for c in scene.get_children():
+			if c != self:
+				c.visible = true
 	_restore_player()
 	_find_player_cam()
 	if _player_cam != null and is_instance_valid(_player_cam):
