@@ -43,9 +43,9 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 func _load_frames() -> void:
 	for i in TOTAL_FRAMES:
 		var path := FRAME_DIR + "/frame_%04d.png" % i
-		var tex: Texture2D = load(path)
-		if tex != null:
-			_frames.append(tex as ImageTexture)
+		var img := Image.load_from_file(path)
+		if img != null:
+			_frames.append(ImageTexture.create_from_image(img))
 		else:
 			push_error("CUTAWAY missing frame: " + path)
 
@@ -77,12 +77,11 @@ func _build_overlay() -> void:
 	_layer = CanvasLayer.new()
 	_layer.layer = 20
 	add_child(_layer)
+	var vp := get_viewport().get_visible_rect().size
 	_tex_rect = TextureRect.new()
 	_tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_tex_rect.anchor_right = 1.0
-	_tex_rect.anchor_bottom = 1.0
-	_tex_rect.offset_right = 0.0
-	_tex_rect.offset_bottom = 0.0
+	_tex_rect.size = vp
+	_tex_rect.position = Vector2.ZERO
 	_tex_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_layer.add_child(_tex_rect)
 	if _frames.size() > 0:
