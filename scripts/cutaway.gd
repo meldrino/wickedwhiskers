@@ -52,7 +52,7 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 	_build_audio()
 	add_child(_padlock)
 	await _build_paw()
-	_calculate_targets()
+	await _calculate_targets()
 	_build_dial_labels()
 	GameState.cinematic_active = true
 	_time = 0.0
