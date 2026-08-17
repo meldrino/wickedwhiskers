@@ -36,11 +36,15 @@ var _bar_h := 0.0
 var _on_done: Callable = Callable()
 var _saved_pos := Vector3.ZERO
 var _saved_yaw := 0.0
+var _entered_digits: Array[int] = [0, 0, 0]
+var _combo_correct := true
 
 
-func play_padlock_unlock(door: Node3D, on_done: Callable) -> void:
+func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool, on_done: Callable) -> void:
 	_on_done = on_done
 	_door = door
+	_entered_digits = entered_digits
+	_combo_correct = correct
 	_padlock = door.get("_padlock") as Node3D
 	if _padlock == null:
 		_finish()
@@ -58,6 +62,7 @@ func play_padlock_unlock(door: Node3D, on_done: Callable) -> void:
 	_build_letterbox()
 	_build_audio()
 	_build_paws()
+	_add_dial_labels()
 	GameState.cinematic_active = true
 	_sequence()
 
@@ -236,6 +241,20 @@ func _dial_world(dial: Node3D) -> Vector3:
 	return _padlock.to_global(dial.position)
 
 
+func _add_dial_labels() -> void:
+	for i in range(_dials.size()):
+		var dial := _dials[i]
+		var lbl := Label3D.new()
+		lbl.text = str(_entered_digits[i])
+		lbl.font_size = 28
+		lbl.modulate = Color(0.12, 0.12, 0.14)
+		lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		var lp := dial.position + Vector3(0.0, 0.0, 0.03)
+		lbl.position = lp
+		lbl.rotation = dial.rotation
+		_padlock.add_child(lbl)
+
+
 func _ok() -> bool:
 	if not is_instance_valid(self):
 		return false
@@ -331,28 +350,35 @@ func _sequence() -> void:
 	await po.finished
 	if not _ok():
 		return
-	# beat of tension, then it pops
+	# beat of tension, then branch on correct/wrong
 	await _wait(0.5)
 	if not _ok():
 		return
-	_pop.play()
-	if _shackle != null:
-		var sw := create_tween()
-		sw.tween_property(_shackle, "rotation:x", PI / 2.0 + 1.8, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		await sw.finished
+	if _combo_correct:
+		_pop.play()
+		if _shackle != null:
+			var sw := create_tween()
+			sw.tween_property(_shackle, "rotation:x", PI / 2.0 + 1.8, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			await sw.finished
+			if not _ok():
+				return
+		# padlock tilts, drops, and is freed
+		var dw := create_tween()
+		dw.set_parallel(true)
+		dw.tween_property(_padlock, "position", _padlock.position + Vector3(0.0, -0.1, 0.05), 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		dw.tween_property(_padlock, "rotation:x", _padlock.rotation.x + 0.55, 0.35)
+		await dw.finished
+		if _ok():
+			_click.pitch_scale = 0.45
+			_click.play()
+			_padlock.queue_free()
+			await _wait(0.4)
+	else:
+		# wrong combo — padlock stays shut
+		Hud.toast("The padlock stays shut. That wasn't the right combination.")
+		await _wait(1.2)
 		if not _ok():
 			return
-	# padlock tilts, drops, and is freed
-	var dw := create_tween()
-	dw.set_parallel(true)
-	dw.tween_property(_padlock, "position", _padlock.position + Vector3(0.0, -0.1, 0.05), 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	dw.tween_property(_padlock, "rotation:x", _padlock.rotation.x + 0.55, 0.35)
-	await dw.finished
-	if _ok():
-		_click.pitch_scale = 0.45
-		_click.play()
-		_padlock.queue_free()
-		await _wait(0.4)
 	await _animate_bars(false, 0.3)
 	_finish()
 

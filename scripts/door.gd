@@ -50,18 +50,20 @@ func interact() -> void:
 
 
 func _on_combo(val: int) -> void:
-	if val == GameState.combo:
+	var digits: Array[int] = [val / 100, (val / 10) % 10, val % 10]
+	var correct := val == GameState.combo
+	if correct:
 		unlocked = true
 		GameState.shed_unlocked = true
-		if _padlock != null and get_tree().current_scene != null:
+	if correct and (_padlock == null or get_tree().current_scene == null):
+		_finish_unlock()
+		return
+	if _padlock != null and get_tree().current_scene != null:
+		if correct:
 			Hud.toast("The dials click into place...")
-			var cw: Node3D = (preload("res://scripts/cutaway.gd") as Script).new()
-			get_tree().current_scene.add_child(cw)
-			cw.play_padlock_unlock(self, _finish_unlock)
-		else:
-			_finish_unlock()
-	else:
-		Hud.toast("The padlock stays stubborn. (Hint: the number's on the tractor's plate.)")
+		var cw: Node3D = (preload("res://scripts/cutaway.gd") as Script).new()
+		get_tree().current_scene.add_child(cw)
+		cw.play_padlock_unlock(self, digits, correct, _finish_unlock if correct else Callable())
 
 
 func _finish_unlock() -> void:
