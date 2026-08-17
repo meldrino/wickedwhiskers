@@ -90,9 +90,9 @@ func _build_camera() -> void:
 	_cam = Camera3D.new()
 	add_child(_cam)
 	_cam.current = true
-	_cam.fov = 70.0
-	var target := _padlock.global_position + Vector3(0.0, 0.01, 0.0)
-	_cam.global_position = _padlock.global_position + Vector3(0.05, 0.07, 0.68)
+	_cam.fov = 38.0
+	var target := _padlock.global_position + Vector3(0.0, 0.02, 0.08)
+	_cam.global_position = _padlock.global_position + Vector3(0.05, 0.0, 0.55)
 	_cam.look_at(target, Vector3.UP)
 
 
@@ -204,7 +204,7 @@ func _sequence() -> void:
 	if not _ok():
 		return
 	# camera push-in
-	var cam_to := _padlock.global_position + Vector3(0.05, 0.08, 0.60)
+	var cam_to := _padlock.global_position + Vector3(0.05, 0.01, 0.45)
 	var ct := create_tween()
 	ct.tween_property(_cam, "global_position", cam_to, 0.9).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	await _wait(0.55)
