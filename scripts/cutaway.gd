@@ -35,6 +35,7 @@ var _saved_pos := Vector3.ZERO
 var _saved_yaw := 0.0
 var _click: AudioStreamPlayer
 var _pop: AudioStreamPlayer
+var _game_we: Array[WorldEnvironment] = []
 
 
 func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool, on_done: Callable) -> void:
@@ -47,6 +48,14 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 			continue
 		if n is Node3D:
 			n.visible = false
+	# Remove game WorldEnvironments so ours takes priority (only one active at a time in Godot)
+	for n in get_tree().root.get_children():
+		if n == self or not n is Node3D:
+			continue
+		for we in n.find_children("*", "WorldEnvironment", true, false):
+			var w: WorldEnvironment = we as WorldEnvironment
+			w.get_parent().remove_child(w)
+			_game_we.append(w)
 	_snatch_player()
 	# Calculate dial positions
 	for i in range(3):
@@ -384,6 +393,12 @@ func _finish_animation() -> void:
 
 
 func _cleanup() -> void:
+	for we in _game_we:
+		if is_instance_valid(we):
+			var scene := get_tree().current_scene
+			if scene != null:
+				scene.add_child(we)
+	_game_we.clear()
 	for n in get_tree().root.get_children():
 		if n == self:
 			continue
