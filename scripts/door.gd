@@ -60,7 +60,7 @@ func _on_combo(val: int) -> void:
 		return
 	if _padlock != null and get_tree().current_scene != null:
 		var cw: Node3D = (preload("res://scripts/cutaway.gd") as Script).new()
-		get_tree().current_scene.add_child(cw)
+		get_tree().root.add_child(cw)
 		if correct:
 			cw.play_padlock_unlock(self, digits, true, _finish_unlock)
 		else:
