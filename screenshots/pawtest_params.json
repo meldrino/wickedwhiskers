@@ -1,19 +1,11 @@
 {
-  "show_paw": true,
-  "path_mode": false,
-  "advance": 0.0,
-  "path_start": [0.2, -0.1, 0.02],
-  "path_end": [0.0, 0.0, 0.02],
-  "fingers": false,
-  "target_offset": [0.0, -0.25, 0.018],
-  "model_rot_x_deg": -90.0,
-  "model_rot_y_deg": 180.0,
-  "model_rot_z_deg": 0.0,
-  "hand_bend_deg": 0.0,
-  "model_scale": 0.55,
-  "model_glb": "res://assets/paw_ai_v4.glb",
-  "cam_offset": [0.0, 0.02, 0.42],
-  "cam_fov": 42.0,
-  "out": "paw_v4_cutaway.png"
+  "bg": [0.05, 0.06, 0.09],
+  "cam_offset": [0.05, 0.0, 0.55],
+  "look_at_offset": [0.0, 0.02, 0.08],
+  "cam_fov": 38.0,
+  "key_pitch_deg": -40.0,
+  "key_energy": 0.5,
+  "fill_energy": 0.4,
+  "dial_numbers": ["0", "0", "0"],
+  "out": "cutaway_v20.png"
 }
-

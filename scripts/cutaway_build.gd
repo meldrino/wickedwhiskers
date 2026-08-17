@@ -18,48 +18,9 @@ func _ready() -> void:
 	var params: Dictionary = JSON.parse_string(pf.get_as_text())
 	pf.close()
 
-	var padlock := _build_padlock()
+	var padlock := _build_padlock(params)
 	padlock.position = Vector3.ZERO
 	add_child(padlock)
-
-	var glb: PackedScene = load(str(params["model_glb"]))
-	if glb == null:
-		push_error("CUTAWAY failed to load model")
-		get_tree().quit()
-		return
-	var model: Node3D = glb.instantiate()
-	model.scale = Vector3.ONE * float(params["model_scale"])
-	model.rotation.x = deg_to_rad(float(params["model_rot_x_deg"]))
-	model.rotation.y = deg_to_rad(float(params["model_rot_y_deg"]))
-	model.rotation.z = deg_to_rad(float(params["model_rot_z_deg"]))
-	add_child(model)
-	await get_tree().process_frame
-
-	var bend_deg := float(params.get("hand_bend_deg", 0.0))
-	if absf(bend_deg) > 0.01:
-		for sk in model.find_children("*", "Skeleton3D", true, false):
-			var hand_i: int = (sk as Skeleton3D).find_bone("Hand.L")
-			if hand_i >= 0:
-				var rest_q: Quaternion = (sk as Skeleton3D).get_bone_rest(hand_i).basis.get_rotation_quaternion()
-				(sk as Skeleton3D).set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend_deg)))
-				await get_tree().process_frame
-				break
-
-	var anchor_arr: Array = params.get("anchor", [0.0, 0.3525, -0.0453])
-	var anchor_local := Vector3(anchor_arr[0], anchor_arr[1], anchor_arr[2])
-	var anchor_world := model.to_global(anchor_local)
-	var dial_world := padlock.to_global(Vector3(0.0, -0.005, 0.172))
-	model.global_position += dial_world - anchor_world
-
-	for mi in model.find_children("*", "MeshInstance3D", true, false):
-		for s in mi.mesh.get_surface_count():
-			var mat: Material = mi.mesh.surface_get_material(s)
-			if mat is StandardMaterial3D:
-				var fd: StandardMaterial3D = mat.duplicate() as StandardMaterial3D
-				fd.albedo_color = Color(float(params.get("color_r", 0.9777)), float(params.get("color_g", 0.68)), float(params.get("color_b", 0.3492)))
-				fd.roughness = 0.9
-				fd.metallic = 0.0
-				mi.set_surface_override_material(s, fd)
 
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
@@ -72,22 +33,22 @@ func _ready() -> void:
 	we.environment = env
 	add_child(we)
 
-	var co: Array = params.get("cam_offset", [0.0, 0.03, 0.48])
-	var lo: Array = params.get("look_at_offset", [0.0, 0.0, 0.0])
+	var co: Array = params.get("cam_offset", [0.0, 0.0, 0.55])
+	var lo: Array = params.get("look_at_offset", [0.0, 0.02, 0.08])
 	var cam := Camera3D.new()
 	cam.current = true
-	cam.fov = float(params.get("cam_fov", 42.0))
+	cam.fov = float(params.get("cam_fov", 38.0))
 	add_child(cam)
 	cam.global_position = padlock.global_position + Vector3(co[0], co[1], co[2])
 	cam.look_at(padlock.global_position + Vector3(lo[0], lo[1], lo[2]), Vector3.UP)
 
 	var key := DirectionalLight3D.new()
-	key.light_energy = float(params.get("key_energy", 0.7))
+	key.light_energy = float(params.get("key_energy", 0.5))
 	key.shadow_enabled = false
-	key.rotation_degrees = Vector3(float(params.get("key_pitch_deg", -30.0)), 0.0, 0.0)
+	key.rotation_degrees = Vector3(float(params.get("key_pitch_deg", -40.0)), 0.0, 0.0)
 	add_child(key)
 	var fill := DirectionalLight3D.new()
-	fill.light_energy = float(params.get("fill_energy", 0.3))
+	fill.light_energy = float(params.get("fill_energy", 0.4))
 	fill.shadow_enabled = false
 	fill.rotation_degrees = Vector3(0.0, 180.0, 0.0)
 	add_child(fill)
@@ -95,12 +56,12 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var img := get_viewport().get_texture().get_image()
-	var out_name: String = str(params.get("out", "paw_cutaway.png"))
+	var out_name: String = str(params.get("out", "cutaway_v20.png"))
 	img.save_png("res://screenshots/" + out_name)
 	print("CUTAWAY saved=res://screenshots/" + out_name)
 	get_tree().quit()
 
-func _build_padlock() -> Node3D:
+func _build_padlock(params: Dictionary) -> Node3D:
 	var p := Node3D.new()
 	var brass := StandardMaterial3D.new()
 	brass.albedo_color = Color(0.95, 0.75, 0.15)
@@ -118,8 +79,6 @@ func _build_padlock() -> Node3D:
 	blk.albedo_color = Color(0.12, 0.12, 0.14)
 	blk.metallic = 0.4
 	blk.roughness = 0.5
-	var wht := StandardMaterial3D.new()
-	wht.albedo_color = Color(0.97, 0.96, 0.9)
 
 	var plate := MeshInstance3D.new()
 	var pm := BoxMesh.new()
@@ -161,6 +120,7 @@ func _build_padlock() -> Node3D:
 	body.position = Vector3(0, -0.03, 0.10)
 	p.add_child(body)
 
+	var dial_numbers: Array = params.get("dial_numbers", ["0", "0", "0"])
 	for i in range(3):
 		var dial := MeshInstance3D.new()
 		var dm := CylinderMesh.new()
@@ -184,6 +144,15 @@ func _build_padlock() -> Node3D:
 		groove.position = Vector3(-0.06 + i * 0.06, -0.005, 0.19)
 		groove.rotation = Vector3(PI / 2.0, 0, 0)
 		p.add_child(groove)
+
+		var num_label := Label3D.new()
+		num_label.text = dial_numbers[i]
+		num_label.pixel_size = 0.001
+		num_label.font_size = 40
+		num_label.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+		num_label.modulate = Color(0.97, 0.96, 0.9)
+		num_label.position = Vector3(-0.06 + i * 0.06, -0.005, 0.198)
+		p.add_child(num_label)
 
 	var kp := MeshInstance3D.new()
 	var kpm := CylinderMesh.new()
