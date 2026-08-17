@@ -296,6 +296,8 @@ func _build_paw() -> void:
 
 
 func _calculate_targets() -> void:
+	if _paw == null:
+		return
 	_paw.global_position = Vector3.ZERO
 	await get_tree().process_frame
 	var anchor_offset := _paw.to_global(ANCHOR) - _paw.global_position
