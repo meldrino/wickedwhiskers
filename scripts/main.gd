@@ -567,7 +567,8 @@ func _run_cutawaytest() -> void:
 
 func _run_pawtest(_variant: String = "v1") -> void:
 	print("PAWTEST start")
-	GameState.day_time = GameState.DAY_SECONDS * 0.75
+	GameState.day_time = 0.0
+	Hud.visible = false
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var shed_door := get_node("Shed/Door_shed")
@@ -641,6 +642,15 @@ func _run_pawtest(_variant: String = "v1") -> void:
 				m.visible = (m.name == "Arm_L")
 			else:
 				m.visible = (m.name == "Paw_L" or m.name == "Arm_L")
+		if params.has("paw_debug_color"):
+			var dc: Array = params["paw_debug_color"]
+			for mi in model.find_children("*", "MeshInstance3D", true, false):
+				var mm := (mi as MeshInstance3D).mesh
+				if mm != null:
+					for s in mm.get_surface_count():
+						var smat: Material = mm.surface_get_material(s)
+						if smat is StandardMaterial3D:
+							(smat as StandardMaterial3D).albedo_color = Color(dc[0], dc[1], dc[2])
 		var hand_w: Vector3 = Vector3.ZERO
 		if skel != null:
 			var hand_i := skel.find_bone("Hand.L")
@@ -668,14 +678,19 @@ func _run_pawtest(_variant: String = "v1") -> void:
 			print("PAWTEST paw_center=" + str(paw_center) + " desired=" + str(desired) + " dial=" + str(dial.global_position))
 		else:
 			if standalone:
-				var paw_mi: MeshInstance3D = null
-				for mi in model.find_children("*", "MeshInstance3D", true, false):
-					paw_mi = mi as MeshInstance3D
-					break
-				var pcenter: Vector3 = Vector3.ZERO
-				if paw_mi != null and paw_mi.mesh != null:
-					pcenter = paw_mi.global_transform * paw_mi.mesh.get_aabb().get_center()
-				model.global_position += target - pcenter
+				var anchor_w: Vector3 = Vector3.ZERO
+				if params.has("model_anchor"):
+					var ma: Array = params["model_anchor"]
+					anchor_w = model.global_transform * Vector3(ma[0], ma[1], ma[2])
+				else:
+					var paw_mi: MeshInstance3D = null
+					for mi in model.find_children("*", "MeshInstance3D", true, false):
+						paw_mi = mi as MeshInstance3D
+						break
+					if paw_mi != null and paw_mi.mesh != null:
+						anchor_w = paw_mi.global_transform * paw_mi.mesh.get_aabb().get_center()
+				model.global_position += target - anchor_w
+				print("PAWTEST anchor_w=" + str(anchor_w) + " target=" + str(target) + " model_pos=" + str(model.global_position))
 			else:
 				model.global_position += target - hand_w
 		if bool(params["fingers"]):
@@ -685,10 +700,39 @@ func _run_pawtest(_variant: String = "v1") -> void:
 	cam.current = true
 	cam.fov = float(params["cam_fov"])
 	add_child(cam)
+	if float(params.get("light_energy", 0.0)) > 0.0:
+		var key := DirectionalLight3D.new()
+		key.light_energy = float(params["light_energy"])
+		key.shadow_enabled = false
+		key.rotation_degrees = Vector3(float(params.get("light_pitch_deg", -30.0)), float(params.get("light_yaw_deg", 0.0)), 0.0)
+		add_child(key)
+		var fill := DirectionalLight3D.new()
+		fill.light_energy = float(params.get("light_fill_energy", 0.35))
+		fill.shadow_enabled = false
+		fill.rotation_degrees = Vector3(float(params.get("fill_pitch_deg", 0.0)), float(params.get("fill_yaw_deg", 180.0)), 0.0)
+		add_child(fill)
 	var co: Array = params["cam_offset"] as Array
 	cam.global_position = padlock.global_position + Vector3(co[0], co[1], co[2])
 	cam.look_at(padlock.global_position, Vector3.UP)
 	await get_tree().process_frame
+	var dn := get_node_or_null("DayNight")
+	if dn != null:
+		for c in dn.get_children():
+			if c is DirectionalLight3D:
+				c.light_energy = 0.0
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.05, 0.06, 0.09)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.65, 0.6, 0.55)
+	env.ambient_light_energy = 0.18
+	var we := get_node_or_null("WorldEnvironment")
+	if we != null:
+		we.environment = env
+	else:
+		var we2 := WorldEnvironment.new()
+		we2.environment = env
+		add_child(we2)
 	var img := get_viewport().get_texture().get_image()
 	var p := "res://screenshots/" + str(params["out"])
 	img.save_png(p)
