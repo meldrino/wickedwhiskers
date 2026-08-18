@@ -173,12 +173,26 @@ build_status:
     door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes; loot now lives in
       the shed scene) / farmhouse night-locked then once-day catfood + scene-2 tease; box
       interaction volume
-    cutaway.gd (2026-08-13, SUPERSEDED by real-paw plan - see below): cinematic padlock unlock
-      played by door.gd._on_combo - letterbox bars + camera push-in, real player cat SNATCHED
-      away, procedural paws (fur color SAMPLED from Paw_L material). v4 = 4-digit anatomy
-      (3 FINGERS + 1 THUMB) curling DOWN over the dial face + GRIP-TURN (dial+paw rotate rigidly
-      about dial world-Z, +0.38/notch x3, click1.wav). Committed at 5b63433 (branch
-      cutaway-finger-anatomy). STATUS: rendered 19:34, NOT user-approved.
+    cutaway.gd (2026-08-18, RP5 = SUBVIEWPORT APPROACH, v7): in-game cinematic padlock unlock
+      played by door.gd._on_combo. SubViewport with own_world_3d=true renders an isolated
+      3D scene (padlock + paw + camera + environment) displayed via CanvasLayer (layer 100)
+      + TextureRect fullscreen. Zero game-world bleed. Scene building copied from
+      cutaway_anim.gd (the approved standalone renderer). Dynamic digits: player's actual
+      entered digits revealed progressively as paw slides across 3 dials.
+      Timeline: 4s animation. Hold "000" 0.5s, paw enters bottom 1s, dial 1 at 1.5s,
+      dial 2 at 2.3s, dial 3 at 3.1s, hold to 4.5s, then shackle pop (correct) or toast
+      (wrong). Smooth-step easing. Audio: click1.wav per dial, click2.wav for shackle pop.
+      Paw config (RP3 locked): rot_x=5, rot_y=180, scale=0.35, anchor=[0.0,0.3525,-0.03],
+      hand_bend=-15, fur=#f9ad59 roughness=0.5. Camera: overhead (0.05,0,0.55), look_at
+      (0,0.02,0.08), fov=38. Environment: shed wall brown bg Color(0.47,0.31,0.18).
+      Player state saved/restored: yaw, pitch, camera_holder rotation, cat_facing, mesh_rot_y.
+      shed_unlocked set in _finish_unlock (NOT _on_combo) to prevent shed portal activating
+      during cutaway. free() used instead of queue_free() for immediate SubViewport teardown.
+      Status: FUNCTIONAL in-game. Known issue: SubViewport+own_world_3d causes persistent VRAM
+      pressure (grass LOD downgrades). Attempted v8 direct-tree revert (hiding game nodes,
+      removing game WorldEnvironments) — worked technically but reverted by user (visual quality
+      rejected, not the approach's fault). See forai/ww.html for full architecture record.
+      Branch: cutaway-finger-anatomy. HEAD: bf1dde3 (revert to RP5).
     pawtest HARNESS (scripts/main.gd --pawtest, 2026-08-13, NEW PLAN): after WW.glb dump showed
       the real cat has Paw_L/Paw_R MESHES (4,906 tris) but NO front-paw finger/toe bones (NOT
       prehensile), plan re-thought per gemini consult: use the REAL paw mesh + SWAT motion
