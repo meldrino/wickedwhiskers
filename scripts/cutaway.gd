@@ -214,7 +214,7 @@ func _build_padlock() -> void:
 	jm.rings = 12
 	jm.ring_segments = 8
 	jm.material = steel
-		jamb.mesh = jm
+	jamb.mesh = jm
 	jamb.position = Vector3(0.15, 0.0, 0.06)
 	jamb.rotation = Vector3(PI / 2.0, 0, 0)
 	_padlock.add_child(jamb)
