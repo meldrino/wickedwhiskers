@@ -16,6 +16,7 @@ const DIAL_Y := -0.005
 const DIAL_Z := 0.172
 const DURATION := 4.0
 const BG_COLOR := Color(0.05, 0.06, 0.09)
+const SHED_WALL_COLOR := Color(0.47, 0.31, 0.18)
 
 var _cam: Camera3D
 var _paw: Node3D
@@ -61,6 +62,7 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 	for i in range(3):
 		_dial_positions.append(Vector3(-DIAL_SPACING + i * DIAL_SPACING, DIAL_Y, DIAL_Z))
 	_build_padlock()
+	_build_backdrop()
 	_build_environment()
 	_build_camera()
 	_build_lights()
@@ -212,10 +214,24 @@ func _build_padlock() -> void:
 	jm.rings = 12
 	jm.ring_segments = 8
 	jm.material = steel
-	jamb.mesh = jm
-	jamb.position = Vector3(0.15, 0.0, 0.06)
-	jamb.rotation = Vector3(PI / 2.0, 0, 0)
-	_padlock.add_child(jamb)
+		jamb.mesh = jm
+		jamb.position = Vector3(0.15, 0.0, 0.06)
+		jamb.rotation = Vector3(PI / 2.0, 0, 0)
+		_padlock.add_child(jamb)
+
+
+func _build_backdrop() -> void:
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = SHED_WALL_COLOR
+	mat.roughness = 0.85
+	mat.metallic = 0.0
+	var backdrop := MeshInstance3D.new()
+	var bm := PlaneMesh.new()
+	bm.size = Vector2(2.0, 2.0)
+	bm.material = mat
+	backdrop.mesh = bm
+	backdrop.position = Vector3(0.0, 0.0, -0.05)
+	add_child(backdrop)
 
 
 func _build_environment() -> void:
