@@ -32,10 +32,11 @@
 <div class="note"><strong>Source:</strong> converted from the design document <code>wicked whiskers.docx</code>. Includes the canonical additions: the wise old cat is <strong>Dumbleclaw</strong>, and all catching is craft-only (no manual catches).</div>
 
 <h2>Live Build Status (Aug 2026)</h2>
-<div class="note"><strong>Project:</strong> <code>C:\crypto\wicked whiskers</code> — Godot 4.7.1, GDScript, source on GitHub (meldrino/wickedwhiskers).</div>
+<div class="note"><strong>Project:</strong> <code>C:\crypto\wicked whiskers</code> — Godot 4.7.1, GDScript, source on GitHub (meldrino/wickedwhiskers). Branch: <code>cutaway-finger-anatomy</code>.</div>
 <ul>
-<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, random each game), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle. Correct combo now plays an orchestrated padlock-unlock CUTAWAY (letterbox + camera push-in, the real cat is hidden, two procedural orange paws with 4-digit finger anatomy turn the dials, shackle springs, padlock drops, then the door swings).</li>
-<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys). Shed is PERSON-SCALE (2026-08-13): 0.9x2.0 m door, 2.5 m walls, ~3.0x2.4 m footprint, ridge ~3.2 m.</li>
+<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, randomised each game via <code>GameState.combo = randi_range(100, 999)</code>), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle.</li>
+<li><strong>Padlock cutaway</strong> — FUNCTIONAL but visually rejected (RP5, SubViewport approach). Correct combo plays a 4-second cinematic: overhead shot of padlock on brown shed wall, paw enters from bottom, slides across 3 dials revealing the player's entered digits, shackle pops, padlock drops, door swings open. Wrong combo shows toast "The padlock stays shut." The paw is paw.glb (TRELLIS.2 asset, ~178K verts, orange #f9ad59). The user is not satisfied with the visual quality — this is the open problem. See "Cutaway paw — the saga" below.</li>
+<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys). Shed is PERSON-SCALE (2026-08-13): 0.9x2.0 m door, 2.5 m walls, ~3.0x2.4 m footprint, ridge ~3.2 m. Door stays open on return (rotation.y = 2.4) if <code>GameState.shed_unlocked</code>.</li>
 <li><strong>S2 farmhouse</strong> — teased only (door locked at night, once-daily catfood at first light); interior not built yet.</li>
 <li><strong>S3 town</strong> — planned (Dick Whittington city, golden fish tease, 30-gold town gates).</li>
 <li><strong>All three catches are craft-only:</strong> convoluted mouse trap / ladder (bird) / fishing rod (fish). No manual catches.</li>
@@ -338,6 +339,92 @@ User also wants to try other models with the same prompt.</li>
 — nothing is altered between the script and the render.</li>
 </ul>
 
+<h2>Padlock cutaway — implementation (2026-08-14 to 2026-08-18)</h2>
+<p>The paw saga above covers getting a paw MODEL. This section covers making it PLAY IN-GAME
+as a cinematic. The result (RP5) is functional but visually rejected by the user — the paw
+still does not look right turning dials.</p>
+
+<h3>What the cutaway does (current RP5, cutaway.gd SubViewport v7)</h3>
+<ol>
+<li>Player clicks the padlocked shed door → <code>door.gd._on_combo()</code> fires.</li>
+<li>A new <code>cutaway.gd</code> Node3D is created and added to <code>get_tree().root</code>.</li>
+<li>It builds an isolated 3D scene inside a <strong>SubViewport (own_world_3d = true)</strong>:
+   padlock (3 dials, shackle, keyhole, body, jamb staple), camera, lights, paw model, environment
+   (brown shed wall <code>Color(0.47, 0.31, 0.18)</code>), audio players.</li>
+<li>The SubViewport is displayed via a CanvasLayer (layer 100) + TextureRect (fullscreen).
+   This isolates the cutaway from the game world — no hiding of game nodes needed.</li>
+<li>Animation: 4 seconds, paw enters from bottom (0.5-1.5s), slides across 3 dials revealing
+   the player's ACTUAL entered digits (not hardcoded "2"), holds. Smooth-step easing.</li>
+<li>On correct combo: shackle pops (tween), padlock drops, <code>_finish_unlock()</code> sets
+   <code>GameState.shed_unlocked = true</code>, tweens door open, frees padlock.</li>
+<li>On wrong combo: toast "The padlock stays shut."</li>
+<li>SubViewport render mode set to UPDATE_DISABLED on finish. CanvasLayer + SubViewport freed
+   with <code>free()</code> (not queue_free) for immediate GPU resource release.</li>
+<li>Player state (position, yaw, pitch, camera_holder rotation, cat_facing, mesh rotation)
+   saved before and restored after.</li>
+</ol>
+
+<h3>Paw config (locked at RP3, 2026-08-17)</h3>
+<table>
+<tr><th>Param</th><th>Value</th><th>Why</th></tr>
+<tr><td>model</td><td><code>res://assets/paw.glb</code> (TRELLIS.2)</td><td>~178K verts, single mesh, fur color #f9ad59</td></tr>
+<tr><td>rot_x / rot_y</td><td>5 / 180</td><td>Back of hand faces camera, arm hangs below frame (Muppet rule)</td></tr>
+<tr><td>scale</td><td>0.35</td><td>Reads as "paw on padlock" not "giant cat hand"</td></tr>
+<tr><td>anchor</td><td>(0, 0.3525, -0.03)</td><td>Tip of paw pads = the contact point on dial centre</td></tr>
+<tr><td>hand_bend</td><td>-15 deg</td><td>Hand.L bone bent so fingers curl slightly over the dial</td></tr>
+<tr><td>roughness / color</td><td>0.5 / #f9ad59</td><td>Matches WW.glb fur, no metallic</td></tr>
+</table>
+
+<h3>Architecture decisions and gotchas</h3>
+<ul>
+<li><strong>SubViewport own_world_3d = true</strong> (RP5): Isolates the cutaway completely from
+the game world. No hiding of game nodes needed. BUT: creates a second rendering pipeline.
+Godot does NOT cleanly release GPU resources on free(), causing persistent VRAM pressure —
+grass LOD downgrades to fake grass after the cutaway plays. This is the known cost of RP5.</li>
+<li><strong>Direct-tree approach (attempted v8, reverted):</strong> Building the 3D scene directly
+in the game tree, hiding game Node3D/CanvasLayer children, removing game WorldEnvironments
+temporarily. Tested successfully with --cutawaytest (all 6 screenshots confirmed as padlock
+scenes). REVERTED by user (visual quality rejected — not the approach's fault, the paw itself).</li>
+<li><strong>daynight.gd patched</strong>: <code>get_node("WorldEnvironment")</code> changed to
+<code>get_node_or_null("WorldEnvironment")</code> at lines 35 and 87. Required for both
+approaches — the cutaway removes game WorldEnvironments temporarily.</li>
+<li><strong>Portal timing fix (2026-08-18):</strong> <code>GameState.shed_unlocked = true</code>
+was moved from <code>_on_combo()</code> to <code>_finish_unlock()</code> in door.gd. Previously,
+the shed portal detected the player overlap DURING the cutaway and teleported them into the
+shed while the cutaway was still playing.</li>
+<li><strong>Door stays open on return:</strong> <code>_build_shed()</code> in main.gd checks
+<code>GameState.shed_unlocked</code> and sets <code>door_mesh.rotation.y = 2.4</code> so the
+door is visually open when the player returns from the shed interior.</li>
+<li><strong>free() not queue_free():</strong> queue_free() defers to end of frame, leaving the
+SubViewport + World3D alive during the transition. free() releases immediately.</li>
+<li><strong>Headless mode:</strong> <code>--cutawaytest</code> does NOT work with <code>--headless</code>
+— SubViewport get_texture() returns null. Must run windowed.</li>
+<li><strong>Godot -- separator:</strong> <code>OS.get_cmdline_user_args()</code> only returns args
+after <code>--</code>. Without it, user flags like --cutawaytest are invisible to GDScript
+(e.g. <code>Godot.exe --path "..." -- --cutawaytest</code>).</li>
+<li><strong>Scene change kills coroutines:</strong> <code>change_scene_to_file()</code> frees the
+current scene's nodes. Any <code>await</code> in a coroutine on a freed node silently dies.
+Workaround for testing: schedule quit via SceneTreeTimer (survives scene changes) or set a
+global flag in GameState checked by the new scene's _ready().</li>
+</ul>
+
+<h3>Git history (cutaway branch)</h3>
+<p>Branch: <code>cutaway-finger-anatomy</code>. Key commits:</p>
+<table>
+<tr><th>Commit</th><th>What</th></tr>
+<tr><td>b62942a</td><td>cutaway v6: add to root, hide all root children except self</td></tr>
+<tr><td>79176f7</td><td>fix: only hide Node3D on root (autoloads have no visible property, crashed)</td></tr>
+<tr><td>ba71af0</td><td>fix: remove game WorldEnvironments during cutaway</td></tr>
+<tr><td>f3065c9</td><td>fix: daynight null guard for WorldEnvironment</td></tr>
+<tr><td>f920497</td><td>cutaway v7: SubViewport with own_world_3d for complete isolation</td></tr>
+<tr><td>26ec181</td><td>shed brown bg, save/restore full player state</td></tr>
+<tr><td>45da069</td><td>door: move shed_unlocked to _finish_unlock</td></tr>
+<tr><td>3930a47</td><td>free() instead of queue_free(); door stays open on return</td></tr>
+<tr><td>beea777</td><td>RP5 snapshot: SubViewport working, all screenshots backed up</td></tr>
+<tr><td>a812a58</td><td>v8 direct-tree attempt (REVERTED by bf1dde3)</td></tr>
+<tr><td>bf1dde3</td><td>Revert to RP5 SubViewport (current HEAD)</td></tr>
+</table>
+
 <h2>Lessons (recurring mistakes to never repeat)</h2>
 <ul>
 <li><strong>This page is for AI, not the public.</strong> <code>/forai/ww.html</code> is the AI reference; <code>/ww.html</code> is the public marketing page. On 2026-08-13 the public page was found copied over this reference page (same title, public styling, no noindex) — a full overwrite that lost the design/canon/build-status content. Recovery: a .bak saved 60 ms before the overwrite (<code>ww.html.bak.202608111715</code>). Rule: never copy the public page over the forai page; keep .bak before any deploy; the forai page stays dark-styled, noindex, and titled "wicked whiskers reference".</li>
@@ -348,6 +435,10 @@ User also wants to try other models with the same prompt.</li>
 <li><strong>No image input, no visual claims (2026-08-13).</strong> An agent that cannot see images must NEVER ship procedural visual work as "done". Render frames, run a vision-capable reviewer (gemini-flash via <code>C:\crypto\bigpickle\gemini-vision.ps1</code>), and let the USER judge aesthetics before claiming a result. The cutaway consumed hours because unverified procedural geometry was built blind and only reviewed by an over-lenient model.</li>
 <li><strong>Paws need finger anatomy, not claws (2026-08-13).</strong> A paw "manipulating" a padlock reads as <em>waving a paw around the lock</em> when the digits are claw-toes hooking up from below, or when the paw and dial move independently. The fix that reads correctly: 3 fingers + 1 thumb wrapping the dial's top edge, and the dial + paw rotate RIGIDLY together around the dial axis so the paw visibly drives the turn (grip-turn).</li>
 <li><strong>Git history two-line save (2026-08-13).</strong> The cutaway work lived on a detached HEAD while origin/master had diverged grass work. Save before a compact = commit + push as a NAMED BRANCH (no force-push needed): <code>cutaway-finger-anatomy</code>. Origin/master was left untouched; reconciling the two lines is still an open user decision. Also: pushing a branch full of committed screenshots packs ~160 MB — allow minutes, don't kill it (each kill restarts the pack).</li>
+<li><strong>SubViewport own_world_3d = true leaks VRAM (2026-08-18).</strong> The SubViewport approach for the cutaway isolates rendering cleanly BUT creates a second World3D + rendering pipeline. Godot does not release the GPU resources on free() — persistent VRAM pressure causes grass LOD to downgrade to fake grass after the cutaway plays. The direct-tree approach (hiding game nodes, removing game WorldEnvironments) is the alternative but has its own complexity (must not hide autoloads, must patch daynight.gd, game WorldEnvironment overrides cutaway's). Neither approach is fully clean.</li>
+<li><strong>Coroutines die on scene change (2026-08-18).</strong> <code>change_scene_to_file()</code> frees the current scene tree. Any <code>await</code> in a function that belongs to a node in that tree silently stops executing — no error, no crash, just dead code. For test automation that needs to survive a scene change: schedule the quit before triggering the change via a SceneTreeTimer (which lives on the SceneTree, not any node), or set a global flag in GameState that the new scene's _ready() checks.</li>
+<li><strong>The user is the only visual judge (2026-08-18, reinforced).</strong> Gemini-vision confirmed the SubViewport cutaway renders correctly (padlock + brown bg). The direct-tree approach also rendered correctly (6/6 screenshots confirmed). The user rejected it anyway — not because the TECHNIQUE was wrong, but because the paw ITSELF still doesn't look right. The rendering approach is solved; the paw geometry is the actual blocker.</li>
+<li><strong>Steps forward vs. back (2026-08-18, user).</strong> The session went: SubViewport v7 (working, VRAM lag) → attempted direct-tree v8 (working, user rejected visuals) → reverted to v7. The technical progress was real (two approaches both work) but the user's experience was "two steps forward, three steps back" because the core problem (paw visual quality) was not addressed by either approach change. Focus effort on the actual blocker.</li>
 </ul>
 
 <hr>
