@@ -33,6 +33,10 @@ var _player: Node3D = null
 var _player_cam: Camera3D = null
 var _saved_pos := Vector3.ZERO
 var _saved_yaw := 0.0
+var _saved_pitch := 0.0
+var _saved_cam_rot := Vector3.ZERO
+var _saved_cat_facing := 0.0
+var _saved_mesh_rot_y := 0.0
 var _click: AudioStreamPlayer
 var _pop: AudioStreamPlayer
 var _shackle_start_y := 0.0
@@ -87,6 +91,14 @@ func _snatch_player() -> void:
 		return
 	_saved_pos = _player.global_position
 	_saved_yaw = _player.get("yaw") as float
+	_saved_pitch = _player.get("pitch") as float
+	_saved_cat_facing = _player.get("cat_facing") as float
+	var mesh_root = _player.get_node_or_null("MeshRoot")
+	if mesh_root:
+		_saved_mesh_rot_y = mesh_root.rotation.y
+	var cam_holder = _player.get_node_or_null("CameraHolder")
+	if cam_holder:
+		_saved_cam_rot = cam_holder.rotation
 	_player.set("velocity", Vector3.ZERO)
 	_player.global_position = Vector3(0.0, 0.6, 20.0)
 
@@ -97,6 +109,14 @@ func _restore_player() -> void:
 	_player.set("velocity", Vector3.ZERO)
 	_player.global_position = _saved_pos
 	_player.set("yaw", _saved_yaw)
+	_player.set("pitch", _saved_pitch)
+	_player.set("cat_facing", _saved_cat_facing)
+	var mesh_root = _player.get_node_or_null("MeshRoot")
+	if mesh_root:
+		mesh_root.rotation.y = _saved_mesh_rot_y
+	var cam_holder = _player.get_node_or_null("CameraHolder")
+	if cam_holder:
+		cam_holder.rotation = _saved_cam_rot
 
 
 func _build_padlock() -> void:
@@ -234,7 +254,7 @@ func _build_padlock() -> void:
 func _build_environment() -> void:
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color(0.05, 0.06, 0.09)
+	env.background_color = Color(0.47, 0.31, 0.18)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.65, 0.6, 0.55)
 	env.ambient_light_energy = 0.18
