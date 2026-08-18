@@ -32,7 +32,7 @@ var _shooting: Array[Dictionary] = []
 
 func _ready() -> void:
 	rng.randomize()
-	var we := get_parent().get_node("WorldEnvironment")
+	var we := get_parent().get_node_or_null("WorldEnvironment")
 	if we != null and we.environment != null:
 		sky_mat = we.environment.sky.sky_material as ProceduralSkyMaterial
 	_build_lights()
@@ -84,7 +84,7 @@ func _update_sky(time_s: float) -> float:
 	_place(moon, azim + PI, -elev + deg_to_rad(6.0), 0.22 * night)
 	moon_mesh.position = moon_dir.normalized() * 150.0
 
-	var we := get_parent().get_node("WorldEnvironment")
+	var we := get_parent().get_node_or_null("WorldEnvironment")
 	if we != null and we.environment != null:
 		we.environment.ambient_light_energy = 0.32 + 0.5 * day
 		we.environment.ambient_light_color = Color(0.9, 0.92, 1.0).lerp(Color(1.0, 1.0, 1.0), day)

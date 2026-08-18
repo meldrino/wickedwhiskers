@@ -365,7 +365,7 @@ func _process(delta: float) -> void:
 	if t >= DURATION:
 		_playing = false
 		set_process(false)
-		_finish_animation()
+		await _finish_animation()
 
 
 func _ease_in_out(t: float) -> float:
