@@ -36,7 +36,6 @@ var quest := "meet"
 var first_dawn := false
 var chase_active := false
 var cinematic_active := false
-var test_quit_pending := false
 
 var day_index := 1
 var day_time := 0.0

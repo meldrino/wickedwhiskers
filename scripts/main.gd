@@ -40,7 +40,6 @@ var rng := RandomNumberGenerator.new()
 var trees: Array[Node3D] = []
 var _shed_portal: Area3D
 var _enter_shed_delay := -1.0
-var _cutaway_fulltest_done := false
 
 
 func _ready() -> void:
@@ -101,9 +100,6 @@ func _maybe_screenshot() -> void:
 		return
 	if "--cutawaytest" in args:
 		_run_cutawaytest()
-		return
-	if "--cutawayfulltest" in args:
-		_run_cutawayfulltest()
 		return
 	if "--pawtest" in args:
 		var vi := args.find("--pawtest")
@@ -560,59 +556,15 @@ func _run_cutawaytest() -> void:
 	await get_tree().process_frame
 	var shed_door := get_node("Shed/Door_shed")
 	shed_door._on_combo(GameState.combo)
-	# Absolute times from cutaway start (animation = 4.5s total)
-	var shots := [0.3, 1.5, 2.3, 3.1, 3.9, 4.3]
-	var t0: float = Time.get_ticks_msec() / 1000.0
+	var shots := [1.5, 2.3, 3.1, 3.9, 4.4, 5.2]
 	for i in range(shots.size()):
-		var wait: float = shots[i] - (Time.get_ticks_msec() / 1000.0 - t0)
-		if wait > 0.0:
-			await get_tree().create_timer(wait).timeout
+		await get_tree().create_timer(shots[i]).timeout
 		var img := get_viewport().get_texture().get_image()
 		var p := "res://screenshots/cw_%d.png" % (i + 1)
 		img.save_png(p)
 		print("CUTAWAY shot " + p)
 	print("CUTAWAY DONE")
 	get_tree().quit()
-
-
-func _run_cutawayfulltest() -> void:
-	if _cutaway_fulltest_done:
-		return
-	_cutaway_fulltest_done = true
-	print("CUTAWAY FULLTEST start")
-	await get_tree().process_frame
-	await get_tree().process_frame
-	var pl := get_tree().get_first_node_in_group("player")
-	if pl == null:
-		push_error("CUTAWAY FULLTEST no player")
-		get_tree().quit()
-		return
-	# Position player near shed but outside portal
-	pl.global_position = Vector3(19.0, 0.0, -8.0)
-	pl.set("velocity", Vector3.ZERO)
-	pl.set("yaw", -1.2)
-	pl.set("pitch", 0.0)
-	await get_tree().process_frame
-	# Trigger correct combo on the shed door
-	var shed_door := get_node("Shed/Door_shed")
-	print("CUTAWAY FULLTEST combo=" + str(GameState.combo))
-	shed_door._on_combo(GameState.combo)
-	# Wait for cutaway (4.5s) + door tween (0.9s) + buffer
-	print("CUTAWAY FULLTEST waiting for cutaway...")
-	await get_tree().create_timer(6.5).timeout
-	# Screenshot after cutaway — door should be open
-	var img1 := get_viewport().get_texture().get_image()
-	img1.save_png("res://screenshots/cw_fulltest_door.png")
-	print("CUTAWAY FULLTEST door screenshot saved")
-	# Teleport player into the portal zone and trigger shed enter directly
-	# (can't rely on _physics_process polling after scene change would free us)
-	# Schedule quit FIRST — SceneTreeTimers survive scene changes
-	var quit_timer := get_tree().create_timer(2.0)
-	quit_timer.timeout.connect(func() -> void: get_tree().quit())
-	_enter_shed_delay = 0.7
-	pl.global_position = Vector3(16.0, 0.0, -8.5)
-	pl.set("velocity", Vector3.ZERO)
-	print("CUTAWAY FULLTEST triggered shed enter, quitting in 2s")
 
 
 func _run_pawtest(_variant: String = "v1") -> void:

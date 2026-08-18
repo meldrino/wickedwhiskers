@@ -1,9 +1,9 @@
 extends Node3D
 
-# Cutaway v8: Direct-in-tree approach.
-# Builds the same 3D scene as cutaway_anim.gd directly in the game tree.
-# Hides game Node3D/CanvasLayer children, removes game WorldEnvironments,
-# and uses its own Camera3D + WorldEnvironment. No SubViewport = no VRAM lag.
+# Cutaway v7: SubViewport approach.
+# Builds the exact same 3D scene as cutaway_anim.gd inside a SubViewport
+# with own_world_3d = true. Displays via TextureRect on a CanvasLayer.
+# Complete isolation from game world - no hiding needed.
 
 const ANCHOR := Vector3(0.0, 0.3525, -0.03)
 const PAW_ROT_X := 5.0
@@ -15,6 +15,8 @@ const DIAL_Y := -0.005
 const DIAL_Z := 0.172
 const DURATION := 4.0
 
+var _viewport: SubViewport
+var _canvas: CanvasLayer
 var _cam: Camera3D
 var _paw: Node3D
 var _dial_labels: Array[Label3D] = []
@@ -28,6 +30,7 @@ var _entered_digits: Array[int] = [0, 0, 0]
 var _combo_correct := true
 var _on_done: Callable = Callable()
 var _player: Node3D = null
+var _player_cam: Camera3D = null
 var _saved_pos := Vector3.ZERO
 var _saved_yaw := 0.0
 var _saved_pitch := 0.0
@@ -39,11 +42,6 @@ var _pop: AudioStreamPlayer
 var _shackle_start_y := 0.0
 var _padlock_start_y := 0.0
 
-# Game state for restore
-var _hidden_nodes: Array[Node] = []
-var _game_envs: Array[Node] = []
-var _game_camera: Camera3D = null
-
 
 func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool, on_done: Callable) -> void:
 	_entered_digits = entered_digits
@@ -52,9 +50,9 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 	_snatch_player()
 	for i in range(3):
 		_dial_positions.append(Vector3(-DIAL_SPACING + i * DIAL_SPACING, DIAL_Y, DIAL_Z))
-	_hide_game()
+	_setup_viewport()
 	_build_padlock()
-	add_child(_padlock)
+	_viewport.add_child(_padlock)
 	_build_environment()
 	_build_camera()
 	_build_lights()
@@ -65,6 +63,26 @@ func play_padlock_unlock(door: Node3D, entered_digits: Array[int], correct: bool
 	_time = 0.0
 	_playing = true
 	set_process(true)
+
+
+func _setup_viewport() -> void:
+	var screen_size := get_viewport().get_visible_rect().size
+	_viewport = SubViewport.new()
+	_viewport.own_world_3d = true
+	_viewport.size = screen_size
+	_viewport.transparent_bg = false
+	_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(_viewport)
+
+	_canvas = CanvasLayer.new()
+	_canvas.layer = 100
+	add_child(_canvas)
+
+	var tex_rect := TextureRect.new()
+	tex_rect.texture = _viewport.get_texture()
+	tex_rect.stretch_mode = TextureRect.STRETCH_SCALE
+	tex_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_canvas.add_child(tex_rect)
 
 
 func _snatch_player() -> void:
@@ -99,35 +117,6 @@ func _restore_player() -> void:
 	var cam_holder = _player.get_node_or_null("CameraHolder")
 	if cam_holder:
 		cam_holder.rotation = _saved_cam_rot
-
-
-func _hide_game() -> void:
-	var root := get_tree().root
-	var main := get_tree().current_scene
-	if main == null:
-		return
-
-	# Remove game WorldEnvironments (cutaway has its own).
-	# daynight.gd uses get_node_or_null — safe to remove/re-add.
-	for n in main.get_children():
-		if n is WorldEnvironment:
-			_game_envs.append(n)
-			n.get_parent().remove_child(n)
-
-	# Hide all Node3D and CanvasLayer children of root (except self and autoloads).
-	# Autoloads (GameState, Hud, Terrain) don't have `visible` — can't be hidden.
-	for n in root.get_children():
-		if n == self:
-			continue
-		if n is Node3D or n is CanvasLayer:
-			if n.visible:
-				n.visible = false
-				_hidden_nodes.append(n)
-
-	# Disable the game camera so cutaway camera renders
-	_game_camera = _player.get_node_or_null("CameraHolder/Camera3D") as Camera3D
-	if _game_camera != null:
-		_game_camera.current = false
 
 
 func _build_padlock() -> void:
@@ -271,14 +260,14 @@ func _build_environment() -> void:
 	env.ambient_light_energy = 0.18
 	var we := WorldEnvironment.new()
 	we.environment = env
-	add_child(we)
+	_viewport.add_child(we)
 
 
 func _build_camera() -> void:
 	_cam = Camera3D.new()
 	_cam.current = true
 	_cam.fov = 38.0
-	add_child(_cam)
+	_viewport.add_child(_cam)
 	_cam.global_position = _padlock.global_position + Vector3(0.05, 0.0, 0.55)
 	_cam.look_at(_padlock.global_position + Vector3(0.0, 0.02, 0.08), Vector3.UP)
 
@@ -288,12 +277,12 @@ func _build_lights() -> void:
 	key.light_energy = 0.5
 	key.shadow_enabled = false
 	key.rotation_degrees = Vector3(-40.0, 0.0, 0.0)
-	add_child(key)
+	_viewport.add_child(key)
 	var fill := DirectionalLight3D.new()
 	fill.light_energy = 0.4
 	fill.shadow_enabled = false
 	fill.rotation_degrees = Vector3(0.0, 180.0, 0.0)
-	add_child(fill)
+	_viewport.add_child(fill)
 
 
 func _build_audio() -> void:
@@ -313,7 +302,7 @@ func _build_paw() -> void:
 	_paw.scale = Vector3.ONE * PAW_SCALE
 	_paw.rotation.x = deg_to_rad(PAW_ROT_X)
 	_paw.rotation.y = deg_to_rad(PAW_ROT_Y)
-	add_child(_paw)
+	_viewport.add_child(_paw)
 	await get_tree().process_frame
 
 	for sk in _paw.find_children("*", "Skeleton3D", true, false):
@@ -356,6 +345,7 @@ func _process(delta: float) -> void:
 	_time += delta
 	var t := _time
 
+	# Determine paw position
 	var off_screen: Vector3 = _paw_targets[0] + Vector3(0.0, -0.5, 0.0)
 	var paw_pos: Vector3
 
@@ -384,6 +374,7 @@ func _process(delta: float) -> void:
 
 	_paw.global_position = paw_pos
 
+	# Update dial labels to show player's digits progressively
 	var digits := ["0", "0", "0"]
 	if t >= 1.5:
 		digits[0] = str(_entered_digits[0])
@@ -401,6 +392,7 @@ func _process(delta: float) -> void:
 	for i in range(3):
 		_dial_labels[i].text = digits[i]
 
+	# After animation, finish
 	if t >= DURATION + 0.5:
 		_finish_animation()
 
@@ -409,43 +401,21 @@ func _finish_animation() -> void:
 	_playing = false
 	set_process(false)
 	GameState.cinematic_active = false
+	_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 
 	if _combo_correct:
 		_pop.play()
+		# Animate shackle popping up
 		var tween := create_tween()
 		tween.set_parallel(true)
 		tween.tween_property(_shackle, "position:y", _shackle_start_y + 0.06, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 		tween.tween_property(_padlock, "position:y", _padlock_start_y - 0.25, 0.35).set_delay(0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
 		await tween.finished
 
-	# Restore game state before freeing
-	_restore_game_env()
-	_restore_game_visibility()
+	# Cleanup — free() immediately so SubViewport + World3D don't linger
+	_canvas.free()
+	_viewport.free()
 	_restore_player()
-
 	if _on_done.is_valid():
 		_on_done.call()
 	free()
-
-
-func _restore_game_env() -> void:
-	var main := get_tree().current_scene
-	if main == null:
-		return
-	# Re-add game WorldEnvironments in original order
-	for env_node in _game_envs:
-		if is_instance_valid(env_node):
-			main.add_child(env_node)
-
-
-func _restore_game_visibility() -> void:
-	var root := get_tree().root
-	# Re-show all hidden nodes
-	for n in _hidden_nodes:
-		if is_instance_valid(n):
-			n.visible = true
-	_hidden_nodes.clear()
-	# Re-enable game camera
-	if _game_camera != null and is_instance_valid(_game_camera):
-		_game_camera.current = true
-		_game_camera = null
