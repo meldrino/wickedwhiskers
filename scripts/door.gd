@@ -54,7 +54,6 @@ func _on_combo(val: int) -> void:
 	var correct := val == GameState.combo
 	if correct:
 		unlocked = true
-		GameState.shed_unlocked = true
 	if correct and (_padlock == null or get_tree().current_scene == null):
 		_finish_unlock()
 		return
@@ -72,6 +71,7 @@ func _on_wrong_combo() -> void:
 
 
 func _finish_unlock() -> void:
+	GameState.shed_unlocked = true
 	Hud.toast("CLICK! The padlock springs open. The shed is yours!")
 	if _door_mesh != null:
 		var t := create_tween()
