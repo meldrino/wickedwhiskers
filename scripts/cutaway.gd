@@ -401,6 +401,7 @@ func _finish_animation() -> void:
 	_playing = false
 	set_process(false)
 	GameState.cinematic_active = false
+	_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 
 	if _combo_correct:
 		_pop.play()
@@ -411,10 +412,10 @@ func _finish_animation() -> void:
 		tween.tween_property(_padlock, "position:y", _padlock_start_y - 0.25, 0.35).set_delay(0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
 		await tween.finished
 
-	# Cleanup
-	_canvas.queue_free()
-	_viewport.queue_free()
+	# Cleanup — free() immediately so SubViewport + World3D don't linger
+	_canvas.free()
+	_viewport.free()
 	_restore_player()
 	if _on_done.is_valid():
 		_on_done.call()
-	queue_free()
+	free()

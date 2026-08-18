@@ -449,6 +449,8 @@ func _build_shed(shed_pos: Vector3) -> void:
 	var door_mesh := _mesh("box", Vector3(0.9, 2.0, 0.1), Color(0.1, 0.08, 0.06))
 	door_mesh.name = "Door"
 	door_mesh.position = Vector3(0, 1.0, half_d - 0.02)
+	if GameState.shed_unlocked:
+		door_mesh.rotation.y = 2.4
 	shed.add_child(door_mesh)
 
 	var door := _make_door("shed")
