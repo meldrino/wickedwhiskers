@@ -1,0 +1,122 @@
+--- 23:34:47 ---
+{"total":3,"move_paw":[0.0,0.01,-0.01],"scale_paw":1.1,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":-10.0,"issue":"Paw lacks orange feline shape and details"}
+--- 23:35:06 ---
+{"total":3,"move_paw":[0.0,-0.02,0.01],"scale_paw":0.8,"cam_dist":0.5,"rot_y_deg":0,"hand_bend_deg":0,"issue":"Paw renders as an untextured sphere obscuring the dials without cat features."}
+--- 23:35:25 ---
+{"total":3,"move_paw":[0.0,0.01,-0.01],"scale_paw":1.1,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":10.0,"issue":"Paw lacks orange cat features and anatomy"}
+--- 23:35:46 ---
+{"total":3,"move_paw":[0.0,0.0,0.0],"scale_paw":1.0,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":0.0,"issue":"Paw and padlock geometry are unrecognizable or missing"}
+--- 23:36:06 ---
+{"total":3,"move_paw":[0.0,0.01,-0.01],"scale_paw":1.0,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":0.0,"issue":"Mesh is an untextured beige sphere rather than a cat paw"}
+--- 23:40:52 ---
+{"total":3,"move_paw":[0.0,0.015,-0.01],"scale_paw":0.85,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":-10.0,"issue":"paw appears as a plain sphere without cat paw definition or claws"}
+--- 23:41:13 ---
+{"total":3,"move_paw":[0.0,-0.01,0.0],"scale_paw":0.8,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":0.0,"issue":"Paw is a plain sphere lacking cat features"}
+--- 23:41:33 ---
+{"total":3,"move_paw":[0.0,0.01,-0.01],"scale_paw":1.2,"cam_dist":0.4,"rot_y_deg":0.0,"hand_bend_deg":-10.0,"issue":"Paw lacks recognizable cat features and shape"}
+--- 23:41:54 ---
+{"total":3,"move_paw":[0.0,0.01,-0.01],"scale_paw":1.0,"cam_dist":0.45,"rot_y_deg":0.0,"hand_bend_deg":0.0,"issue":"Paw lacks cat features and appears as a plain beige sphere."}
+--- 23:42:13 ---
+{"total":3,"move_paw":[0.0,0.0,0.0],"scale_paw":1.0,"cam_dist":0.45,"rot_y_deg":0,"hand_bend_deg":0,"issue":"Paw model is a plain sphere lacking cat paw features"}
+--- 23:42:57 ---
+{"total":3,"move_paw":[0.0,-0.02,0.01],"scale_paw":1.2,"cam_dist":0.5,"rot_y_deg":0.0,"hand_bend_deg":-15.0,"issue":"Paw lacks recognizable geometry and cat texture"}
+--- 23:45:52 ---
+{}
+--- 23:46:33 ---
+{}
+--- 23:47:11 ---
+{}
+--- 23:47:50 ---
+{}
+--- 23:48:31 ---
+{"total":0,"move_paw":[0.001,0.001,0.001],"scale_paw":1.0,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":10,"issue":"no paw visible"}
+--- 23:49:10 ---
+{}
+--- 23:49:50 ---
+{}
+--- 23:50:27 ---
+{}
+--- 23:51:04 ---
+{}
+--- 23:51:42 ---
+{}
+--- 23:52:18 ---
+{}
+--- 23:52:57 ---
+{}
+--- 23:53:35 ---
+{}
+--- 23:54:12 ---
+{}
+--- 23:54:50 ---
+{}
+--- 23:55:27 ---
+{}
+--- 23:56:04 ---
+{}
+--- 23:56:48 ---
+{"total":0,"move_paw":[0.01,0.01,0.01],"scale_paw":1.0,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":20,"issue":"no paw visible"}
+--- 23:57:31 ---
+{"total":0,"move_paw":[0.01,0.01,0.01],"scale_paw":1,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":10,"issue":"cat paw not touching padlock dial"}
+--- 23:58:08 ---
+{}
+--- 23:58:46 ---
+{}
+--- 23:59:22 ---
+{}
+--- 00:00:00 ---
+{}
+--- 00:00:44 ---
+{"total":0,"move_paw":[0.01,0.01,0.01],"scale_paw":1,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":10,"issue":"no paw or padlock visible"}
+--- 00:01:22 ---
+{}
+--- 00:02:05 ---
+{"total":0,"move_paw":[0.01,0.01,0.01],"scale_paw":1.0,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":20,"issue":"paw not touching padlock dial"}
+--- 00:02:47 ---
+{"total":0,"move_paw":[0.001,0.002,0.003],"scale_paw":0.8,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":10,"issue":"cat paw not touching padlock dial"}
+--- 00:03:29 ---
+{"total":0,"move_paw":[0.01,0.01,0.01],"scale_paw":1.0,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":10,"issue":"no paw visible"}
+--- 00:04:06 ---
+{}
+--- 00:04:44 ---
+{}
+--- 00:05:21 ---
+{}
+--- 00:05:58 ---
+{}
+--- 00:06:34 ---
+{}
+--- 00:07:10 ---
+{}
+--- 00:07:47 ---
+{}
+--- 00:08:29 ---
+{"total":0,"move_paw":[0.01,0.01,0.01],"scale_paw":1.0,"cam_dist":0.5,"rot_y_deg":5,"hand_bend_deg":10,"issue":"no cat paw or padlock visible"}
+--- 00:09:06 ---
+{}
+--- 00:09:42 ---
+{}
+--- 00:10:18 ---
+{}
+--- 00:10:54 ---
+{}
+--- 00:11:31 ---
+{}
+--- 00:12:08 ---
+{}
+--- 00:12:45 ---
+{}
+--- 00:13:23 ---
+{}
+--- 00:14:00 ---
+{}
+--- 00:14:38 ---
+{}
+--- 00:15:14 ---
+{}
+--- 00:15:51 ---
+{}
+--- 00:16:28 ---
+{}
+--- 00:17:05 ---
+{}

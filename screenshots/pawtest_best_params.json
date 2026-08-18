@@ -1,0 +1,18 @@
+{
+  "target_offset": [
+    0.0,
+    -0.02,
+    0.018
+  ],
+  "model_rot_x_deg": 0.0,
+  "model_rot_y_deg": 0.0,
+  "hand_bend_deg": 0.0,
+  "model_scale": 0.35,
+  "cam_offset": [
+    0.0,
+    0.02,
+    0.42
+  ],
+  "cam_fov": 42.0,
+  "out": "pawtest_iter.png"
+}

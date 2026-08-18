@@ -1,0 +1,74 @@
+[23:40:33] driver start model=auto current=gemini maxIter=60 threshold=8
+[23:40:52] iter 1 [gemini]: total=3 scale=0.85 cam=0.45 move=[0.000,0.015,-0.010] ry=0 bend=-10 issue=paw appears as a plain sphere without cat paw definition or claws
+[23:41:13] iter 2 [gemini]: total=3 scale=0.8 cam=0.45 move=[0.000,-0.010,0.000] ry=0 bend=0 issue=Paw is a plain sphere lacking cat features
+[23:41:33] iter 3 [gemini]: total=3 scale=1.2 cam=0.4 move=[0.000,0.010,-0.010] ry=0 bend=-10 issue=Paw lacks recognizable cat features and shape
+[23:41:54] iter 4 [gemini]: total=3 scale=1 cam=0.45 move=[0.000,0.010,-0.010] ry=0 bend=0 issue=Paw lacks cat features and appears as a plain beige sphere.
+[23:42:13] iter 5 [gemini]: total=3 scale=1 cam=0.45 move=[0.000,0.000,0.000] ry=0 bend=0 issue=Paw model is a plain sphere lacking cat paw features
+[23:42:30] iter 6 grade error on gemini: Response status code does not indicate success: 429 (Too Many Requests). (retry same pose)
+[23:42:57] iter 7 [gemini]: total=3 scale=1.2 cam=0.5 move=[0.000,-0.020,0.010] ry=0 bend=-15 issue=Paw lacks recognizable geometry and cat texture
+[23:42:57] plateau at total=3 -> JITTER new pose ry=16 bend=-12 cam=0.491 scale=0.393
+[23:43:15] iter 8 grade error on gemini: Response status code does not indicate success: 429 (Too Many Requests). (retry same pose)
+[23:43:40] iter 9 grade error on gemini: Response status code does not indicate success: 429 (Too Many Requests). (retry same pose)
+[23:44:05] GEMINI UNAVAILABLE after 3 fails -> FALLBACK to quenn
+[23:44:05] iter 10 grade error on quenn: Response status code does not indicate success: 429 (Too Many Requests). (retry same pose)
+[23:45:52] iter 11 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:46:33] iter 12 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:47:11] iter 13 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:47:50] iter 14 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:48:31] iter 15 [quenn]: total=0 scale=1 cam=0.5 move=[0.001,0.001,0.001] ry=5 bend=10 issue=no paw visible
+[23:48:31] plateau at total=3 -> JITTER new pose ry=50 bend=1 cam=0.48 scale=0.309
+[23:49:10] iter 16 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:49:50] iter 17 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:50:27] iter 18 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:51:04] iter 19 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:51:42] iter 20 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:51:42] plateau at total=3 -> JITTER new pose ry=89 bend=4 cam=0.51 scale=0.27
+[23:52:18] iter 21 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:52:57] iter 22 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:53:35] iter 23 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:54:12] iter 24 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:54:50] iter 25 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:54:50] plateau at total=3 -> JITTER new pose ry=51 bend=-21 cam=0.333 scale=0.278
+[23:55:27] iter 26 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:56:04] iter 27 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:56:48] iter 28 [quenn]: total=0 scale=1 cam=0.5 move=[0.010,0.010,0.010] ry=5 bend=20 issue=no paw visible
+[23:57:31] iter 29 [quenn]: total=0 scale=1 cam=0.5 move=[0.010,0.010,0.010] ry=5 bend=10 issue=cat paw not touching padlock dial
+[23:58:08] iter 30 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:58:08] plateau at total=3 -> JITTER new pose ry=79 bend=5 cam=0.383 scale=0.351
+[23:58:46] iter 31 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[23:59:22] iter 32 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:00:00] iter 33 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:00:44] iter 34 [quenn]: total=0 scale=1 cam=0.5 move=[0.010,0.010,0.010] ry=5 bend=10 issue=no paw or padlock visible
+[00:01:22] iter 35 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:01:22] plateau at total=3 -> JITTER new pose ry=13 bend=21 cam=0.377 scale=0.419
+[00:02:05] iter 36 [quenn]: total=0 scale=1 cam=0.5 move=[0.010,0.010,0.010] ry=5 bend=20 issue=paw not touching padlock dial
+[00:02:47] iter 37 [quenn]: total=0 scale=0.8 cam=0.5 move=[0.001,0.002,0.003] ry=5 bend=10 issue=cat paw not touching padlock dial
+[00:03:29] iter 38 [quenn]: total=0 scale=1 cam=0.5 move=[0.010,0.010,0.010] ry=5 bend=10 issue=no paw visible
+[00:04:06] iter 39 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:04:44] iter 40 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:04:44] plateau at total=3 -> JITTER new pose ry=86 bend=16 cam=0.482 scale=0.438
+[00:05:21] iter 41 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:05:58] iter 42 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:06:34] iter 43 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:07:10] iter 44 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:07:47] iter 45 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:07:47] plateau at total=3 -> JITTER new pose ry=-14 bend=-20 cam=0.458 scale=0.391
+[00:08:29] iter 46 [quenn]: total=0 scale=1 cam=0.5 move=[0.010,0.010,0.010] ry=5 bend=10 issue=no cat paw or padlock visible
+[00:09:06] iter 47 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:09:42] iter 48 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:10:18] iter 49 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:10:54] iter 50 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:10:54] plateau at total=3 -> JITTER new pose ry=-66 bend=-25 cam=0.495 scale=0.366
+[00:11:31] iter 51 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:12:08] iter 52 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:12:45] iter 53 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:13:23] iter 54 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:14:00] iter 55 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:14:00] plateau at total=3 -> JITTER new pose ry=-19 bend=31 cam=0.321 scale=0.361
+[00:14:38] iter 56 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:15:14] iter 57 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:15:51] iter 58 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:16:28] iter 59 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:17:05] iter 60 [quenn]: total=0 scale=0.5 cam=0.25 move=[0.000,0.000,0.000] ry=0 bend=0 issue=
+[00:17:05] plateau at total=3 -> JITTER new pose ry=-64 bend=15 cam=0.397 scale=0.323
+[00:17:07] driver done (stopped at iter 61 of 60, quennRuns=50, geminiFails=0)
