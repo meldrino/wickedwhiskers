@@ -953,3 +953,11 @@ CHAPTER 3 + PLOT OUTLINE COMPLETE (2026-08-19): Wrote Chapter 3 "Into Town" (~95
     https://meldrino.com/ww-book.html (200 OK). Committed 78b3b2a, pushed to GitHub.
     Plot outline covers: farm -> farmhouse -> village -> village deeper (gold race) ->
     town gates -> city -> Golden Fishbowl mirror ending. Saved to book_plot_outline.md.
+
+PLOT OUTLINE V2 (2026-08-19): Complete rewrite at user request. Now 12 chapters.
+    Arc: petty thief -> criminal mastermind (he never becomes good, he gets good at being bad).
+    MacGuffin: Pied Piper's Pipe of Muminpur (attracts rats, plausible mechanism).
+    Crew: Scraps (brains), seagull (aerial recon, recruited from Ch3 antagonist), Margaret
+    (social engineer), pigeon (comic relief). Dumbleclaw drops out after Ch2. Heist climax
+    in Ch11-12. Sequel hook: rumour of another artifact in another city. First draft,
+    will need further tweaking. Committed 9bcfc94.
