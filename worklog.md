@@ -961,3 +961,8 @@ PLOT OUTLINE V2 (2026-08-19): Complete rewrite at user request. Now 12 chapters.
     (social engineer), pigeon (comic relief). Dumbleclaw drops out after Ch2. Heist climax
     in Ch11-12. Sequel hook: rumour of another artifact in another city. First draft,
     will need further tweaking. Committed 9bcfc94.
+
+BOOK PLAN WEB PAGE (2026-08-19): Created bookideas.html on Pi with full plot outline
+    (arc, crew, macguffin, all 12 chapter summaries, tone). Added "Book Plan" button to
+    ww.html next to "Read Book So Far". Both deployed to https://meldrino.com/ (200 OK).
+    Website files live on Pi only, not in git repo.
