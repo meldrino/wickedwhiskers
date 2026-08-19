@@ -940,4 +940,16 @@ prop must come from THIS kit (same style), never Quaternius/KayKit mixed in. Cha
    roughness=0.5). Anchor offset computed at runtime from to_global(ANCHOR). Frames saved
    to screenshots/cutaway_anim/frame_0000-0119.png, stitched to cutaway_seq.gif via
    Python/Pillow. Committed 76be488. Combination values hardcoded to "2" for now — will be
-   parametric from tractor plate in future iteration.
+    parametric from tractor plate in future iteration.
+
+CHAPTER 3 + PLOT OUTLINE COMPLETE (2026-08-19): Wrote Chapter 3 "Into Town" (~950 words)
+    and full 7-chapter book/game plot outline. Chapter 3 went through 5 MoE iterations:
+    (1) copilot pun density review (4/10 -> 10 specific replacements),
+    (2) gemini narrative quality review (7.5/10, 8 replacements including fish math fix),
+    (3) copilot humor punch-up (10 improvements, physical comedy, joke sharpening),
+    (4) gemini flow/pacing review (6 tightening fixes, transitions, sentence rhythm),
+    (5) copilot final copy edit (5 surgical tweaks). Final chapter covers: seagull fish theft,
+    clothesline revenge drop, butcher chicken chase, kind woman with tuna. Deployed to
+    https://meldrino.com/ww-book.html (200 OK). Committed 78b3b2a, pushed to GitHub.
+    Plot outline covers: farm -> farmhouse -> village -> village deeper (gold race) ->
+    town gates -> city -> Golden Fishbowl mirror ending. Saved to book_plot_outline.md.
