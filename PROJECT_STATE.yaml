@@ -457,6 +457,34 @@ backup_2026_08_09:
     - Re-capture --noon screenshots into small grass\.
 
 # =============================================================================
+# BOOK PROJECT
+# =============================================================================
+book:
+  title: "Wicked Whiskers — The Book"
+  status: "3 chapters written, 12-chapter outline v3 complete (first draft)"
+  web_pages:
+    book: https://meldrino.com/ww-book.html  # chapters 1-3 live
+    plan: https://meldrino.com/bookideas.html  # full 12-chapter outline v3
+    game: https://meldrino.com/ww.html  # game page with "Read Book So Far" + "Book Plan" buttons
+  files:
+    chapter1: "Ch1 is on the book page (user-written, not in git as separate file)"
+    chapter2: "chapter2.md (user-written, deployed to book page)"
+    chapter3: "chapter3.md (MoE-iterated, deployed to book page)"
+    outline: "book_plot_outline.md (v3 — 12 chapters, backstory, clues, Muminpur lore)"
+    worklog: "worklog.md"
+  plot:
+    arc: "petty thief → criminal mastermind (never becomes good, gets good at being bad)"
+    macguffin: "Pied Piper's Pipe of Muminpur — attracts rats, in City Museum"
+    crew: [Scraps, Seagull, Margaret, Pigeon]
+    backstory: "WW was a pedigree cat (Muminpur Opaline) owned by a billionaire, escaped from private jet, got amnesia"
+    clues: 4  # newspaper, mansion, pedigree, microchip
+    ending: "heist + mansion revenge + WW2 rescue"
+    sequel_hook: "rumour of second Muminpur relic"
+    gearheads: "moved to Ideas/Back Pocket — rival cat crew, not in current story"
+  git: "chapter3.md + book_plot_outline.md committed. Web pages live on Pi only."
+  moe_iterations: 5  # on chapter 3
+
+# =============================================================================
 # TODO / NEXT STEPS
 # =============================================================================
 todo:
