@@ -1,4 +1,4 @@
-# Wicked Whiskers — Full Plot Outline (12 Chapters)
+# Wicked Whiskers — Full Plot Outline (12 Chapters, v3)
 
 ## The Goal
 Wicked Whiskers wants to steal the **Pied Piper's Pipe of Muminpur** — an ancient cat relic in the City Museum that attracts rats when played. He's cocky, arrogant, and convinced he's good enough to pull off the biggest heist in cat history. He's not wrong.
@@ -8,16 +8,34 @@ The book and game share the SAME story. Each chapter = one game scene/level.
 ---
 
 ## The Arc
-**Petty thief → criminal mastermind.** WW never becomes good. He gets good at being bad.
+**Petty thief → criminal mastermind.** WW never becomes good. He gets good at being bad. But by the end, he's also someone who chose to save a stranger — the first unselfish thing he's ever done.
+
+## The Hidden Backstory
+Before the book begins, WW was an ultra-expensive pedigree cat (Muminpur Opaline) owned by a ruthless billionaire. He was tormented by the billionaire's nasty child. He staged a high-altitude prison break from a private jet, plummeted toward earth, hit his head, lost a life, got amnesia, and landed in a farm garden with a rucksack. He doesn't know any of this. The reader doesn't either — not yet.
+
+## The Clues (4 breadcrumbs through the story)
+1. **Ch3** — newspaper blurb about "object falling from private jet" (doesn't connect it to himself)
+2. **Ch4** — breaks into a rich house, feels weirdly at home in luxury ("Why do I know which fork to use?")
+3. **Ch7** — another cat recognises his breed: "You're a Muminpur Opaline. Those are worth a fortune."
+4. **Ch9** — cat thieves scan his microchip. Amnesia shatters. He remembers everything.
 
 ## The Crew
-- **Scraps** — street-smart exiled village cat. Brains and logistics. Knows the city's underworld.
+- **Scraps** — street-smart exiled village cat. Brains and logistics.
 - **The Seagull** — aerial recon, distraction, and the comedic tension of working with someone who wronged you. Recruited in Ch5.
 - **Margaret** — the cat lady's fat tabby. Knows how humans think (she's watched them for years). Social engineer.
 - **The Pigeon** — useless, enthusiastic, keeps volunteering. Comic relief. WW can't get rid of him.
 
 ## The MacGuffin
 **The Pied Piper's Pipe of Muminpur** — an ancient bone-and-silver flute from the cat-worshipping civilisation of Muminpur. When played, it attracts rats. Plausible mechanism (sound attracts rodents). In the City Museum behind glass. The most famous cat artifact in the world. Every cat has heard of it.
+
+## The Origins of the Pipe
+Muminpur was an ancient civilisation where cats were worshipped as gods. The priests served them — fed them, groomed them, built temples in their honour. To prove their devotion, the priests crafted sacred relics: objects imbued with power, designed to serve the cats.
+
+The Pied Piper's Pipe was one of them. When played, it summoned rats — an endless feast for the gods. The priests would play the pipe, the rats would come, and the cats would hunt. It was a ritual. A ceremony. The pipe was the holiest object in Muminpur.
+
+When the civilisation fell, the relics were scattered. Some were buried. Some were stolen. Some were lost. Over thousands of years, they ended up in museums, private collections, and forgotten vaults around the world. Each one grants a different power. Each one was designed to serve cats.
+
+The pipe is the most famous. But it's not the only one.
 
 ## The Tone
 Warm, funny, pun-filled. No death, no real violence (chase scenes only). Douglas Adams meets a children's picture book. The cat is the hero, the humans are background noise. Every chapter ends with a joke or a cliffhanger.
@@ -47,7 +65,10 @@ Warm, funny, pun-filled. No death, no real violence (chase scenes only). Douglas
 ### Chapter 3: The Village
 **Setting:** A small English village. Butcher, bakery, fishmonger, pub (The Salty Cod), post office.
 
-**Story:** WW arrives in the village. A seagull steals one of his fish — he recovers it via clothesline drop. Steals chicken from the butcher (chase sequence). Gets fed tuna by a kind woman. While hiding behind a bin, he reads a discarded newspaper. Headline: **"PIED PIPER'S PIPE: HYPE NOT TRIPE."** Article: the Pied Piper's Pipe of Muminpur has been found and is on display at the City Museum. WW reads the article. His eyes narrow. His tail flicks. "If that pipe can call every rat in the city... I could run this whole place."
+**Story:** WW arrives in the village. A seagull steals one of his fish — he recovers it via clothesline drop. Steals chicken from the butcher (chase sequence). Gets fed tuna by a kind woman. While hiding behind a bin, he reads a discarded newspaper. Two things catch his eye:
+
+1. Headline: **"PIED PIPER'S PIPE HYPE NOT TRIPE"** — the pipe is on display at the City Museum. "If that pipe can call every rat in the city... I could run this whole place."
+2. A smaller blurb: "Object falling from private jet spotted over county — experts baffled." WW doesn't connect it to himself. He's too focused on the pipe.
 
 **Key Puzzles:** Clothesline drop (recover fish), butcher chase, cat lady interaction.
 
@@ -60,15 +81,17 @@ Warm, funny, pun-filled. No death, no real violence (chase scenes only). Douglas
 ## ACT TWO: ESCALATION (Chapters 4–6)
 
 ### Chapter 4: Bigger Scores
-**Setting:** The village, deeper exploration. New areas: the harbour, the church, the fishmonger's at night.
+**Setting:** The village, deeper exploration. New areas: the harbour, the church, the fishmonger's at night, a rich merchant's house on the edge of the village.
 
-**Story:** WW needs money and skills for the city. He starts pulling bigger jobs in the village — stealing fish from the fishmonger at closing time, lifting sausages from the butcher (revenge for Ch3), conning humans out of food at the pub. He's learning to plan, not just improvise. He also starts studying the pipe article — the museum's layout, the security. He realises he can't do this alone.
+**Story:** WW needs money and skills for the city. He starts pulling bigger jobs — stealing fish from the fishmonger at closing time, lifting sausages from the butcher (revenge for Ch3), conning humans out of food at the pub. He's learning to plan, not just improvise.
 
-**Key Puzzles:** Night-time fishmonger heist (stealth), sausage lift (distraction), pub con (social engineering).
+He breaks into a rich merchant's house — and feels weirdly at home. The furniture, the cutlery, the layout. He knows which glass is for water and which is for wine. "Why do I know which fork to use?" He shakes it off. Must have seen it in a magazine.
 
-**New Character:** **Scraps** — a scruffy street cat with one torn ear, exiled from the city for reasons he won't discuss. He hears WW talking about the pipe and laughs. "You? Steal the Piper's Pipe? You're a village cat." WW: "I'm a cat with a plan." Scraps: "...I'm listening."
+He meets Scraps — a scruffy street cat with one torn ear, exiled from the city for reasons he won't discuss. Scraps hears WW talking about the pipe and laughs. "You? Steal the Piper's Pipe? You're a village cat." WW: "I'm a cat with a plan." Scraps: "...I'm listening."
 
-**Ending:** Scraps agrees to help — for a cut. "The city has rules. The city has gangs. The city has the Gearheads — a cat crew that runs the east district. You don't walk into their territory without a crew of your own." WW: "Then I'll need a crew."
+**Key Puzzles:** Night-time fishmonger heist (stealth), sausage lift (distraction), pub con (social engineering), rich house infiltration.
+
+**Ending:** Scraps agrees to help — for a cut. "The city has rules. You don't walk in without knowing what you're doing." WW: "Then I'll teach myself."
 
 ### Chapter 5: The Crew
 **Setting:** The village edge, the harbour, various spots where cats gather.
@@ -93,18 +116,22 @@ Warm, funny, pun-filled. No death, no real violence (chase scenes only). Douglas
 ## ACT THREE: THE BIG LEAGUES (Chapters 7–10)
 
 ### Chapter 7: The City
-**Setting:** A big city. Overwhelming — traffic, dogs, humans, cats everywhere. The Gearheads' territory.
+**Setting:** A big city. Overwhelming — traffic, dogs, humans, cats everywhere.
 
-**Story:** WW arrives in the city. It's massive. Scraps leads them to a safe house (an abandoned building in the Gearheads' territory). The Gearheads — a crew of muscular street cats — confront them. Their leader, **Tinker** (a battle-scarred tom), doesn't want newcomers. WW talks his way out of it ("We're not staying. We're just passing through on our way to something much bigger than your territory."). Tinker lets them go but warns: "If you cause trouble in my city, I'll find you."
+**Story:** WW arrives in the city. It's massive. Scraps leads them to a safe house (an abandoned building). WW sees the City Museum for the first time — enormous, guarded, cameras everywhere.
 
-**Key Puzzles:** Navigating the city (avoiding dogs, traffic, humans), dealing with the Gearheads (diplomacy/threat assessment).
+A cat on the street notices WW's fur pattern: "Wait — you're a Muminpur Opaline. Those are worth a fortune. Where did you get that coat?" WW: "I was born with it." Cat: "No you weren't. Nobody's born with that. That's bred. That's *money*." WW shakes it off. But the seed is planted.
 
-**Ending:** WW sees the City Museum for the first time. It's enormous. Guards, cameras, walls, gates. "That's where the pipe is?" Scraps: "That's where the pipe is." WW stares at it. "...This is going to be fun."
+**Key Puzzles:** Navigating the city (avoiding dogs, traffic, humans), spotting the museum's defences.
+
+**Ending:** WW stares at the museum. "That's where the pipe is?" Scraps: "That's where the pipe is." WW: "...This is going to be fun."
 
 ### Chapter 8: The Plan
 **Setting:** The safe house, the museum exterior.
 
-**Story:** WW plans the heist. This is the "heist movie planning sequence" — WW draws up the plan on the floor using sticks and string (callback to Ch1). He assigns roles: Scraps maps the interior, Margaret handles human social engineering, the seagull does aerial recon, WW handles the actual theft. The pigeon is "the backup." Scraps pushes back: "The plan is too simple. You need to know the guard's routine, the alarm system, the key locations." WW listens. The plan evolves. He's learning to lead, not just command.
+**Story:** WW plans the heist. He draws up the plan on the floor using sticks and string (callback to Ch1). He assigns roles: Scraps maps the interior, Margaret handles human social engineering, the seagull does aerial recon, WW handles the actual theft. The pigeon is "the backup."
+
+Scraps pushes back: "The plan is too simple. You need to know the guard's routine, the alarm system, the key locations." WW listens. The plan evolves. He's learning to lead, not just command.
 
 **Key Puzzles:** Planning (assigning roles, identifying weaknesses), teamwork negotiation, adapting the plan.
 
@@ -113,48 +140,70 @@ Warm, funny, pun-filled. No death, no real violence (chase scenes only). Douglas
 ### Chapter 9: Reconnaissance
 **Setting:** The museum exterior, the janitor's route, the city streets.
 
-**Story:** The crew gathers intel. Scraps maps the museum interior (he's been inside before — "I was exiled for a reason"). Margaret befriends the night guard's cat and learns the guard's routine (he takes a break at 2am, smokes outside for 10 minutes). The seagull flies over the museum and reports back: three cameras, two guards, one alarm panel near the entrance. WW realises the heist requires the janitor's key. He follows the janitor for a day, learns his routine, his habits, his weaknesses. The janitor likes fish. WW has fish.
+**Story:** The crew gathers intel. Scraps maps the museum interior (he's been inside before — "I was exiled for a reason"). Margaret befriends the night guard's cat and learns the guard's routine (he takes a break at 2am, smokes outside for 10 minutes). The seagull flies over the museum and reports back: three cameras, two guards, one alarm panel near the entrance.
 
-**Key Puzzles:** Surveillance (following the janitor), intelligence gathering, identifying the key.
+WW follows the janitor for a day, learns his routine. The janitor likes fish. WW has fish. He feels guilty. Scraps: "He's a means to an end."
 
-**Ending:** WW approaches the janitor. Friendly. Charming. Earns his trust over a week of visits. The janitor starts leaving fish out for WW. WW feels guilty. Scraps: "Don't feel guilty. He's a means to an end." WW: "I know. It's just... he's nice." Scraps: "So is the pipe. Get the key."
+Then — cat thieves corner WW in an alley. They scan his microchip. One of them goes pale: "Do you know who this cat belongs to? This is the billionaire's cat. The one that fell from the jet." WW's amnesia shatters. He remembers everything — the jet, the child, the escape, the fall. He runs. He doesn't tell the crew.
+
+**Key Puzzles:** Surveillance (following the janitor), intelligence gathering, the microchip reveal.
+
+**Ending:** WW approaches the janitor. Earns his trust over a week of visits. The janitor starts leaving fish out for WW. WW is different now — quieter, focused. Scraps notices. "What happened?" WW: "I remembered something." Scraps: "What?" WW: "Why I need the pipe." He doesn't say more. The crew is ready.
 
 ### Chapter 10: The Inside Job
 **Setting:** The museum, the janitor's break room, the safe house.
 
-**Story:** WW executes the key theft. He befriends the janitor, earns his trust, steals his keyring at the perfect moment (while the janitor is sleeping), has Scraps copy the key using a wax impression technique, and returns it before the janitor notices. The crew is impressed. WW is starting to believe his own hype. "I told you I was a criminal mastermind." Scraps: "You haven't done the heist yet." WW: "But I've done the planning. And the planning IS the heist. The rest is just... walking in and taking it."
+**Story:** WW executes the key theft. He steals the janitor's keyring at the perfect moment (while the janitor is sleeping), has Scraps copy the key using a wax impression technique, and returns it before the janitor notices. The crew is impressed.
 
-**Key Puzzles:** Key copying (wax impression), timing (stealing and returning the key), managing guilt.
+WW: "The planning IS the heist. The rest is just... walking in and taking it."
 
-**Ending:** The crew is ready. The plan is set. Tomorrow night, they hit the museum. WW looks at the crew — Scraps, the seagull, Margaret, the pigeon. "We're really doing this." Scraps: "We're really doing this." The pigeon: "I brought snacks." Everyone: "Shut up."
+**Key Puzzles:** Key copying (wax impression), timing (stealing and returning the key).
+
+**Ending:** The crew is ready. Tomorrow night, they hit the museum. WW looks at the crew — Scraps, the seagull, Margaret, the pigeon. "We're really doing this." Scraps: "We're really doing this." The pigeon: "I brought snacks." Everyone: "Shut up."
 
 ---
 
-## ACT FOUR: THE HEIST (Chapters 11–12)
+## ACT FOUR: THE HEIST & THE REVENGE (Chapters 11–12)
 
 ### Chapter 11: The Heist
 **Setting:** The City Museum, night.
 
-**Story:** The crew executes the plan. Night. Scraps disables the alarm (he found the panel during recon). The seagull creates a distraction outside (screaming, flapping, knocking over bins). Margaret social-engineers the night guard's cat into taking a "break" ("Darling, there's a mouse in the lobby — shall we chase it?"). WW enters through a window with the copied key. He reaches the exhibit hall. The Piper's Pipe sits in a glass case. He picks the lock (a skill learned in Ch6).
+**Story:** The crew executes the plan. Everything goes brilliantly — for once, WW's ridiculous confidence is justified. Margaret gets the guard looking the wrong way. The seagull handles the aerial distraction. Scraps gets them through the difficult bit. WW reaches the display. The Pipe. He gets it out of the case. They've done it.
 
-But — the pigeon sits on a wire and triggers a backup alarm. Chaos. Guards run. The crew scrambles. WW has to improvise: tricks a guard into opening a door ("There's a cat in the other wing!"), slides down a staircase, hides in a sarcophagus, walks out the front door carrying the pipe wearing a museum gift-shop hat as a disguise. He escapes. They did it.
+Then the pigeon triggers a backup alarm.
 
-**Key Puzzles:** Alarm bypass, lock picking, distraction coordination, improvisation under pressure.
+Museum goes into lockdown. Doors slam shut. Guards flood the building. The crew gets separated — Scraps, Margaret, the seagull, and the pigeon escape through the window. WW is trapped inside with the pipe.
 
-**Ending:** They reach the safe house. WW holds the pipe. It's real. It's ancient. It's beautiful. "Did we actually do that?" Scraps: "We actually did that."
+Guards closing in. Every exit blocked. WW has to choose between saving himself and saving the pipe. He chooses the pipe. Not because he's noble — because he's stolen it and he really, really wants it. He hides in a sarcophagus. Guards search room by room. He's cornered. He's finished.
+
+Then Scraps appears through a vent. "I'm not leaving you." Margaret creates a distraction in the lobby. The seagull causes chaos outside — dive-bombing guards, screaming, knocking over bins. Even the pigeon does something useful (sits on the alarm panel and accidentally disables it). The crew gets WW out.
+
+WW realises: he hadn't assembled a collection of useful cats. He'd assembled a crew.
+
+**Key Puzzles:** Alarm bypass, lock picking, distraction coordination, improvisation under pressure, the "all is lost" moment, the crew rescue.
+
+**Ending:** They escape. WW holds the pipe. He's alive. The crew saved him. "Why did you come back?" Scraps: "You're an idiot. But you're our idiot."
 
 ### Chapter 12: The Mastermind
-**Setting:** The safe house, then a rooftop overlooking the city.
+**Setting:** The safe house, then the billionaire's mansion on the hill.
 
-**Story:** The crew gathers. WW looks at the pipe. He blows into it. Nothing happens. He blows harder. A low, ancient note fills the room. Then — silence. Then — scratching. From every wall, every drain, every crack in the city — rats. Thousands of them. Pouring toward the museum. The pipe works. It actually works.
+**Story:** They reach the safe house. WW holds the pipe. He blows. Nothing. Everyone stares. He blows again. Nothing. A beat.
 
-WW stares at the rats pouring past the window. The crew stares at him. "Well?" says Scraps. "You've got your pipe. What now?"
+Then — somewhere beneath the city — SCRATCH. Then another. SCRATCH SCRATCH SCRATCH. Rats pour from a drain. Then another. Then another. Thousands of them.
 
-WW looks at the rats. He looks at the crew. He looks at the city spread out below him. He grins — the widest, most wicked grin of his life.
+WW slowly smiles.
 
-"Everything," he says.
+"Well?" says Scraps.
 
-He sits on the rooftop, pipe across his knees, crew around him, city below. He's not a hero. He's not redeemed. He's a cat who stole the most famous artifact in cat history, and he's just getting started.
+WW leads the crew to the billionaire's mansion on the hill. He unleashes the pipe. Rats flood the mansion — shredding furniture, destroying art, creating total chaos. The billionaire is humiliated on the news: "MILLIONAIRE'S MANSION INFESTED WITH RATS."
+
+WW sneaks inside during the chaos. He finds the replacement cat — WW2 — a nervous, pampered doppelgänger who has no idea what's happening. The nasty child is screaming. The billionaire is on the phone calling pest control.
+
+WW looks at WW2. WW2 looks at WW. They're identical. WW feels something he's never felt before — empathy. He doesn't fight WW2. He doesn't hate him. He just walks over, picks up the terrified doppelgänger by the scruff, and carries him out the window.
+
+He escapes into the night with his crew and his doppelgänger. Scraps: "Who's this?" WW: "Family. I think."
+
+He's not a hero. He's not redeemed. He's a criminal mastermind who just did one unselfish thing — and he's already planning the next job.
 
 The pigeon raises its wing. "I have an idea about the Crown Jewels—"
 
@@ -164,8 +213,22 @@ The pigeon raises its wing. "I have an idea about the Crown Jewels—"
 
 ---
 
+## The Three Payoffs
+1. **The pipe actually works** — after the false start, the rats arrive
+2. **The crew actually works** — they came back for him when everything went wrong
+3. **The mastermind arc completes** — WW has genuinely become the criminal mastermind he thought he already was
+
+And crucially, he hasn't become a better person. He's become a better thief.
+
 ## Sequel Hook
-WW is sitting on the rooftop with the pipe, crew around him, city below. Scraps mentions there's a rumour — another artifact, in another museum, in another city. "Bigger than the pipe. Older. More valuable." WW grins. "Where?" Scraps: "Nobody knows yet." WW looks at the pipe, then at the city, then at his crew. "Then we find out." Fade to black. Same crew, new heist, next book.
+Scraps mentions something: "When I was in the city, I heard rumours. Someone else is looking for another Muminpur relic. Older than the pipe. More powerful." WW looks at the pipe, then at the city, then at his crew. "Then we find it before they do." Same crew, new heist, next book.
+
+---
+
+## Ideas / Back Pocket
+*Not in the current story — but kept for potential future use:*
+
+**The Gearheads** — a rival cat crew that runs the east district of the city. Leader: **Tinker**, a battle-scarred tom. When WW arrives in the city, the Gearheads confront him as a newcomer in their territory. WW talks his way out. Tinker warns: "If you cause trouble in my city, I'll find you." Could be the antagonists in a sequel — Tinker is also hunting Muminpur relics, setting up a race for the second artifact.
 
 ## Game Integration
 - Each chapter = one game level with puzzles matching the book
