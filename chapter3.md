@@ -60,6 +60,8 @@ Whiskers hid behind a wheelie bin, panting, chicken still clamped in his jaws. H
 
 He ate the chicken behind the bin. It was delicious. It was worth every frantic step. He licked his whiskers, burped quietly, and thought about what to do next. He still had two fish in his rucksack — one for eating, one for trading. Dumbleclaw had said gold would be useful, and a fish was worth its weight in gold to the right buyer.
 
+He noticed a discarded newspaper beside the bin. He didn't care about newspapers — until a headline caught his eye: **PIED PIPER'S PIPE HYPE NOT TRIPE**. He read the article. The Pied Piper's Pipe of Muminpur — an ancient relic that attracted rats — had been found and was on display at the City Museum. WW stared at the headline. His tail flicked. "If that pipe can call every rat in the city... I could run this whole place."
+
 That was when a woman found him.
 
 She was not angry. She was not cross. She was the sort of woman who treated her handbag like a feline vending machine — always stocked, always ready, emergency tuna budgeted in at all times. She had names for all the local cats (even the ones that actively avoided her) and the superpower of seeing any filthy cat and thinking "what a precious angel." She knelt down, saw Whiskers sitting there with chicken grease on his whiskers and a flower petal on his ear, and her face melted like butter on a warm scone left out in July.
