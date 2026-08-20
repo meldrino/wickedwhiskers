@@ -1,0 +1,72 @@
+Write a complete, ready-to-run Blender Python (bpy) script for a cute low-poly 3D cat game. The script builds a CARTOON FARM TRACTOR and exports it as a GLB file. It will be run headless with no UI and no render:
+    blender --background --python tractor.py
+
+Return ONLY the final script, inside a single markdown python code block (```python ... ```), with nothing before or after the code block. The script MUST be complete and runnable exactly as-is - every helper function, every line, nothing abbreviated.
+
+========== THE TRACTOR (sizes in metres) ==========
+Cartoon style: chunky, rounded, kid-friendly, slightly stylised - like a toy farm tractor. NOT photorealistic, but clearly READABLE as a tractor with all the iconic parts. The current version is rejected for being "about 8 blocks" - the minimum to look right is ~25 separate parts. Build AT LEAST these:
+
+BODY/ENGINE (front of tractor faces +Z):
+- Bonnet/hood: rounded box (use a box slightly bevelled by scaling, or a squashed cylinder-ended shape), red
+- Grille at the very front: dark box with thin horizontal slats (2-3 thin boxes), dark grey
+- Headlights: two small spheres/cylinders on the grille sides, warm yellow-white
+- Front axle + small front wheels
+- Engine block under the bonnet visible from the side (darker red or dark grey box)
+
+CABIN:
+- Cabin body: red box, set toward the rear
+- Windows: light-blue translucent-looking panels (just light-blue material, front + sides), slightly inset
+- Roof: red flat box on top, slightly wider than the cabin, with 4 thin support posts (dark grey)
+- Seat inside: dark grey/brown box with a backrest
+- Steering wheel: torus or thin cylinder ring tilted toward the seat, dark grey, on a short column
+
+REAR:
+- Big rear wheels (much larger than front), with mudguards/fenders: curved arches over the rear wheels (use half-torus or curved boxes; a flattened partial cylinder arch is fine)
+- Exhaust pipe: vertical black cylinder beside the cabin with a slight forward tilt, plus a small rain-cap on top
+- Tow hitch at the very back: small dark frame/plate
+
+WHEELS (critical - read carefully):
+- 2 small FRONT wheels + 2 large REAR wheels
+- Each wheel = dark tyre (cylinder, 20+ radial segments) + lighter hub cap (shorter, wider-radius cylinder or disc, light grey) so hubs are visibly different from tyres
+- EACH of the four wheel meshes must be its OWN mesh object named EXACTLY: "Wheel_FL", "Wheel_FR", "Wheel_RL", "Wheel_RR" (FL=front left, FR=front right, RL=rear left, RR=rear right)
+- Build each wheel directly along the X axis (the axle direction): create the cylinder with its height along X WITHOUT rotating the object afterwards - e.g. build the bmesh cylinder then rotate the MESH data (me.transform) so the object's local axes stay identity and local X is the axle. This matters: the game spins each wheel around its LOCAL X axis.
+- Wheel origins must sit at the hub centre.
+- Add simple tread hint: a slightly larger very-short cylinder ring in the middle of each tyre, near-black.
+
+NUMBER PLATE (gameplay object):
+- A white/cream rectangular plate (0.5 x 0.22 x 0.05) mounted on the REAR (-Z side) of the tractor, roughly 1.1 m above ground, named EXACTLY "Plate"
+
+ORIENTATION + SIZE (must match the game's existing collider):
+- Up is +Y, FRONT of the tractor faces +Z, rear at -Z
+- Origin at ground level, centred left-right
+- Overall footprint close to: width (X) ~2.2 m (wheel outer edges), length (Z) ~2.6 m, height (Y) ~1.9 m including exhaust and roof
+- Rear wheels: radius ~0.55 m; front wheels: radius ~0.32 m; ground contact at y=0
+
+========== COLOURS (Principled BSDF, sRGB) ==========
+- Tractor red:  #D12E21 = (0.82, 0.18, 0.13), Roughness 0.45
+- Dark grey:    #333338 = (0.2, 0.2, 0.22), Roughness 0.5
+- Near-black (tyres): #141417 = (0.08, 0.08, 0.09), Roughness 0.4
+- Light grey (hubs):  #9a9aa0 = (0.6, 0.6, 0.63), Roughness 0.5
+- Window blue:  #a8d8e8 = (0.66, 0.85, 0.91), Roughness 0.15
+- Headlight:    #fff2cc = (1.0, 0.95, 0.8), Roughness 0.3
+- Plate cream:  #f5f2e6 = (0.96, 0.95, 0.9), Roughness 0.35
+
+========== BLENDER 5.x COMPATIBILITY (critical) ==========
+Target is Blender 5.2. These rules must be followed:
+- NEVER use bpy.data.meshes.new_from_mesh() - removed in Blender 5. Create a bmesh, then assign via me.to_mesh(mesh).
+- Solids: bmesh.ops.create_box / create_cone / create_uvsphere. Cones and cylinders get 24+ segments, cap_ends=True.
+- To orient a part, prefer transforming the MESH DATA (me.transform(Matrix)) or building vertices at final coordinates, keeping OBJECT transforms at identity - except the four wheels whose object transforms MUST stay identity (see WHEELS rule).
+- Torus for the steering wheel/mudguard arch: there is no bmesh torus op - build a torus manually (loop of quads around a circle) OR approximate an arch with several short boxes/cylinder segments arranged in an arc. Keep it simple and robust.
+- Materials: bpy.data.materials.new + Principled BSDF node inputs ("Base Color", "Roughness").
+- Create objects with bpy.data.objects.new + bpy.context.collection.objects.link.
+- Clear the scene at the start.
+- DO NOT join everything into one mesh: keep parts separate, ESPECIALLY the four wheels and the Plate (they must remain individually nameable). You may join small static groups (e.g. grille slats into one "Grille" mesh) if convenient.
+- After building all parts, set the scene unit scale is unnecessary - just make sure objects sit at world coordinates per the spec.
+- Export GLB to EXACTLY this path (it is a placeholder that gets replaced - keep it verbatim):
+    bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+- Print exactly: TRACTOR_BUILT
+- Print the overall bounding-box dimensions: print("DIMS", ...) computed across all mesh objects.
+
+DO NOT add a camera, lights, or a render. Geometry + GLB export only.
+
+REMEMBER: your final answer must be the COMPLETE script in one ```python code block - fully written out, all numbers in place, ready to save and run.
