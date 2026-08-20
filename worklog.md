@@ -966,3 +966,12 @@ BOOK PLAN WEB PAGE (2026-08-19): Created bookideas.html on Pi with full plot out
     (arc, crew, macguffin, all 12 chapter summaries, tone). Added "Book Plan" button to
     ww.html next to "Read Book So Far". Both deployed to https://meldrino.com/ (200 OK).
     Website files live on Pi only, not in git repo.
+
+PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporating
+    Gemini backstory (WW escaped from billionaire's jet, amnesia) and ChatGPT heist
+    structure (all-is-lost moment, crew rescue, pipe false start). Added: hidden
+    backstory, 4 clue breadcrumbs, Muminpur origins (ancient cat civilisation, multiple
+    relics), revised Ch11 (lockdown, crew rescue, pigeon saves the day), revised Ch12
+    (pipe fails then works, mansion revenge, WW2 rescue). Gearheads moved to Ideas/
+    Back Pocket. Three payoffs: pipe works, crew works, mastermind arc. Updated
+    bookideas.html on Pi with v3 content (200 OK). Committed 5e3eccc.
