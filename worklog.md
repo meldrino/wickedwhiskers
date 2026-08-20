@@ -975,3 +975,11 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
     (pipe fails then works, mansion revenge, WW2 rescue). Gearheads moved to Ideas/
     Back Pocket. Three payoffs: pipe works, crew works, mastermind arc. Updated
     bookideas.html on Pi with v3 content (200 OK). Committed 5e3eccc.
+
+- VISION STACK RE-VERIFIED POST-REBOOT (2026-08-20 ~23:58): a lost conversation (laptop reboot,
+  never saved) claimed gemini vision was unavailable due to missing API key - WRONG. Verified
+  live: GEMINI_API_KEY user-scope intact after reboot (AQ.Ab8... format), gemini-vision.ps1
+  smoke test PASSED with real image (paw_v6_s042.png -> correct description). Standing order
+  stands: quenn = too weak on this laptop for asset judgement; gemini-vision.ps1 = the strong
+  eyes; user eyes = final gate. Also 2026-08-20: heartbeat breach POPUP disabled per user
+  demand (2026-08-19 x2); breach JSON logging unchanged (bigpickle side, local-only).
