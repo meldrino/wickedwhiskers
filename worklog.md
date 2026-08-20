@@ -983,3 +983,13 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   stands: quenn = too weak on this laptop for asset judgement; gemini-vision.ps1 = the strong
   eyes; user eyes = final gate. Also 2026-08-20: heartbeat breach POPUP disabled per user
   demand (2026-08-19 x2); breach JSON logging unchanged (bigpickle side, local-only).
+
+- ASSET LOOP HARD RULE (2026-08-21 ~00:05): user confirmed the paw burned days on this loop:
+  blind bpy build -> Godot render -> screenshot -> QUENN judge -> fix from vague description.
+  The gemini-for-verdicts rule existed in PROJECT_STATE.yaml since 08-13 but was ignored in
+  practice. Now mechanical: EVERY asset iteration judged by gemini-vision.ps1 with STRUCTURED
+  prompt (numbered checks, PASS/FAIL, single most-wrong thing); quenn NEVER the judge; only a
+  gemini PASS goes to the user. Written into PROJECT_STATE.yaml vision_tooling + deployed to
+  forai/ww.html Lessons (bak ww.html.bak.202608210005; working copy /home/andy/ww.html was
+  STALE at 284 lines vs deployed 447 - refreshed from live BEFORE editing, avoiding a repeat
+  of the 08-13 overwrite incident). 200 OK verified.

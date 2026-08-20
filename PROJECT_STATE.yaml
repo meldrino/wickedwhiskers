@@ -28,6 +28,15 @@ project:
     (-Prompt "..." -Image @('a.png',...); GEMINI_API_KEY set; 180s HTTP cap; auto-appends to
     inbox). Use gemini for verdicts; quenn only if gemini unavailable (it is too lenient on
     procedural paws).
+    ASSET LOOP PROTOCOL (2026-08-21, HARD RULE after days of quenn-guided drift):
+    1. build/modify asset in Blender bpy -> export GLB
+    2. render in Godot isolated studio scene -> screenshot
+    3. EVERY iteration judged by gemini-vision.ps1 with a STRUCTURED prompt (numbered checks:
+       anatomy counts, orientation vs spec, proportions, artifacts; verdict PASS/FAIL + the
+       single most-wrong thing). NEVER quenn. No exceptions while gemini API is up.
+    4. fix from gemini's specifics -> re-render -> re-judge
+    5. only a gemini PASS goes to the user; user eyes = final gate.
+    Re-verified post-reboot 2026-08-20: GEMINI_API_KEY intact, smoke test PASS (see worklog).
   project_dir: "C:\\crypto\\wicked whiskers"
   docs_site: https://meldrino.com/forai/ww.html
   design_doc: "C:\\crypto\\wicked whiskers.docx"
