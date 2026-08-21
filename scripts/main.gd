@@ -98,6 +98,26 @@ func _maybe_screenshot() -> void:
 	if "--smoketest" in args:
 		_run_smoke()
 		return
+	if "--pondgrid" in args:
+		var lc: Vector2 = Terrain.lake.center
+		var dry := 0
+		var dry_inner := 0
+		for gix in range(-26, 27):
+			for giz in range(-26, 27):
+				var wx := lc.x + gix * 0.2
+				var wz := lc.y + giz * 0.2
+				var hh := Terrain.height_at(wx, wz)
+				if hh > Terrain.water_level + 0.02 and Vector2(gix * 0.2, giz * 0.2).length() < Terrain.water_radius:
+					dry += 1
+					var gd := Vector2(gix * 0.2, giz * 0.2).length()
+					if gd < 4.5:
+						dry_inner += 1
+						if dry_inner <= 12:
+							print("PONDGRID (%.1f, %.1f) d=%.1f h=%.3f (+%.2f)" % [
+								wx, wz, gd, hh, hh - Terrain.water_level])
+		print("PONDRESULT dry=%d dry_inner=%d wl=%.3f wr=%.2f" % [dry, dry_inner, Terrain.water_level, Terrain.water_radius])
+		get_tree().quit()
+		return
 	if "--cutawaytest" in args:
 		_run_cutawaytest()
 		return
@@ -161,6 +181,36 @@ func _maybe_screenshot() -> void:
 					sp.x, sp.y, sp.z, sr, Terrain.water_level, Terrain.water_radius,
 					Terrain.lake.center.x, Terrain.lake.center.y, Terrain.lake.radius])
 				break
+		if "--pondcensus" in args:
+			var stack: Array[Node] = [get_tree().current_scene]
+			while stack.size() > 0:
+				var nd: Node = stack.pop_back()
+				for c in nd.get_children():
+					stack.append(c)
+				if nd is MeshInstance3D or nd is MultiMeshInstance3D:
+					var n3 := nd as Node3D
+					var gp := n3.global_position
+					var dd := Vector2(gp.x - Terrain.lake.center.x, gp.z - Terrain.lake.center.y).length()
+					if dd < 9.5:
+						var info := ""
+						if nd is MeshInstance3D:
+							var ab: AABB = (nd as MeshInstance3D).get_aabb()
+							var sc: float = maxf(n3.scale.x, maxf(n3.scale.y, n3.scale.z))
+							info = "aabb=%s xscale=%.2f vis=%s" % [ab.size, sc, n3.visible]
+						else:
+							info = "MULTIMESH vis=%s" % n3.visible
+						print("CENSUS %s/%s pos=(%.2f, %.2f, %.2f) %s" % [
+							nd.get_parent().name, nd.name, gp.x, gp.y, gp.z, info])
+		if "--pondgrid" in args:
+			var lc: Vector2 = Terrain.lake.center
+			for gix in range(-26, 27):
+				for giz in range(-26, 27):
+					var wx := lc.x + gix * 0.2
+					var wz := lc.y + giz * 0.2
+					var hh := Terrain.height_at(wx, wz)
+					if hh > Terrain.water_level + 0.02 and Vector2(gix * 0.2, giz * 0.2).length() < 5.45:
+						print("PONDGRID (%.1f, %.1f) d=%.1f h=%.3f (+%.2f)" % [
+							wx, wz, Vector2(wx - lc.x, wz - lc.y).length(), hh, hh - Terrain.water_level])
 	elif "--ground" in args and player != null:
 		player.camera_frozen = true
 		player.camera_holder.position = player.global_position + Vector3(0, 0.4, 0)

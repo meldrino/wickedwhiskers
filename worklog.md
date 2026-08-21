@@ -1040,3 +1040,14 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   maps water/grass/sand per cell - this is how we verify visuals without eyeballs.
 - In flight / next: rod has no held mesh yet (invisible while fishing); fish respawn?
   currently consumed permanently; asset loop could build a proper rod model.
+
+- POND SHEETS root cause (user: "two huge sheets of grass over the pond"): noise ridges
+  inside the lake depression poked ABOVE water level inside the rendered disc - 720/2809
+  probe points dry pre-fix. They painted green (h > wl+0.3) and read as grass sheets
+  lying on the water. Fix: Terrain._submerge_lake_interior() clamps all vertices within
+  water_radius+0.25 to wl-0.12 before the disc radius recompute; verified --pondgrid
+  dry_inner=0 post-fix, smoketest full green. NOTE: visual re-check pending - windowed
+  screenshot runs hang when the desktop is locked (two zombie godot.exe killed); use
+  headless --pondgrid for numbers until morning.
+- main.gd: --pondgrid probe moved to a render-free early path (headless-safe), counts
+  dry cells inside disc + inner zone.

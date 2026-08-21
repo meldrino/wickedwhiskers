@@ -18,6 +18,8 @@ func _ready() -> void:
 		lake = config.lakes[0]
 		water_level = height_at(lake.center.x, lake.center.y) + lake.depth - 1.4 * CAT
 		water_radius = _compute_water_radius()
+		_submerge_lake_interior()
+		water_radius = _compute_water_radius()
 	_build_world()
 
 
@@ -60,6 +62,24 @@ func in_water(x: float, z: float) -> bool:
 	if d.length() > lake.radius + 2.0:
 		return false
 	return height_at(x, z) < water_level
+
+
+# Kill dry islands/ridges inside the pond for good: noise ridges poking above
+# the waterline rendered as green sheets across the water. Everything within
+# the rendered disc (+0.25 m bank, well inside the tree/bush ring) is clamped
+# below the surface, then the disc radius is recomputed from the clean bed.
+func _submerge_lake_interior() -> void:
+	var c: Vector2 = lake.center
+	var size := config.size
+	var cell := config.extent * 2.0 / float(size - 1)
+	var r_clamp := water_radius + 0.25
+	for iz in range(size):
+		var z := -config.extent + iz * cell
+		for ix in range(size):
+			var x := -config.extent + ix * cell
+			if Vector2(x - c.x, z - c.y).length() < r_clamp:
+				var idx := iz * size + ix
+				heights[idx] = minf(heights[idx], water_level - 0.12)
 
 
 func _build_world() -> void:
