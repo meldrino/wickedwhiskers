@@ -1,0 +1,85 @@
+```python
+import bpy
+import bmesh
+import mathutils
+from math import radians
+
+def create_material(name, color, roughness=0.5):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+# Palette
+grey = (0.60, 0.60, 0.63)
+light_grey = (0.79, 0.77, 0.74)
+pink = (0.85, 0.54, 0.54)
+black = (0.08, 0.08, 0.09)
+
+# Materials
+mat_grey = create_material("MouseGrey", grey, 0.7)
+mat_light = create_material("MouseLight", light_grey, 0.7)
+mat_pink = create_material("MousePink", pink, 0.7)
+mat_black = create_material("MouseBlack", black, 0.4)
+
+def create_part(name, shape_type, radius, depth, location, rotation=(0,0,0), mat=None):
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    if shape_type == "sphere":
+        bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=12, radius=radius)
+    elif shape_type == "cone":
+        bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=12, radius1=radius, radius2=0, depth=depth)
+    else: # cylinder
+        bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=12, radius1=radius, radius2=radius, depth=depth)
+    
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(ob)
+    ob.location = location
+    ob.rotation_euler = rotation
+    if mat: ob.data.materials.append(mat)
+    return ob
+
+# Build Mouse
+# Body: Pear shape (Sphere at 0, 0.05, 0)
+body = create_part("Body", "sphere", 0.04, 0, (0, 0.05, 0), mat=mat_grey)
+head = create_part("Head", "sphere", 0.03, 0, (0, 0.07, 0.04), mat=mat_grey)
+snout = create_part("Snout", "cone", 0.015, 0.02, (0, 0.07, 0.07), (radians(90), 0, 0), mat=mat_grey)
+nose = create_part("Nose", "sphere", 0.005, 0, (0, 0.07, 0.085), mat=mat_pink)
+
+# Ears
+ear_l = create_part("EarL", "sphere", 0.015, 0, (-0.025, 0.1, 0.03), mat=mat_grey)
+ear_r = create_part("EarR", "sphere", 0.015, 0, (0.025, 0.1, 0.03), mat=mat_grey)
+ear_in_l = create_part("EarInL", "sphere", 0.008, 0, (-0.025, 0.1, 0.04), mat=mat_pink)
+ear_in_r = create_part("EarInR", "sphere", 0.008, 0, (0.025, 0.1, 0.04), mat=mat_pink)
+
+# Eyes
+eye_l = create_part("EyeL", "sphere", 0.005, 0, (-0.015, 0.08, 0.06), mat=mat_black)
+eye_r = create_part("EyeR", "sphere", 0.005, 0, (0.015, 0.08, 0.06), mat=mat_black)
+
+# Legs
+for x, z in [(-0.02, 0.02), (0.02, 0.02), (-0.02, -0.02), (0.02, -0.02)]:
+    create_part("Leg", "cylinder", 0.008, 0.03, (x, 0.015, z), mat=mat_grey)
+
+# Tail
+tail = create_part("Tail", "cone", 0.005, 0.08, (0, 0.04, -0.04), (radians(-30), 0, 0), mat=mat_grey)
+
+# Export
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+
+# Calculate Bounds
+min_co = mathutils.Vector((999, 999, 999))
+max_co = mathutils.Vector((-999, -999, -999))
+for obj in bpy.data.objects:
+    for v in obj.data.vertices:
+        world_v = obj.matrix_world @ v.co
+        for i in range(3):
+            min_co[i] = min(min_co[i], world_v[i])
+            max_co[i] = max(max_co[i], world_v[i])
+
+print("ASSET_BUILT")
+print(f"DIMS Vector({(max_co - min_co)})")
+```

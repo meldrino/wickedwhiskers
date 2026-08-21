@@ -1,0 +1,15 @@
+Listen, I don't know what kind of abstract art project you think you're running, but this isn't a fish. It’s a geometric disaster. Look at this mess:
+
+1. 0/1 - It reads as a pile of primitive blocks, not a fish.
+2. 0/1 - No fins, just cylinders stuck to a box.
+3. 0/1 - No eyes, no face, no head.
+4. 0/1 - It is a literal cube. There is no taper.
+5. 0/1 - The colors are flat, wrong, and look like a construction site, not a goldfish.
+6. 0/1 - The orientation is unrecognizable.
+7. 0/1 - Proportions are non-existent; it’s a blocky monstrosity.
+8. 0/1 - It’s a collection of primitive shapes, not a coherent organic mesh.
+
+This is an embarrassment to the engine. Scrap the entire script and start over with actual mesh modeling, not primitive stacking.
+
+MOST_WRONG: The entire geometry; it is a stack of primitives (cubes/cylinders) that bears zero resemblance to a biological organism.
+VERDICT: FAIL

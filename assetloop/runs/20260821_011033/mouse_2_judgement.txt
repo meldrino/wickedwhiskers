@@ -1,0 +1,13 @@
+Listen, I don't know what you think you've built, but this is an insult to the discipline of 3D modeling. This is a collection of primitive shapes that resembles a piece of brutalist office furniture, not a living creature. Do not waste my time with this again.
+
+1. 0/1 - This is a blocky, unrecognizable mess. It looks like a minimalist chair or a weird pedestal.
+2. 0/1 - Those are flat cylinders on the sides, not ears on top of a head.
+3. 0/1 - There is no snout, no nose bead, and no eyes.
+4. 0/1 - There are no legs visible; it’s a floating block.
+5. 0/1 - There is no tail.
+6. 0/1 - It is grey and red, not grey and pink.
+7. 0/1 - It is floating in a void, not standing on a ground plane with defined scale.
+8. 0/1 - It is a disjointed pile of primitives.
+
+MOST_WRONG: The entire geometry; delete this script and start over by defining a proper mouse silhouette with a head, torso, and limbs instead of stacking random cubes.
+VERDICT: FAIL

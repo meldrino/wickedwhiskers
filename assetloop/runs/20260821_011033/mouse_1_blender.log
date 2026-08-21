@@ -1,0 +1,49 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_011033\mouse_1.py:7: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+01:13:45 | INFO: Starting glTF 2.0 export
+01:13:45 | INFO: Extracting primitive: Body
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Cube
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Ear_0.025
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Ear_-0.025
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Eye_0.015
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Eye_-0.015
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Head
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: InnerEar_0.025
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: InnerEar_-0.025
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Leg_0
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Leg_1
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Leg_2
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Leg_3
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Nose
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Snout
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Extracting primitive: Tail
+01:13:45 | INFO: Primitives created: 1
+01:13:45 | INFO: Finished glTF 2.0 export in 0.05048680305480957 s
+Traceback (most recent call last):
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_011033\mouse_1.py", line 84, in <module>
+
+    for v in obj.data.vertices:
+ASSET_BUILT
+             ^^^^^^^^^^^^^^^^^
+AttributeError: 'PointLight' object has no attribute 'vertices'
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

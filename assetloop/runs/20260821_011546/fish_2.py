@@ -1,0 +1,88 @@
+import bpy
+import bmesh
+import mathutils
+
+def create_material(name, color, roughness=0.5):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+# Colors
+gold_orange = (0.91, 0.53, 0.17)
+belly_cream = (0.96, 0.85, 0.66)
+fin_orange = (0.79, 0.42, 0.12)
+near_black = (0.08, 0.08, 0.09)
+
+# Materials
+mat_body = create_material("FishBody", gold_orange, 0.45)
+mat_belly = create_material("FishBelly", belly_cream, 0.45)
+mat_fins = create_material("FishFins", fin_orange, 0.45)
+mat_eye_w = create_material("EyeWhite", (1, 1, 1), 0.3)
+mat_eye_b = create_material("EyePupil", near_black, 0.3)
+
+def create_part(name, mesh_func, mat):
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    mesh_func(bm)
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    ob.data.materials.append(mat)
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+# 1. Torpedo Body (Elongated UV Sphere)
+def build_body(bm):
+    bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=12, radius=0.06)
+    for v in bm.verts:
+        v.co.z *= 2.0 # Elongate along Z
+        v.co.y += 0.06 # Shift up so belly is at y=0
+    
+body = create_part("Body", build_body, mat_body)
+
+# 2. Tail Fin (Triangular prism)
+def build_tail(bm):
+    bmesh.ops.create_cube(bm, size=0.08)
+    for v in bm.verts:
+        v.co.x *= 0.1
+        v.co.z += 0.15
+    bmesh.ops.scale(bm, vec=(1, 2, 0.5), verts=bm.verts)
+tail = create_part("Tail", build_tail, mat_fins)
+
+# 3. Fins (Side + Dorsal)
+def build_fin(bm):
+    bmesh.ops.create_cube(bm, size=0.04)
+    bmesh.ops.scale(bm, vec=(0.2, 1, 1), verts=bm.verts)
+fin_l = create_part("FinL", build_fin, mat_fins)
+fin_l.location = (-0.06, 0.04, 0)
+fin_r = create_part("FinR", build_fin, mat_fins)
+fin_r.location = (0.06, 0.04, 0)
+
+# 4. Eyes
+def build_eye(bm):
+    bmesh.ops.create_uvsphere(bm, u_segments=8, v_segments=8, radius=0.015)
+eye_l = create_part("EyeL", build_eye, mat_eye_w)
+eye_l.location = (-0.04, 0.08, 0.08)
+eye_r = create_part("EyeR", build_eye, mat_eye_w)
+eye_r.location = (0.04, 0.08, 0.08)
+
+# Export
+bpy.ops.export_scene.gltf(filepath="C:\\crypto\\wicked whiskers\\assetloop\\runs\\20260821_011546\\fish_2.glb", export_format='GLB')
+
+# Calculate Bounding Box
+min_pt = mathutils.Vector((100, 100, 100))
+max_pt = mathutils.Vector((-100, -100, -100))
+for ob in bpy.data.objects:
+    for corner in ob.bound_box:
+        world_corner = ob.matrix_world @ mathutils.Vector(corner)
+        for i in range(3):
+            min_pt[i] = min(min_pt[i], world_corner[i])
+            max_pt[i] = max(max_pt[i], world_corner[i])
+
+print("ASSET_BUILT")
+print(f"DIMS Vector({max_pt - min_pt})")
+
+

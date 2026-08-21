@@ -1,0 +1,13 @@
+Listen, I don't know what kind of abstract art project you think you're running, but this is a disaster. If this is a mouse, then my coffee mug is a starship. It’s a collection of primitive blocks that looks like a broken piece of office furniture.
+
+1. 0/10 - This is a blocky, abstract mess. It reads as a chair or a primitive robot, not a living creature.
+2. 0/10 - There are no ears, let alone round ones with discs.
+3. 0/10 - No snout, no nose, no eyes. Just a flat, uninspired grey surface.
+4. 0/10 - There are no legs visible, just circular platforms that look like feet for a pedestal.
+5. 0/10 - No tail exists.
+6. 5/10 - You got the grey and pink colors, but that's the bare minimum.
+7. 0/10 - It has no discernible scale or anatomy.
+8. 0/10 - It looks like a pile of unjoined primitives.
+
+MOST_WRONG: The entire geometry; the script failed to generate any recognizable organic shapes or mouse-like features, producing only basic primitives instead of a character mesh.
+VERDICT: FAIL

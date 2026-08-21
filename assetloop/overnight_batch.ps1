@@ -34,15 +34,33 @@ $dryStreak = 0
 foreach ($a in $queue) {
     try { & $tick -src big-pickle | Out-Null } catch {}
     Log "=== START $($a.name) ==="
-    $out = & pwsh -NoProfile -File $loop `
+    $null = & pwsh -NoProfile -File $loop `
         -SpecFile "$dir\$($a.spec)" -AssetName $a.name -MaxIters $a.iters `
-        -CamDist $a.dist -CamPitch $a.pitch -TargetY $a.ty -ModelScale 1.0 2>&1 |
-        Out-String
-    $runDir = if ($out -match 'run dir: (\S+)') { $Matches[1] } else { '' }
-    $verdict = if ($out -match 'FINAL VERDICT:\s*(\w+)') { $Matches[1] } else { 'NO-VERDICT' }
-    $glbCount = 0
-    if ($runDir -and (Test-Path $runDir)) { $glbCount = (Get-ChildItem $runDir -Filter *.glb -ErrorAction SilentlyContinue).Count }
-    Log "=== DONE $($a.name): verdict=$verdict glbs=$glbCount dir=$runDir ==="
+        -CamDist $a.dist -CamPitch $a.pitch -TargetY $a.ty -ModelScale 1.0 2>&1
+    # read results from disk, not stdout (streams proved unreliable)
+    Start-Sleep -Seconds 2
+    $runDir = Get-ChildItem "$dir\runs" -Directory | Sort-Object Name -Descending | Select-Object -First 1
+    $verdict = 'NO-VERDICT'; $glbCount = 0; $bestIter = 0
+    if ($runDir) {
+        $rp = Join-Path $runDir.FullName 'report.md'
+        if (Test-Path $rp) {
+            $tail = Get-Content $rp -Tail 5
+            $m = [regex]::Match(($tail -join "`n"), 'FINAL VERDICT:\s*(\w+)')
+            if ($m.Success) { $verdict = $m.Groups[1].Value }
+            $iters = [regex]::Matches((Get-Content $rp -Raw), 'VERDICT PASS on iteration (\d+)')
+            if ($iters.Count -gt 0) { $bestIter = [int]$iters[$iters.Count-1].Groups[1].Value }
+        }
+        $glbCount = (Get-ChildItem $runDir.FullName -Filter *.glb -ErrorAction SilentlyContinue).Count
+    }
+    Log "=== DONE $($a.name): verdict=$verdict glbs=$glbCount dir=$($runDir.Name) ==="
+    if ($verdict -eq 'PASS' -and $bestIter -gt 0) {
+        $acc = "$dir\accepted\$($a.name)"
+        New-Item -ItemType Directory -Force -Path $acc | Out-Null
+        Copy-Item "$($runDir.FullName)\$($a.name)_$bestIter.glb" $acc -Force -ErrorAction SilentlyContinue
+        Copy-Item "$($runDir.FullName)\$($a.name)_$bestIter.png" $acc -Force -ErrorAction SilentlyContinue
+        Copy-Item "$($runDir.FullName)\$($a.name)_$bestIter`_judgement.txt" $acc -Force -ErrorAction SilentlyContinue
+        Log "=== ACCEPTED $($a.name) (iteration $bestIter) -> accepted\$($a.name) ==="
+    }
     if ($glbCount -eq 0) { $dryStreak++ } else { $dryStreak = 0 }
     if ($dryStreak -ge 3) { Log "STOPPING: 3 consecutive assets with no GLB - gemini quota likely exhausted."; break }
     Start-Sleep -Seconds 5

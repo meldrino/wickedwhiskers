@@ -193,6 +193,8 @@ for ($i = 1; $i -le $MaxIters; $i++) {
         if ($fixed) { $fixed = Repair-KnownApiBreaks $fixed; $scriptText = $fixed; Set-Content -LiteralPath $pyPath -Value $scriptText -Encoding utf8; $build = Run-BlenderBuild $pyPath $glbPath $repairs }
     }
     if (-not $build.ok) { Tick "ABORT: build still failing after repairs (see $pyPath)"; break }
+    # gemini sometimes disobeys the no-.blend rule; a .blend inside the project KILLS godot --import
+    Get-ChildItem $OutDir -Filter *.blend* -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
     Tick "built OK, DIMS $($build.dims)"
 
     Tick "=== iteration $i : godot studio render ==="
@@ -210,6 +212,7 @@ for ($i = 1; $i -le $MaxIters; $i++) {
     }
     $studioParams | ConvertTo-Json | Set-Content -LiteralPath "$wwProject\screenshots\pawstudio_params.json" -Encoding utf8
     & $godot --path $wwProject --headless --import 2>&1 | Out-Null
+    Remove-Item -LiteralPath $shot -Force -ErrorAction SilentlyContinue
     $slog = & $godot --path $wwProject "res://scenes/pawstudio.tscn" 2>&1 | Out-String
     Set-Content -LiteralPath "$OutDir\$AssetName`_$i`_godot.log" -Value $slog -Encoding utf8
     $shot = "$wwProject\screenshots\assetloop_latest.png"
