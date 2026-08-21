@@ -1,5 +1,13 @@
 extends Area3D
 
+const STICK_SCENES: Array[PackedScene] = [
+	preload("res://assets/sticks/stick_base.glb"),
+	preload("res://assets/sticks/stick_a.glb"),
+	preload("res://assets/sticks/stick_b.glb"),
+	preload("res://assets/sticks/stick_c.glb"),
+	preload("res://assets/sticks/stick_d.glb"),
+]
+
 @export var kind := "string"
 @export var amount := 1
 @export var loot_id := ""
@@ -53,23 +61,12 @@ func _build_mesh() -> void:
 			mesh = cm
 			mat.albedo_color = Color(0.95, 0.9, 0.75)
 		"stick":
-			var bm := BoxMesh.new()
-			bm.size = Vector3(0.09, 0.09, 1.0)
-			mesh = bm
-			mat.albedo_color = Color(0.55, 0.38, 0.22)
-			mat.roughness = 0.6
-			mi.rotation = Vector3(0, 0.6, 0.1)
-			var tip := MeshInstance3D.new()
-			var tm := SphereMesh.new()
-			tm.radius = 0.06
-			tm.height = 0.1
-			var tmat := StandardMaterial3D.new()
-			tmat.albedo_color = Color(0.62, 0.44, 0.26)
-			tmat.roughness = 0.6
-			tm.material = tmat
-			tip.mesh = tm
-			tip.position = Vector3(0.6, 0.0, 0.0)
-			add_child(tip)
+			var scene: PackedScene = STICK_SCENES[randi() % STICK_SCENES.size()]
+			var inst: Node3D = scene.instantiate()
+			inst.rotation = Vector3(0.0, randf() * TAU, 0.06)
+			inst.scale = Vector3.ONE * 1.5
+			add_child(inst)
+			return
 		"food":
 			var sm := SphereMesh.new()
 			sm.radius = 0.16

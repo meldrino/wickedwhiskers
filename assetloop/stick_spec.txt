@@ -1,10 +1,18 @@
-ASSET BRIEF: WOODEN STICK for Wicked Whiskers (follows the shared style sheet above).
+MODE: builder
+FAMILY: curved
 
-A single fallen tree stick/twig for the cat to fetch. Length ~55 cm. Origin at ground under stick centre; stick lying along Z with a slight natural bend.
+ASSET BRIEF: WOODEN STICK for Wicked Whiskers (follows the shared style sheet and rulebook above).
 
-Parts (~8+): main shaft built from 4-5 slightly rotated cylinder segments end-to-end forming a gentle bend (NOT one straight cylinder), a stubby side branch (short thin cylinder) about 1/3 along, a forked mini-branch at one end (two small cylinders splitting), bark ridge hints via 2-3 very thin longer boxes hugging the shaft, broken/frayed tip at the far -Z end (tiny cone).
+A single fallen tree stick/twig for the cat to fetch. Length ~55 cm, lying FLAT on the ground with its long axis HORIZONTAL along X (height about equal to its thickness). Origin at ground under stick centre.
 
-Colours: bark brown #6B4A2B = (0.42, 0.29, 0.17) roughness 0.85; lighter inner wood at the frayed tip #C9A870 = (0.79, 0.66, 0.44); branch tips slightly darker.
+Design (the builder guarantees contiguity, smoothness, taper and ground contact - you decide shape and placement):
+- Shaft: ONE bent_cylinder through 5 waypoints walking x = -0.26 to +0.26 (LONG AXIS HORIZONTAL - the stick lies on the ground), with small alternating z offsets (+-0.01..0.02) for a gentle organic bend and tiny y drift. Radius tapers 0.016 at the thick end to 0.010 at the thin end. sides: 24.
+- One stubby side branch (cylinder) starting INSIDE the shaft about 1/3 along, pointing up-sideways at roughly 45 degrees, length ~6 cm, radius ~0.007.
+- A forked mini-branch near the thick end: two short cylinders from nearly the same point splitting in a V.
+- A frayed/broken tip at the far -X end: cone_tip whose base sits on the shaft end and points OUTWARD (-X), lighter wood colour, radius matching the shaft end.
+- 2-3 very thin bark ridge boxes hugging/embedded in the shaft surface, slightly rotated.
+
+Colours: bark brown #6B4A2B = (0.148, 0.068, 0.023) roughness 0.85; lighter inner wood at the frayed tip #C9A870 = (0.59, 0.40, 0.16); branch tips slightly darker.
 
 ========== JUDGE CHECKLIST ==========
 1. Reads unmistakably as a wooden STICK/twig?

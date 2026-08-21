@@ -3,28 +3,35 @@ This section applies to EVERY asset for the game Wicked Whiskers. It is followed
 ========== VISUAL LANGUAGE (Wicked Whiskers) ==========
 Style: chunky, rounded, toy-like low-poly cartoon. Kid-friendly farm-game look. Simple readable silhouettes, slightly exaggerated proportions. NOT photorealistic. Flat solid colours - no textures, no image files, no UV work. Materials are plain Principled BSDF with Base Color + Roughness only.
 
-Game palette (hex -> linear-ish sRGB floats):
-- Tractor red   #D12E21 = (0.82, 0.18, 0.13)
-- Wood brown    #8B5A2B = (0.55, 0.35, 0.17)
-- Dark grey     #333338 = (0.20, 0.20, 0.22)
-- Near black    #141417 = (0.08, 0.08, 0.09)
-- Light grey    #9A9AA0 = (0.60, 0.60, 0.63)
-- Cream         #F5F2E6 = (0.96, 0.95, 0.90)
-- Leaf green    #4C9A3F = (0.30, 0.60, 0.25)
-- Sky/window    #A8D8E8 = (0.66, 0.85, 0.91)
-- Warm light    #FFF2CC = (1.00, 0.95, 0.80)
+Game palette (hex -> LINEAR floats for Principled BSDF Base Color; linear = (c/255)^2.2 - feeding sRGB values makes everything washed-out beige):
+- Tractor red   #D12E21 = (0.65, 0.025, 0.012)
+- Wood brown    #8B5A2B = (0.26, 0.10, 0.023)
+- Bark brown    #6B4A2B = (0.148, 0.068, 0.023)
+- Inner wood    #C9A870 = (0.59, 0.40, 0.16)
+- Dark grey     #333338 = (0.033, 0.033, 0.040)
+- Near black    #141417 = (0.0037, 0.0037, 0.005)
+- Light grey    #9A9AA0 = (0.33, 0.33, 0.36)
+- Cream         #F5F2E6 = (0.92, 0.89, 0.80)
+- Leaf green    #4C9A3F = (0.072, 0.33, 0.049)
+- Sky/window    #A8D8E8 = (0.40, 0.69, 0.81)
+- Warm light    #FFF2CC = (1.00, 0.89, 0.61)
 Roughness guide: matte surfaces 0.6-0.95, plastic/painted metal 0.35-0.5, glass/windows 0.15, lights 0.3.
 
-Orientation contract (unless the asset brief says otherwise):
-- Up is +Y, FRONT of the asset faces +Z, origin at ground level centred left-right.
+Orientation contract (BUILD SPACE = Blender native; the GLB exporter converts automatically for the game):
+- While building: ground plane is XY, UP is +Z, front of the asset faces -Y. Origin at ground level centred left-right.
+- "Lying flat" ALWAYS means long axis horizontal (along X or Y) with tiny Z extent - never along Z.
 - Real-world scale in metres (a fence plank ~1 m long, a tractor ~2 m tall).
+- In the GAME (Godot) these become +Y up / front +Z automatically - do not pre-rotate anything.
+
+Construction quality rules (violating these = automatic FAIL):
+- SMOOTH PRIMITIVES: every cylinder/cone/sphere must use 16+ radial segments AND get smooth shading applied to all its faces. Visible hexagonal/pentagonal facets on a round part = FAIL.
 
 ========== BLENDER 5.2 API - VERIFIED FACTS (violating these crashes the script) ==========
 Verified against Blender 5.2.0 LTS on this machine. Follow EXACTLY:
 
 bmesh.ops functions that EXIST: create_circle, create_cone, create_cube, create_grid, create_icosphere, create_uvsphere, contextual_create, create_vert.
 - bmesh.ops.create_box DOES NOT EXIST. Use bmesh.ops.create_cube(bm, size=1.0) - size is the FULL edge length of the cube; scale afterwards or transform mesh data to the size you want.
-- bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=24, radius1=R, radius2=R, depth=D) - keywords are radius1/radius2/depth. diameter1/diameter2 DO NOT EXIST. radii are RADII not diameters.
+- bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=24, radius1=R, radius2=R, depth=D) - keywords are radius1/radius2/depth. diameter1/diameter2 DO NOT EXIST. radii are RADII not diameters. The cone's axis is local Z: radius1 is the BOTTOM (-Z end), radius2 is the TOP (+Z end). After rotating any cone/tip part, verify its sharp end faces OUTWARD away from the body - an upside-down tip cone = FAIL.
 - bmesh.ops.create_uvsphere(bm, u_segments=24, v_segments=16, radius=R).
 - There is NO bmesh torus op. For rings/arches use bpy.ops.mesh.primitive_torus_add(major_radius=..., minor_radius=..., location=...) which DOES exist, or build arcs from short box/cylinder segments.
 

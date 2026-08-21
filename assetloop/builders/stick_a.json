@@ -1,0 +1,20 @@
+{
+  "asset": "stick_a_slim",
+  "auto_ground": true,
+  "surface_noise": { "frequency": 12, "amplitude": 0.0014, "seed": 21 },
+  "materials": {
+    "bark": { "color": [0.148, 0.068, 0.023], "roughness": 0.85 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "Shaft", "material": "bark",
+      "waypoints": [
+        [-0.26, 0.0, 0.028], [-0.17, 0.002, 0.020], [-0.08, 0.003, 0.013],
+        [0.01, 0.003, 0.010], [0.10, 0.002, 0.012], [0.18, 0.001, 0.018],
+        [0.26, 0.0, 0.022]
+      ],
+      "radii": [0.0150, 0.0130, 0.0114, 0.0100, 0.0090, 0.0083, 0.0077],
+      "sides": 24 },
+    { "type": "cylinder", "name": "Twig1", "material": "bark", "collar": 1.6,
+      "from": [-0.05, 0.002, 0.0115], "to": [-0.09, -0.04, 0.05], "radius": 0.0045 }
+  ]
+}

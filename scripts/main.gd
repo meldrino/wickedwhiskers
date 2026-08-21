@@ -941,19 +941,32 @@ func _build_logs() -> void:
 
 
 func _spawn_pickups() -> void:
-	var stick_positions := [
-		Vector3(1.5, 0.25, 8.0),
-		Vector3(2.6, 0.25, 5.2),
-		Vector3(-2.2, 0.25, 9.6),
-		Vector3(4.2, 0.25, 10.8),
-		Vector3(-3.4, 0.25, 6.0),
-		Vector3(6.0, 0.25, -3.0),
-		Vector3(0.5, 0.25, -1.0),
-	]
-	for p in stick_positions:
+	var placed: Array[Vector3] = []
+	var attempts := 0
+	var min_gap := 8.0
+	while placed.size() < 7 and attempts < 600:
+		attempts += 1
+		if attempts == 300:
+			min_gap = 5.0
+		var p := _random_pos(3.0)
+		if _too_close_to_landmarks(p):
+			continue
+		if Terrain.water_level > -900.0 and Terrain.height_at(p.x, p.z) < Terrain.water_level + 0.1:
+			continue
+		if placed.is_empty() and Vector3(0, 0, 12).distance_to(p) > 12.0:
+			continue
+		var ok := true
+		for q in placed:
+			if p.distance_to(q) < min_gap:
+				ok = false
+				break
+		if not ok:
+			continue
+		placed.append(p)
+	for p in placed:
 		var st := preload("res://scripts/pickup.gd").new()
 		st.kind = "stick"
-		st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.25, p.z)
+		st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.04, p.z)
 		add_child(st)
 
 
