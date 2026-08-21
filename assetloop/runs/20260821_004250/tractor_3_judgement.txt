@@ -1,0 +1,13 @@
+Listen, I don't know what kind of "cat" you’ve been studying, but this isn't a paw—it’s a pile of primitive shapes that looks like a rejected toy from a 1995 budget console. You’ve wasted my time with this. Here is your evaluation:
+
+1. **0/4:** There are four floating cylinders. None of these resemble digits, and there is no thumb.
+2. **0/1:** There is no attachment; the "fingers" are floating in the void.
+3. **0/1:** There are no knuckles, just cylinders hovering at random offsets.
+4. **0/1:** Zero claws. Not even a hint of a point.
+5. **0/1:** This reads as a block with four wheels. It is a blob, not a cat paw.
+6. **0/1:** The color is a flat, uninspired salmon-pink, not the requested orange (#f9ad59).
+7. **0/1:** There is no arm, just a floating cube.
+8. **0/1:** Nothing is connected. It is a collection of loose, unparented geometry.
+
+MOST_WRONG: The model consists of disconnected floating primitives rather than a single, unified mesh.
+VERDICT: FAIL

@@ -1,0 +1,111 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_1.py:28: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+00:45:49 | INFO: Starting glTF 2.0 export
+00:45:49 | INFO: Extracting primitive: Air_Intake_Canister
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Air_Intake_Tube
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Bonnet_Main
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Bonnet_Side_Stripe_L
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Bonnet_Side_Stripe_R
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Bonnet_Top_Trim
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Cabin_Dashboard
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Cabin_Lower_Body
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Cabin_Roof
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Chassis_Frame
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Engine_Block
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Exhaust_Pipe_Lower
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Exhaust_Pipe_Upper
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Exhaust_Rain_Cap
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Fender_L
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Fender_R
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Footstep_L
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Footstep_R
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Front_Axle
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Front_Bumper
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Front_Grille
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Grille_Slat_1
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Grille_Slat_2
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Grille_Slat_3
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Headlight_Housing_L
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Headlight_Housing_R
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Headlight_Lens_L
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Headlight_Lens_R
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Plate
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Rear_Axle
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Roof_Cap_Trim
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Roof_Post_FL
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Roof_Post_FR
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Roof_Post_RL
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Roof_Post_RR
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Seat_Backrest
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Seat_Base
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Steering_Column
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Torus
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Tow_Hitch_Base
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Tow_Hitch_Pin
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Wheel_FL
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Wheel_FR
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Wheel_RL
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Wheel_RR
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Window_Front
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Window_Rear
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Window_Side_L
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Extracting primitive: Window_Side_R
+00:45:49 | INFO: Primitives created: 1
+00:45:49 | INFO: Finished glTF 2.0 export in 0.09235835075378418 s
+
+DIMS <Vector (2.1400, 1.9392, 2.5475)>
+ASSET_BUILT
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

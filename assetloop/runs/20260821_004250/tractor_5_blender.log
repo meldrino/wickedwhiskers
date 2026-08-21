@@ -1,0 +1,19 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_5.py:24: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+Traceback (most recent call last):
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_5.py", line 67, in <module>
+    ob = create_part(name, lambda bm: build_wheel(bm, r, 0.3), "near_black", loc)
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_5.py", line 33, in create_part
+    mesh_func(bm)
+    ~~~~~~~~~^^^^
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_5.py", line 67, in <lambda>
+    ob = create_part(name, lambda bm: build_wheel(bm, r, 0.3), "near_black", loc)
+                                      ~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_5.py", line 60, in build_wheel
+    bmesh.ops.create_cylinder(bm, cap_ends=True, radius=r, depth=w, segments=24)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: BMeshOpsModule: operator "create_cylinder" doesn't exist
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

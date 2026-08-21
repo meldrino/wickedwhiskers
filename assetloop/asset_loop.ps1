@@ -12,10 +12,13 @@ param(
     [double]$CamDist = 1.1,
     [double]$CamPitch = -10.0,
     [double]$TargetY = 0.0,
-    [double]$ModelScale = 1.5
+    [double]$ModelScale = 1.5,
+    [string]$FallbackModel = 'gemini-3.1-flash-lite'
 )
 
 $ErrorActionPreference = 'Stop'
+$script:CurrentModel = $Model
+$styleSheet = Join-Path (Split-Path $PSCommandPath) 'style_sheet.txt'
 $blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
 $godot = "C:\crypto\tools\Godot_v4.7.1-stable_win64_console.exe"
 $wwProject = "C:\crypto\wicked whiskers"
@@ -28,7 +31,10 @@ if ([string]::IsNullOrWhiteSpace($key)) { Write-Error 'GEMINI_API_KEY not set.' 
 
 if (-not $OutDir) { $OutDir = "C:\crypto\wicked whiskers\assetloop\runs\$(Get-Date -Format 'yyyyMMdd_HHmmss')" }
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
-$spec = Get-Content -LiteralPath $SpecFile -Raw
+$spec = ''
+if (Test-Path $styleSheet) { $spec += (Get-Content -LiteralPath $styleSheet -Raw) + "`n`n" }
+$assetBrief = Get-Content -LiteralPath $SpecFile -Raw
+$spec += $assetBrief
 $report = New-Object System.Collections.Generic.List[string]
 $report.Add("# asset loop run $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  model=$Model spec=$(Split-Path $SpecFile -Leaf)")
 
@@ -44,7 +50,7 @@ function Log-Inbox([string]$text) {
 }
 
 function Invoke-Gemini {
-    param([string]$Prompt, [string[]]$Images = @(), [int]$MaxTokens = 8000)
+    param([string]$Prompt, [string[]]$Images = @(), [int]$MaxTokens = 32000)
     $parts = @(@{ text = $Prompt })
     foreach ($img in $Images) {
         if ($img -and (Test-Path -LiteralPath $img)) {
@@ -59,17 +65,23 @@ function Invoke-Gemini {
         contents         = @(@{ parts = $parts })
         generationConfig = @{ temperature = 0.5; maxOutputTokens = $MaxTokens }
     } | ConvertTo-Json -Depth 8
-    for ($attempt = 1; $attempt -le 4; $attempt++) {
+    for ($attempt = 1; $attempt -le 6; $attempt++) {
         try {
-            $resp = Invoke-RestMethod -Uri "https://generativelanguage.googleapis.com/v1beta/models/$($Model):generateContent?key=$key" `
+            $resp = Invoke-RestMethod -Uri "https://generativelanguage.googleapis.com/v1beta/models/$($script:CurrentModel):generateContent?key=$key" `
                 -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 300
             return ($resp.candidates[0].content.parts.text -join "`n")
         }
         catch {
             $msg = $_.Exception.Message
-            if ($msg -match '429' -or $msg -match 'RESOURCE_EXHAUSTED') {
-                Tick "gemini 429, waiting 45s (attempt $attempt/4)"
-                Start-Sleep -Seconds 45
+            if ($msg -match '429' -or $msg -match 'RESOURCE_EXHAUSTED' -or $msg -match '503' -or $msg -match 'UNAVAILABLE') {
+                $wait = 30 * $attempt
+                Tick "gemini busy ($($script:CurrentModel)), waiting ${wait}s (attempt $attempt/6)"
+                Start-Sleep -Seconds $wait
+                # after 3 failed attempts on the primary, drop to the fallback model
+                if ($attempt -ge 3 -and $FallbackModel -and $script:CurrentModel -ne $FallbackModel) {
+                    $script:CurrentModel = $FallbackModel
+                    Tick "switching to fallback model $($script:CurrentModel)"
+                }
             }
             else { throw }
         }
@@ -80,21 +92,45 @@ function Invoke-Gemini {
 function Get-Script([string]$Text) {
     $matches2 = [regex]::Matches($Text, '(?s)```python\s*(.*?)```')
     foreach ($m in $matches2) { if ($m.Groups[1].Value -match 'bpy') { return $m.Groups[1].Value } }
-    if ($Text -match '(?s)^```\s*(.*?)```' -and $matches2.Count -eq 0) { return $Matches[1] }
+    $any = [regex]::Matches($Text, '(?s)```\s*(.*?)```')
+    foreach ($m in $any) { if ($m.Groups[1].Value -match 'bpy') { return $m.Groups[1].Value } }
+    # unfenced fallback: gemini sometimes returns bare code
+    $idx = $Text.IndexOf('import bpy')
+    if ($idx -ge 0) {
+        $code = $Text.Substring($idx)
+        $lastPrint = $code.LastIndexOf('print(')
+        if ($lastPrint -gt 0) {
+            $lineEnd = $code.IndexOf("`n", $lastPrint)
+            if ($lineEnd -gt 0) { $code = $code.Substring(0, $lineEnd) }
+        }
+        return $code
+    }
     return $null
 }
 
-function Run-BlenderBuild([string]$pyPath, [string]$glbPath) {
+function Repair-KnownApiBreaks([string]$code) {
+    # Blender 5 renamed create_cone diameter1/diameter2 -> radius1/radius2.
+    $code = $code -replace 'diameter1\s*=', 'radius1=' -replace 'diameter2\s*=', 'radius2='
+    # missing imports gemini keeps forgetting
+    if ($code -match '\bmath\.' -and $code -notmatch '(?m)^\s*(import|from)\s+math\b') { $code = "import math`n$code" }
+    if ($code -match '\bmathutils\b' -and $code -notmatch '(?m)^\s*(import|from)\s+mathutils\b') { $code = "import mathutils`nfrom mathutils import Vector, Matrix, Euler`n$code" }
+    return $code
+}
+
+function Run-BlenderBuild([string]$pyPath, [string]$glbPath, [int]$attempt = 0) {
     $py = Get-Content -LiteralPath $pyPath -Raw
     $py = $py.Replace('__GLB_OUT__', ($glbPath -replace '\\', '\\'))
     Set-Content -LiteralPath $pyPath -Value $py -Encoding utf8
-    $log = & $blender --background --python $pyPath 2>&1
+    $log = $null
+    Push-Location (Split-Path $pyPath)
+    try { $log = & $blender --background --python $pyPath 2>&1 } finally { Pop-Location }
     $logText = ($log | Out-String)
-    Set-Content -LiteralPath ($pyPath -replace '\.py$', '_blender.log') -Value $logText -Encoding utf8
+    $logSuffix = if ($attempt -gt 0) { "_repair$attempt" } else { "" }
+    Set-Content -LiteralPath ($pyPath -replace '\.py$', "${logSuffix}_blender.log") -Value $logText -Encoding utf8
     return @{
-        ok     = ((Test-Path $glbPath) -and $logText -match 'PAW_BUILT')
+        ok     = ((Test-Path $glbPath) -and $logText -match 'ASSET_BUILT|PAW_BUILT|TRACTOR_BUILT')
         log    = $logText
-        dims   = if ($logText -match 'DIMS \(([^)]*)\)') { $Matches[1] } else { '' }
+        dims   = if ($logText -match 'DIMS \(([^)]*)\)') { $Matches[1] } elseif ($logText -match 'DIMS Vector\(([^)]*)\)') { $Matches[1] } else { '' }
     }
 }
 
@@ -116,9 +152,25 @@ for ($i = 1; $i -le $MaxIters; $i++) {
     $imgs = @(); if ($ReferenceImage) { $imgs += $ReferenceImage }; if ($critique -and (Test-Path "$OutDir\$AssetName`_$($i-1).png")) { $imgs += "$OutDir\$AssetName`_$($i-1).png" }
 
     $resp = Invoke-Gemini -Prompt $prompt -Images $imgs
+    Set-Content -LiteralPath "$OutDir\raw_iter$i.txt" -Value $resp -Encoding utf8
     $scriptText = Get-Script $resp
-    if (-not $scriptText) { Tick "no python block returned, retrying generation"; $resp = Invoke-Gemini -Prompt ($prompt + "`n\nIMPORTANT: respond with ONE complete ```python code block containing the full bpy script."); $scriptText = Get-Script $resp }
+    if (-not $scriptText) {
+        Tick "no python block returned, retrying generation"
+        $resp = Invoke-Gemini -Prompt ($prompt + "`n\nIMPORTANT: your entire reply must be ONE complete ```python code block containing the full bpy script. No prose, no explanations.")
+        Set-Content -LiteralPath "$OutDir\raw_iter${i}_retry.txt" -Value $resp -Encoding utf8
+        $scriptText = Get-Script $resp
+    }
+    else {
+        $open = ([regex]::Matches($scriptText, '\(')).Count; $close = ([regex]::Matches($scriptText, '\)')).Count
+        if ($open -ne $close) {
+            Tick "script TRUNCATED (parens $open open / $close close), regenerating"
+            $resp = Invoke-Gemini -Prompt ($prompt + "`n\nIMPORTANT: your previous reply was CUT OFF mid-script. Reply with ONE complete ```python code block containing the ENTIRE bpy script from 'import bpy' through the GLB export and final print. Write compact helper-driven code so the whole script fits.")
+            Set-Content -LiteralPath "$OutDir\raw_iter${i}_retry.txt" -Value $resp -Encoding utf8
+            $scriptText = Get-Script $resp
+        }
+    }
     if (-not $scriptText) { Tick "ABORT: gemini would not return a script"; break }
+    $scriptText = Repair-KnownApiBreaks $scriptText
     $pyPath = "$OutDir\$AssetName`_$i.py"
     $glbPath = "$OutDir\$AssetName`_$i.glb"
     Set-Content -LiteralPath $pyPath -Value $scriptText -Encoding utf8
@@ -132,9 +184,13 @@ for ($i = 1; $i -le $MaxIters; $i++) {
         $errTail = $build.log
         if ($errTail.Length -gt 3000) { $errTail = $errTail.Substring($errTail.Length - 3000) }
         $fixPrompt = "This bpy script failed when run headless in Blender 5.2. Fix it and return the COMPLETE corrected script in one ``````python code block.`n`nSCRIPT:`n``````python`n$scriptText`n`````` `n`nBLENDER OUTPUT (tail):`n$errTail"
-        $resp = Invoke-Gemini -Prompt $fixPrompt -MaxTokens 8000
+        if ($build.log -notmatch 'Traceback' -and $build.log -notmatch 'Error') {
+            $fixPrompt += "`n\nNOTE: the script produced NO output at all - it probably defines functions without calling them, wraps everything in a condition that never runs, or swallows errors silently. Make sure the top-level code actually builds every part, exports the GLB, and prints ASSET_BUILT."
+        }
+        $resp = Invoke-Gemini -Prompt $fixPrompt -MaxTokens 32000
+        Set-Content -LiteralPath "$OutDir\raw_iter${i}_repair${repairs}.txt" -Value $resp -Encoding utf8
         $fixed = Get-Script $resp
-        if ($fixed) { $scriptText = $fixed; Set-Content -LiteralPath $pyPath -Value $scriptText -Encoding utf8; $build = Run-BlenderBuild $pyPath $glbPath }
+        if ($fixed) { $fixed = Repair-KnownApiBreaks $fixed; $scriptText = $fixed; Set-Content -LiteralPath $pyPath -Value $scriptText -Encoding utf8; $build = Run-BlenderBuild $pyPath $glbPath $repairs }
     }
     if (-not $build.ok) { Tick "ABORT: build still failing after repairs (see $pyPath)"; break }
     Tick "built OK, DIMS $($build.dims)"
@@ -161,22 +217,17 @@ for ($i = 1; $i -le $MaxIters; $i++) {
     Copy-Item $shot $png -Force
 
     Tick "=== iteration $i : judge ==="
+    $mCheck = [regex]::Match($assetBrief, '(?s)JUDGE CHECKLIST\s*={3,}\s*(.*?)(\r?\n={3,}|\z)')
+    $checklist = if ($mCheck.Success) { $mCheck.Groups[1].Value.Trim() } else { $assetBrief.Trim() }
     $judgePrompt = @"
-You are a HARSH 3D art director judging a screenshot of a cartoon cat paw built from your own bpy script. The screenshot is a REAL-TIME render from the GAME ENGINE (Godot) - exactly what players will see: the BACK of the paw (fingers up, arm hanging down out of frame) on a dark background.
+You are a HARSH 3D art director judging a screenshot of a game asset that gemini built from its own bpy script. The screenshot is a REAL-TIME render from the GAME ENGINE (Godot) - exactly what players will see - on a dark background.
 
 Judge it against this checklist and answer EVERY point with a number:
-1. Exactly 3 fingers + 1 thumb visible? (count them)
-2. Digits attach INTO the hand - no gaps/seams between finger bases and palm?
-3. Knuckles low and aligned at a common height?
-4. Sharp claws visible on every digit?
-5. Reads as a chunky cartoon CAT paw (not a human hand, not a blob)?
-6. Colour orange (#f9ad59), matte, no white blowout or metallic sheen?
-7. Arm attached, hanging down, reasonable proportions?
-8. Single connected model - nothing floating separately?
+$checklist
 
 Then the last two lines of your reply MUST be exactly:
 MOST_WRONG: <the single worst thing to fix, concrete and actionable>
-VERDICT: PASS   (only if points 1-8 are all acceptable)
+VERDICT: PASS   (only if every checklist point is acceptable)
 VERDICT: FAIL   (if anything is wrong)
 "@
     $judge = Invoke-Gemini -Prompt $judgePrompt -Images @($png) -MaxTokens 1500
@@ -188,7 +239,7 @@ VERDICT: FAIL   (if anything is wrong)
         $critique = if ($m.Success) { $judge.Trim() } else { $judge.Trim() }
         Tick "VERDICT FAIL on iteration $i -> next iteration carries critique"
     }
-    Log-Inbox ("iter ${i}: verdict=$verdict dims=$($build.dims)`nPROMPT-JUDGE: (structured 8-point paw checklist)`nOUTPUT:`n" + $judge.Substring(0, [Math]::Min(700, $judge.Length)))
+    Log-Inbox ("iter ${i}: verdict=$verdict dims=$($build.dims)`nPROMPT-JUDGE: (spec checklist)`nOUTPUT:`n" + $judge.Substring(0, [Math]::Min(700, $judge.Length)))
     if ($verdict -eq 'PASS') { break }
 }
 

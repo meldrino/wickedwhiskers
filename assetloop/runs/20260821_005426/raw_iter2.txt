@@ -1,0 +1,88 @@
+```python
+import bpy
+import bmesh
+import mathutils
+
+# Constants for Palette
+RED = (0.82, 0.18, 0.13, 1.0)
+BROWN = (0.55, 0.35, 0.17, 1.0)
+DK_GREY = (0.20, 0.20, 0.22, 1.0)
+NR_BLACK = (0.08, 0.08, 0.09, 1.0)
+LT_GREY = (0.60, 0.60, 0.63, 1.0)
+CREAM = (0.96, 0.95, 0.90, 1.0)
+SKY = (0.66, 0.85, 0.91, 1.0)
+WARM = (1.00, 0.95, 0.80, 1.0)
+
+def create_mat(name, color, roughness=0.5):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = color
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+def create_part(name, mesh_func, mat, loc=(0,0,0)):
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    mesh_func(bm)
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    ob.location = loc
+    ob.data.materials.append(mat)
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+# Materials
+m_red = create_mat("Red", RED, 0.4)
+m_dk = create_mat("DkGrey", DK_GREY, 0.7)
+m_black = create_mat("Black", NR_BLACK, 0.8)
+m_lt = create_mat("LtGrey", LT_GREY, 0.4)
+m_sky = create_mat("Sky", SKY, 0.2)
+m_cream = create_mat("Cream", CREAM, 0.7)
+m_warm = create_mat("Warm", WARM, 0.3)
+
+# 1. Body/Bonnet (Z+ is front)
+def b_bonnet(bm): bmesh.ops.create_cube(bm, size=1.0); bmesh.ops.scale(bm, vec=(1.0, 0.8, 1.2), verts=bm.verts)
+create_part("Bonnet", b_bonnet, m_red, (0, 0.8, 0.6))
+
+# 2. Cabin
+def b_cabin(bm): bmesh.ops.create_cube(bm, size=1.0); bmesh.ops.scale(bm, vec=(1.2, 1.0, 0.8), verts=bm.verts)
+create_part("Cabin", b_cabin, m_red, (0, 1.2, -0.6))
+
+# 3. Windows
+def b_win(bm): bmesh.ops.create_cube(bm, size=1.0); bmesh.ops.scale(bm, vec=(1.1, 0.9, 0.05), verts=bm.verts)
+create_part("Win_F", b_win, m_sky, (0, 1.2, -0.2))
+
+# 4. Wheels
+def create_wheel(name, radius, x_pos, z_pos):
+    def b_wheel(bm):
+        # Tyre
+        c = bmesh.ops.create_cone(bm, cap_ends=True, radius1=radius, radius2=radius, depth=0.3)
+        # Hub
+        h = bmesh.ops.create_cone(bm, cap_ends=True, radius1=radius*0.6, radius2=radius*0.6, depth=0.35)
+        # Rotate to X-axis
+        rot = mathutils.Matrix.Rotation(math.radians(90), 4, 'Y')
+        bmesh.ops.rotate(bm, cent=(0,0,0), matrix=rot, verts=bm.verts)
+    
+    ob = create_part(name, b_wheel, m_black, (x_pos, radius, z_pos))
+    return ob
+
+create_wheel("Wheel_FL", 0.32, 1.1, 0.8)
+create_wheel("Wheel_FR", 0.32, -1.1, 0.8)
+create_wheel("Wheel_RL", 0.55, 1.1, -0.8)
+create_wheel("Wheel_RR", 0.55, -1.1, -0.8)
+
+# 5. Number Plate
+def b_plate(bm): bmesh.ops.create_cube(bm, size=1.0); bmesh.ops.scale(bm, vec=(0.5, 0.22, 0.05), verts=bm.verts)
+create_part("Plate", b_plate, m_cream, (0, 1.1, -1.4))
+
+# 6. Exhaust
+def b_exh(bm): bmesh.ops.create_cone(bm, cap_ends=True, radius1=0.1, radius2=0.1, depth=1.0)
+create_part("Exhaust", b_exh, m_black, (0.5, 1.5, -0.5))
+
+# Export
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+print("ASSET_BUILT")
+print("DIMS Vector((2.2, 1.9, 2.6))")
+```

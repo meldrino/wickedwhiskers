@@ -1,0 +1,15 @@
+Listen, I don't know what kind of geometric nightmare you've cooked up, but this is an absolute embarrassment to the craft. You call this a "cat paw"? It looks like a low-budget industrial robot part found in a dumpster. 
+
+Here is your evaluation:
+
+1. 0 (There are only 2 floating cylinders, not 4 digits.)
+2. 0 (The digits are not attached; they are floating objects.)
+3. 0 (There are no knuckles, just floating discs.)
+4. 0 (There are no claws, just flat-faced cylinders.)
+5. 0 (This reads as a mechanical block, not a cat paw.)
+6. 0 (The colour is grey/white, not the requested orange #f9ad59.)
+7. 0 (The "arm" is a primitive cube with no anatomical proportion.)
+8. 0 (Nothing is connected; this is a collection of disjointed primitives.)
+
+MOST_WRONG: The entire geometry is a failure; you must switch from spawning disconnected primitive shapes to creating a single, unified mesh with proper topology that actually resembles a paw.
+VERDICT: FAIL

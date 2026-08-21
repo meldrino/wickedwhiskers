@@ -1,0 +1,17 @@
+ASSET BRIEF: GARDEN STONE for Wicked Whiskers (follows the shared style sheet above).
+
+A single chunky garden stone. Size ~30 cm across. Origin at ground under stone centre; stone resting naturally at y=0.
+
+Parts (~6+): main body an icosphere/uvsphere randomly scaled and squashed (NOT a perfect sphere), plus 3-4 smaller lumps merged visually into the surface to break the silhouette, one flat-ish facet suggestion (a squashed box intersecting the bottom), a few shallow crack hints via thin dark boxes inset into the surface.
+
+Colours: stone grey #8C8C90 = (0.55, 0.55, 0.56) roughness 0.9; lumps slightly varied #7A7A80 = (0.48, 0.48, 0.50); cracks near-black #333338 = (0.20, 0.20, 0.22); a faint mossy patch on top #6B8F4E = (0.42, 0.56, 0.31).
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a natural STONE/rock (not a sphere, not a cube)?
+2. Irregular silhouette with lumps - clearly not a primitive?
+3. Matte stony grey with at least one moss or crack detail?
+4. Sits flat on the ground plane, stable-looking?
+5. Size ~30 cm across?
+6. No metallic sheen, no white blowout?
+7. Bottom looks grounded (flat-ish contact area)?
+8. Single coherent model - nothing floating?

@@ -1,0 +1,17 @@
+ASSET BRIEF: CARTOON MOUSE for Wicked Whiskers (follows the shared style sheet above).
+
+A small cute mouse for the cat to hunt. Body ~10 cm long including tail. Origin at ground under body centre; mouse standing on all fours, nose pointing +Z.
+
+Parts (~14+): pear-shaped body (uvsphere scaled), rounded head merged visually with body front, two big round ears (flattened spheres) on top of head with pink inner discs, pointed snout tip (small cone), tiny black nose bead, two black bead eyes, 4 short legs (small cylinders/boxes) with tiny feet, long thin tail (~8 cm) curving out behind along -Z made of 3-4 shrinking cylinder segments, whisker hint optional (skip if fiddly).
+
+Colours: mouse grey #9A9AA0 = (0.60, 0.60, 0.63) roughness 0.7; ears/belly lighter #C9C4BC = (0.79, 0.77, 0.74); inner ears + nose pink #D98A8A = (0.85, 0.54, 0.54); eyes near-black.
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a cute cartoon MOUSE (not a rat, not a blob)?
+2. Two BIG round ears on top of the head with visible inner-ear discs?
+3. Pointed snout with tiny nose bead and two dark eyes?
+4. Four small legs underneath lifting the belly off the ground?
+5. Long thin tail extending out behind (-Z), clearly thinner than any leg?
+6. Grey body with pink accents?
+7. Total length ~10 cm including tail, standing on the ground plane?
+8. Single coherent model - parts attached, nothing floating?

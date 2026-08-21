@@ -1,0 +1,17 @@
+ASSET BRIEF: FARMHOUSE for Wicked Whiskers (follows the shared style sheet above).
+
+The farmhouse is the hero building of the game. The old version had its gable roof built upside down - get the roof RIGHT: two slabs leaning against each other forming a peak (a Lambda shape), NOT a V. Footprint ~9 m wide (X) x 6.5 m deep (Z), walls ~4.5 m tall, roof peak ~6.2 m. Origin at ground under house centre; FRONT door face at +Z.
+
+Parts (~25+): main cream wall box; gable roof = two long slabs (boxes) rotated around the X axis by equal opposite angles meeting at a ridge along X, overhanging the walls slightly; ridge cap beam along the peak; TWO triangular gable-end infills (flattened prisms) closing the roof ends at x=+-4.5; brick-red chimney on the roof slope with a cap; front porch: platform slab, two wooden support posts, porch roof mini-slab; brown plank door in the +Z wall with a tiny knob bead; 2 windows flanking the door + 2 per side wall (sky-blue panes with cream frames); stone step in front of the door.
+
+Colours: walls cream #EDE0BD = (0.93, 0.88, 0.74) roughness 0.7; roof dark red-brown #9E4733 = (0.62, 0.28, 0.20); chimney brick #8A4A38 = (0.54, 0.29, 0.22); wood posts/door brown #5C4026 = (0.36, 0.25, 0.15); window frames cream, panes sky #A8D8E8 = (0.66, 0.85, 0.91) roughness 0.15.
+
+========== JUDGE CHECKLIST ==========
+1. Roof is a proper PEAKED gable (Lambda from the front) - definitely not upside down?
+2. Reads unmistakably as a cosy cartoon FARMHOUSE?
+3. Chimney on the roof slope with a cap?
+4. Front porch with posts and a visible brown door (+Z face)?
+5. At least 5 windows with frames and blue panes?
+6. Cream walls + dark red-brown roof palette?
+7. Proportions sane: ~9 m wide, walls ~4.5 m, peak ~6.2 m?
+8. Single coherent model - roof sealed to walls, nothing floating?

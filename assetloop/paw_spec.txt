@@ -97,3 +97,13 @@ print("DIMS", bpy.context.active_object.dimensions)
 Build the paw geometry from the spec above: 2 tapered segments per finger (base->knuckle, knuckle->tip) with a slight inward curl at the knuckle, finger bases EMBEDDED into the palm top edge at a common knuckle line; a sharp claw cone past each fingertip (slightly downward hook); the palm as a squashed uv-sphere; the 3 toe pads + palm pad as small flattened uv-spheres on the +Z side; the thumb shorter/chunkier off to one side; the arm as one tapered segment from the wrist going -Y.
 
 REMEMBER: your final answer must be the COMPLETE script in one ```python code block - with the paw-building code fully written out, all numbers in place, ready to save and run.
+
+========== JUDGE CHECKLIST ==========
+1. Exactly 3 fingers + 1 thumb visible? (count them)
+2. Digits attach INTO the hand - no gaps/seams between finger bases and palm?
+3. Knuckles low and aligned at a common height?
+4. Sharp claws visible on every digit?
+5. Reads as a chunky cartoon CAT paw (not a human hand, not a blob)?
+6. Colour orange (#f9ad59), matte, no white blowout or metallic sheen?
+7. Arm attached, hanging down, reasonable proportions?
+8. Single connected model - nothing floating separately?

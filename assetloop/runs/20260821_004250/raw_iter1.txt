@@ -1,0 +1,362 @@
+```python
+import bpy
+import bmesh
+from mathutils import Vector, Matrix
+import math
+
+# Clear existing objects in scene
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False)
+
+# ==========================================
+# PALETTE / MATERIALS SETUP
+# ==========================================
+PALETTE = {
+    "Tractor_Red":  ((0.82, 0.18, 0.13, 1.0), 0.40),
+    "Wood_Brown":   ((0.55, 0.35, 0.17, 1.0), 0.70),
+    "Dark_Grey":    ((0.20, 0.20, 0.22, 1.0), 0.50),
+    "Near_Black":   ((0.08, 0.08, 0.09, 1.0), 0.80),
+    "Light_Grey":   ((0.60, 0.60, 0.63, 1.0), 0.40),
+    "Cream":        ((0.96, 0.95, 0.90, 1.0), 0.50),
+    "Leaf_Green":   ((0.30, 0.60, 0.25, 1.0), 0.60),
+    "Sky_Window":   ((0.66, 0.85, 0.91, 1.0), 0.15),
+    "Warm_Light":   ((1.00, 0.95, 0.80, 1.0), 0.30),
+}
+
+materials = {}
+for mat_name, (col, rough) in PALETTE.items():
+    mat = bpy.data.materials.new(name=mat_name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = col
+        bsdf.inputs["Roughness"].default_value = rough
+    materials[mat_name] = mat
+
+# ==========================================
+# HELPER FUNCTIONS FOR MESH CREATION
+# ==========================================
+def create_box_object(name, size, location, mat_name, rotation=(0, 0, 0)):
+    """Creates a box mesh with geometry transformed in mesh space."""
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    
+    # Scale cube to desired size
+    for v in bm.verts:
+        v.co.x *= size[0]
+        v.co.y *= size[1]
+        v.co.z *= size[2]
+        
+    bm.to_mesh(me)
+    bm.free()
+    
+    # Apply rotation and translation to mesh data directly
+    rot_mat = Matrix.Rotation(rotation[0], 4, 'X') @ \
+              Matrix.Rotation(rotation[1], 4, 'Y') @ \
+              Matrix.Rotation(rotation[2], 4, 'Z')
+    trans_mat = Matrix.Translation(Vector(location))
+    me.transform(trans_mat @ rot_mat)
+    
+    ob = bpy.data.objects.new(name, me)
+    ob.data.materials.append(materials[mat_name])
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+def create_cylinder_object(name, radius, depth, location, mat_name, axis='Y', segments=20):
+    """Creates a cylinder aligned with axis ('X', 'Y', or 'Z')."""
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=segments,
+                          radius1=radius, radius2=radius, depth=depth)
+    
+    # Cone default axis is Z; rotate to X or Y if needed
+    if axis == 'X':
+        rot = Matrix.Rotation(math.radians(90), 4, 'Y')
+        for v in bm.verts:
+            v.co = rot @ v.co
+    elif axis == 'Y':
+        rot = Matrix.Rotation(math.radians(-90), 4, 'X')
+        for v in bm.verts:
+            v.co = rot @ v.co
+
+    bm.to_mesh(me)
+    bm.free()
+    
+    me.transform(Matrix.Translation(Vector(location)))
+    ob = bpy.data.objects.new(name, me)
+    ob.data.materials.append(materials[mat_name])
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+def create_sphere_object(name, radius, location, mat_name):
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=12, radius=radius)
+    bm.to_mesh(me)
+    bm.free()
+    
+    me.transform(Matrix.Translation(Vector(location)))
+    ob = bpy.data.objects.new(name, me)
+    ob.data.materials.append(materials[mat_name])
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+def create_mudguard_arch(name, center, inner_radius, width, thickness, mat_name):
+    """Creates an arched mudguard over rear wheels."""
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    
+    segments = 8
+    start_angle = math.radians(15)
+    end_angle = math.radians(165)
+    
+    verts_outer = []
+    verts_inner = []
+    
+    for i in range(segments + 1):
+        t = i / segments
+        angle = start_angle + t * (end_angle - start_angle)
+        
+        # Local arch in Y-Z plane
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        
+        r_in = inner_radius
+        r_out = inner_radius + thickness
+        
+        # Left and Right edges along X
+        hx = width / 2.0
+        v0 = bm.verts.new((-hx, r_in * sin_a, r_in * cos_a))
+        v1 = bm.verts.new((hx, r_in * sin_a, r_in * cos_a))
+        v2 = bm.verts.new((hx, r_out * sin_a, r_out * cos_a))
+        v3 = bm.verts.new((-hx, r_out * sin_a, r_out * cos_a))
+        
+        verts_outer.append((v0, v1, v2, v3))
+        
+    for i in range(segments):
+        curr_v = verts_outer[i]
+        next_v = verts_outer[i+1]
+        # Inner face
+        bm.faces.new((curr_v[0], next_v[0], next_v[1], curr_v[1]))
+        # Outer face
+        bm.faces.new((curr_v[3], curr_v[2], next_v[2], next_v[3]))
+        # Side face +X
+        bm.faces.new((curr_v[1], next_v[1], next_v[2], curr_v[2]))
+        # Side face -X
+        bm.faces.new((curr_v[0], curr_v[3], next_v[3], next_v[0]))
+        
+    # Caps at ends
+    bm.faces.new((verts_outer[0][0], verts_outer[0][1], verts_outer[0][2], verts_outer[0][3]))
+    bm.faces.new((verts_outer[-1][3], verts_outer[-1][2], verts_outer[-1][1], verts_outer[-1][0]))
+    
+    bm.to_mesh(me)
+    bm.free()
+    
+    me.transform(Matrix.Translation(Vector(center)))
+    ob = bpy.data.objects.new(name, me)
+    ob.data.materials.append(materials[mat_name])
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+# ==========================================
+# 1. WHEEL CREATION (CRITICAL REQUIREMENTS)
+# ==========================================
+# 4 wheels named exactly Wheel_FL, Wheel_FR, Wheel_RL, Wheel_RR
+# Tyres along X axis. Object origin at hub center.
+def create_wheel(name, hub_location, radius, width, hub_radius):
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    
+    # Tyre main body
+    res_tyre = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=24,
+                                      radius1=radius, radius2=radius, depth=width)
+    for f in res_tyre['faces']:
+        f.material_index = 0
+        
+    # Tread ridge in center
+    res_tread = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=24,
+                                       radius1=radius * 1.035, radius2=radius * 1.035, depth=width * 0.35)
+    for f in res_tread['faces']:
+        f.material_index = 0
+        
+    # Hub cap cylinder (slightly wider than tyre center so it's clearly readable)
+    res_hub = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=20,
+                                     radius1=hub_radius, radius2=hub_radius, depth=width * 1.05)
+    for f in res_hub['faces']:
+        f.material_index = 1
+        
+    # Rotate mesh geometry so cylinder axis is along X (local axle)
+    rot = Matrix.Rotation(math.radians(90), 4, 'Y')
+    for v in bm.verts:
+        v.co = rot @ v.co
+        
+    bm.to_mesh(me)
+    bm.free()
+    
+    ob = bpy.data.objects.new(name, me)
+    ob.location = Vector(hub_location) # Origin sits directly at hub center
+    
+    # Material slot 0: Near_Black, slot 1: Light_Grey
+    ob.data.materials.append(materials["Near_Black"])
+    ob.data.materials.append(materials["Light_Grey"])
+    
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+# Wheel positions (Radius front ~0.32, Rear ~0.55; touch ground at Y=0)
+R_front = 0.32
+R_rear = 0.55
+W_front = 0.22
+W_rear = 0.38
+hub_x_front = 0.76
+hub_x_rear = 0.85
+z_front = 0.85
+z_rear = -0.65
+
+wheel_FL = create_wheel("Wheel_FL", (-hub_x_front, R_front, z_front), R_front, W_front, R_front * 0.55)
+wheel_FR = create_wheel("Wheel_FR", ( hub_x_front, R_front, z_front), R_front, W_front, R_front * 0.55)
+wheel_RL = create_wheel("Wheel_RL", (-hub_x_rear,  R_rear,  z_rear),  R_rear,  W_rear,  R_rear * 0.52)
+wheel_RR = create_wheel("Wheel_RR", ( hub_x_rear,  R_rear,  z_rear),  R_rear,  W_rear,  R_rear * 0.52)
+
+# ==========================================
+# 2. CHASSIS & AXLES
+# ==========================================
+create_box_object("Chassis_Frame", (0.55, 0.18, 2.1), (0.0, 0.38, 0.05), "Dark_Grey")
+create_cylinder_object("Front_Axle", 0.045, hub_x_front * 2.0, (0.0, R_front, z_front), "Dark_Grey", axis='X')
+create_cylinder_object("Rear_Axle", 0.06, hub_x_rear * 2.0, (0.0, R_rear, z_rear), "Dark_Grey", axis='X')
+create_box_object("Engine_Block", (0.60, 0.32, 0.85), (0.0, 0.52, 0.65), "Dark_Grey")
+
+# ==========================================
+# 3. BONNET / HOOD & FRONT DETAILS
+# ==========================================
+# Rounded chunky bonnet
+create_box_object("Bonnet_Main", (0.76, 0.42, 1.05), (0.0, 0.82, 0.62), "Tractor_Red")
+create_box_object("Bonnet_Top_Trim", (0.64, 0.06, 1.02), (0.0, 1.04, 0.62), "Tractor_Red")
+create_box_object("Bonnet_Side_Stripe_L", (0.02, 0.05, 0.90), (-0.385, 0.85, 0.62), "Cream")
+create_box_object("Bonnet_Side_Stripe_R", (0.02, 0.05, 0.90), ( 0.385, 0.85, 0.62), "Cream")
+
+# Grille at front (+Z)
+create_box_object("Front_Grille", (0.64, 0.36, 0.06), (0.0, 0.80, 1.15), "Dark_Grey")
+create_box_object("Grille_Slat_1", (0.54, 0.035, 0.04), (0.0, 0.90, 1.17), "Cream")
+create_box_object("Grille_Slat_2", (0.54, 0.035, 0.04), (0.0, 0.80, 1.17), "Cream")
+create_box_object("Grille_Slat_3", (0.54, 0.035, 0.04), (0.0, 0.70, 1.17), "Cream")
+
+# Headlights flanking the grille
+hl_x = 0.30
+hl_y = 0.86
+hl_z = 1.16
+create_cylinder_object("Headlight_Housing_L", 0.08, 0.08, (-hl_x, hl_y, hl_z), "Dark_Grey", axis='Z')
+create_cylinder_object("Headlight_Housing_R", 0.08, 0.08, ( hl_x, hl_y, hl_z), "Dark_Grey", axis='Z')
+create_sphere_object("Headlight_Lens_L", 0.065, (-hl_x, hl_y, hl_z + 0.035), "Warm_Light")
+create_sphere_object("Headlight_Lens_R", 0.065, ( hl_x, hl_y, hl_z + 0.035), "Warm_Light")
+
+# Front bumper / weight block
+create_box_object("Front_Bumper", (0.78, 0.14, 0.16), (0.0, 0.38, 1.18), "Dark_Grey")
+
+# ==========================================
+# 4. CABIN & INTERIOR
+# ==========================================
+# Cabin lower body & base
+create_box_object("Cabin_Lower_Body", (0.92, 0.35, 1.05), (0.0, 0.72, -0.38), "Tractor_Red")
+create_box_object("Cabin_Dashboard", (0.80, 0.28, 0.16), (0.0, 1.00, 0.08), "Tractor_Red")
+
+# Seat
+create_box_object("Seat_Base", (0.46, 0.12, 0.38), (0.0, 0.78, -0.40), "Dark_Grey")
+create_box_object("Seat_Backrest", (0.44, 0.38, 0.10), (0.0, 1.02, -0.56), "Dark_Grey")
+
+# Steering column & wheel
+create_cylinder_object("Steering_Column", 0.03, 0.32, (0.0, 0.98, -0.06), "Dark_Grey", axis='Y')
+
+# Steering wheel torus
+bpy.ops.mesh.primitive_torus_add(
+    major_radius=0.14,
+    minor_radius=0.028,
+    major_segments=20,
+    minor_segments=10,
+    location=(0.0, 1.10, -0.16),
+    rotation=(math.radians(40), 0, 0)
+)
+st_wheel = bpy.context.active_object
+st_wheel.name = "Steering_Wheel"
+st_wheel.data.materials.append(materials["Dark_Grey"])
+
+# Roof support posts (4 posts)
+post_x = 0.40
+post_z_f = 0.08
+post_z_r = -0.84
+post_y_mid = 1.40
+post_h = 0.72
+
+create_cylinder_object("Roof_Post_FL", 0.028, post_h, (-post_x, post_y_mid, post_z_f), "Dark_Grey", axis='Y')
+create_cylinder_object("Roof_Post_FR", 0.028, post_h, ( post_x, post_y_mid, post_z_f), "Dark_Grey", axis='Y')
+create_cylinder_object("Roof_Post_RL", 0.028, post_h, (-post_x, post_y_mid, post_z_r), "Dark_Grey", axis='Y')
+create_cylinder_object("Roof_Post_RR", 0.028, post_h, ( post_x, post_y_mid, post_z_r), "Dark_Grey", axis='Y')
+
+# Roof
+create_box_object("Cabin_Roof", (0.98, 0.08, 1.12), (0.0, 1.76, -0.38), "Tractor_Red")
+create_box_object("Roof_Cap_Trim", (0.86, 0.04, 1.00), (0.0, 1.81, -0.38), "Cream")
+
+# Windows (Sky-blue panels, chunky and toy-like)
+create_box_object("Window_Front", (0.74, 0.48, 0.02), (0.0, 1.42, 0.07), "Sky_Window")
+create_box_object("Window_Rear",  (0.74, 0.48, 0.02), (0.0, 1.42, -0.83), "Sky_Window")
+create_box_object("Window_Side_L", (0.02, 0.48, 0.84), (-post_x + 0.01, 1.42, -0.38), "Sky_Window")
+create_box_object("Window_Side_R", (0.02, 0.48, 0.84), ( post_x - 0.01, 1.42, -0.38), "Sky_Window")
+
+# ==========================================
+# 5. REAR FENDERS / MUDGUARDS
+# ==========================================
+create_mudguard_arch("Fender_L", (-hub_x_rear, R_rear, z_rear), R_rear + 0.06, W_rear + 0.06, 0.05, "Tractor_Red")
+create_mudguard_arch("Fender_R", ( hub_x_rear, R_rear, z_rear), R_rear + 0.06, W_rear + 0.06, 0.05, "Tractor_Red")
+
+# ==========================================
+# 6. EXHAUST, AIR FILTER & ACCESSORIES
+# ==========================================
+# Exhaust pipe on right side near cabin
+create_cylinder_object("Exhaust_Pipe_Lower", 0.035, 0.70, (0.42, 1.18, 0.22), "Near_Black", axis='Y')
+create_cylinder_object("Exhaust_Pipe_Upper", 0.030, 0.45, (0.42, 1.68, 0.24), "Near_Black", axis='Y')
+create_cylinder_object("Exhaust_Rain_Cap", 0.045, 0.02, (0.42, 1.91, 0.25), "Near_Black", axis='Y')
+
+# Air intake canister on left side
+create_cylinder_object("Air_Intake_Tube", 0.03, 0.42, (-0.42, 1.05, 0.22), "Dark_Grey", axis='Y')
+create_cylinder_object("Air_Intake_Canister", 0.065, 0.16, (-0.42, 1.28, 0.22), "Dark_Grey", axis='Y')
+
+# Footsteps under cabin entrance
+create_box_object("Footstep_L", (0.16, 0.03, 0.24), (-0.56, 0.35, -0.15), "Dark_Grey")
+create_box_object("Footstep_R", (0.16, 0.03, 0.24), ( 0.56, 0.35, -0.15), "Dark_Grey")
+
+# Tow hitch at the rear
+create_box_object("Tow_Hitch_Base", (0.24, 0.12, 0.16), (0.0, 0.35, -1.02), "Dark_Grey")
+create_cylinder_object("Tow_Hitch_Pin", 0.025, 0.16, (0.0, 0.42, -1.08), "Dark_Grey", axis='Y')
+
+# ==========================================
+# 7. NUMBER PLATE (EXACT REQUIREMENTS)
+# ==========================================
+# Cream rectangular plate (0.5 x 0.22 x 0.05) mounted on REAR (-Z side), about 1.1 m up, named EXACTLY "Plate"
+create_box_object("Plate", (0.50, 0.22, 0.05), (0.0, 1.10, -0.87), "Cream")
+
+# ==========================================
+# EXPORT AND BOUNDING BOX CALCULATION
+# ==========================================
+# Compute overall scene bounding box across all mesh objects
+min_coords = Vector((float('inf'), float('inf'), float('inf')))
+max_coords = Vector((float('-inf'), float('-inf'), float('-inf')))
+
+for obj in bpy.context.scene.objects:
+    if obj.type == 'MESH':
+        for corner in obj.bound_box:
+            world_corner = obj.matrix_world @ Vector(corner)
+            min_coords.x = min(min_coords.x, world_corner.x)
+            min_coords.y = min(min_coords.y, world_corner.y)
+            min_coords.z = min(min_coords.z, world_corner.z)
+            max_coords.x = max(max_coords.x, world_corner.x)
+            max_coords.y = max(max_coords.y, world_corner.y)
+            max_coords.z = max(max_coords.z, world_corner.z)
+
+dims = max_coords - min_coords
+
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+
+print(f"DIMS {dims}")
+print("ASSET_BUILT")
+```

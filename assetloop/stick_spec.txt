@@ -1,0 +1,17 @@
+ASSET BRIEF: WOODEN STICK for Wicked Whiskers (follows the shared style sheet above).
+
+A single fallen tree stick/twig for the cat to fetch. Length ~55 cm. Origin at ground under stick centre; stick lying along Z with a slight natural bend.
+
+Parts (~8+): main shaft built from 4-5 slightly rotated cylinder segments end-to-end forming a gentle bend (NOT one straight cylinder), a stubby side branch (short thin cylinder) about 1/3 along, a forked mini-branch at one end (two small cylinders splitting), bark ridge hints via 2-3 very thin longer boxes hugging the shaft, broken/frayed tip at the far -Z end (tiny cone).
+
+Colours: bark brown #6B4A2B = (0.42, 0.29, 0.17) roughness 0.85; lighter inner wood at the frayed tip #C9A870 = (0.79, 0.66, 0.44); branch tips slightly darker.
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a wooden STICK/twig?
+2. Slightly bent or irregular - NOT one perfect straight cylinder?
+3. At least one side branch and a forked or frayed end?
+4. Wood-brown matte bark with a lighter wood hint at a broken tip?
+5. Length ~55 cm, lying on the ground plane?
+6. Thickness believable for a twig (~2-3 cm) relative to length?
+7. Bark ridges or surface variation visible?
+8. Single coherent model - segments joined smoothly, nothing floating?

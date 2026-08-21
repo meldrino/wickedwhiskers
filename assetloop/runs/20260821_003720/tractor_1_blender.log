@@ -1,0 +1,8 @@
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_003720\tractor_1.py", line 164
+    create_box("Front_Bumper", (0.84, 0.26, 0.20), (0.0, 0.36, 1.18), mat
+              ^
+SyntaxError: '(' was never closed
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

@@ -1,0 +1,17 @@
+ASSET BRIEF: BIRCH TREE for Wicked Whiskers (follows the shared style sheet above).
+
+A cartoon birch tree, clearly different from pines: slender white trunk + rounded leafy crown. Height ~4.5 m. Origin at ground under trunk centre; trunk along +Y.
+
+Parts (~14+): slender white trunk (cylinder radius ~0.16, slightly tapered) with 6-8 thin dark horizontal band rings (very short wider-radius cylinders hugging the trunk = birch bark marks), 3-4 main branches (angled cylinders) leaving the upper trunk in different directions, 4-5 overlapping leaf blobs (squashed uvspheres) forming a rounded airy crown at the top, one lower small side branch with its own leaf tuft, root flare at base (2-3 short angled boxes).
+
+Colours: bark white-cream #E8E4D8 = (0.91, 0.89, 0.85) roughness 0.75; bark bands near-black #1C1C20 = (0.11, 0.11, 0.13); leaves fresh green #5FA84B = (0.37, 0.66, 0.29) roughness 0.8 with one lighter tuft #79BC5F = (0.47, 0.74, 0.37); branch wood pale #D8D0BE = (0.85, 0.82, 0.75).
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a BIRCH: slender pale trunk + rounded green crown (NOT cone-shaped)?
+2. Dark horizontal bark bands clearly visible on the white trunk?
+3. Crown made of several overlapping leaf blobs - airy, not one giant sphere?
+4. At least 3 branches connecting trunk to crown?
+5. Height ~4.5 m with believable slender proportions?
+6. Fresh greens with tonal variation, matte?
+7. Root flare or convincing trunk-to-ground contact?
+8. Single coherent model - branches/crown attached, nothing floating?

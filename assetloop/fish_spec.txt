@@ -1,0 +1,17 @@
+ASSET BRIEF: CARTOON POND FISH for Wicked Whiskers (follows the shared style sheet above).
+
+A small fish for the pond scene. Body ~25 cm long including tail. Origin at body centre, fish lying horizontally along Z (nose at +Z), y=0 at belly.
+
+Parts (~10+): torpedo body (uvsphere scaled elongated), separate tail fin (flat triangular prism or flattened cone), dorsal fin on top, two side fins, eyes (white sphere + black pupil each side), gill line hint (thin darker strip), slightly open mouth notch suggestion via small dark box inset.
+
+Colours: orange-gold scales #E8862B = (0.91, 0.53, 0.17) roughness 0.45; belly cream #F5D9A8 = (0.96, 0.85, 0.66); fins slightly darker orange #C96A1F = (0.79, 0.42, 0.12); eyes white + near-black pupils.
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a cartoon FISH?
+2. Distinct tail fin, dorsal fin and side fins (not just an oval)?
+3. Eyes on both sides with pupils, placed near the nose end?
+4. Body tapered toward the tail (torpedo shape, not a ball)?
+5. Gold-orange with cream belly, slight sheen OK but no metallic look?
+6. Lying horizontal along Z, nose at +Z, belly at y=0?
+7. Proportions sane: total length ~25 cm, tail fin roughly 1/4 of length?
+8. Single coherent model - fins attached, nothing floating?
