@@ -6,6 +6,7 @@ $dir = Split-Path $PSCommandPath
 $tick = "C:\crypto\bigpickle\heartbeat-tick.ps1"
 $report = "$dir\batch_report.md"
 $loop = "$dir\asset_loop.ps1"
+Start-Transcript -Path "$dir\batch_transcript.txt" -Force | Out-Null
 
 function Log([string]$msg) {
     $line = "$(Get-Date -Format 'HH:mm:ss') $msg"
@@ -48,3 +49,4 @@ foreach ($a in $queue) {
 }
 try { & $tick -src big-pickle | Out-Null } catch {}
 Log "BATCH DONE $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+Stop-Transcript | Out-Null
