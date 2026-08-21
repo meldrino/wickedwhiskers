@@ -1,0 +1,7 @@
+1. **FAIL**: While it has faceted planes, the silhouette is far too rounded and symmetrical. It looks like a low-poly geosphere, not a naturally formed rock.
+2. **FAIL**: The base is not flattened. The geometry is clearly floating or intersecting the ground plane at a single point/edge, creating a "hovering" effect rather than a solid, resting weight.
+3. **PASS**: The color is a neutral, matte grey, which is appropriate for a base stone material.
+4. **PASS**: The scale relative to the ground plane suggests it is within the requested size range.
+
+MOST_WRONG: The geometry is a rounded primitive (geosphere) rather than a hand-modeled or decimated mesh with a flat base, causing it to look like a floating ball instead of a grounded rock.
+VERDICT: FAIL

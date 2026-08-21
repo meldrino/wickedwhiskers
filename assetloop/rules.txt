@@ -23,6 +23,13 @@
 - Separate boxes for walls/roof/door are fine; align them so joints read cleanly (edges flush or clearly overlapping).
 - Roofs: slabs tilted symmetrically meeting at a ridge ABOVE the walls, overhanging slightly.
 
+[FAMILY:rock]
+- OWNER-APPROVED STYLE: Wicked Whiskers rocks are STYLIZED FACETED chunks (flat-shaded angular planes, like classic cartoon-game boulders) - NOT realistic smooth cobbles. Use facet 0.5-0.8 and smooth:false on rock parts.
+- Every stone has a DISTINCT flattened resting face (flatten 0.4-0.55) touching the ground - no floating, no rolling potatoes.
+- Irregular massing: vary seed/squash/lumpiness per stone so silhouettes differ; avoid symmetric egg shapes.
+- Matte and dry: roughness 0.9-0.95. Colours from the style-sheet stone palette; subtle variation between stones, never saturated.
+- Size discipline: pickups are fist-to-skull sized (radius 0.04-0.09 m). Bigger boulders are decoration, not pickups.
+
 [STICK]
 - Lies FLAT on the ground: long axis along X (~55 cm), height ~= thickness. Gentle vertical wobble lives in Z, never along Z.
 - OWNER RULING: NO sprouts/splinter spikes on the ends - ends are plain rounded shaft ends. The splintered_tip part is banned for sticks.

@@ -14,11 +14,13 @@ param(
     [double]$TargetY = 0.0,
     [double]$ModelScale = 1.5,
     [string]$FallbackModel = 'gemini-3.1-flash-lite',
-    [string[]]$RefImages = @()
+    [string[]]$RefImages = @(),
+    [int]$SharpEdgeLimit = 60
 )
 
 $ErrorActionPreference = 'Stop'
 $script:CurrentModel = $Model
+$script:SharpEdgeLimit = $SharpEdgeLimit
 $styleSheet = Join-Path (Split-Path $PSCommandPath) 'style_sheet.txt'
 $blender = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
 $godot = "C:\crypto\tools\Godot_v4.7.1-stable_win64_console.exe"
@@ -151,7 +153,7 @@ function Test-AssetJson([string]$Json) {
     $errs = @()
     try { $o = $Json | ConvertFrom-Json } catch { return @("JSON parse error: $($_.Exception.Message)") }
     if (-not $o.parts -or @($o.parts).Count -eq 0) { $errs += "parts must be a non-empty list" }
-    $valid = 'bent_cylinder', 'cylinder', 'cone_tip', 'box', 'sphere'
+    $valid = 'bent_cylinder', 'cylinder', 'cone_tip', 'splintered_tip', 'box', 'sphere', 'rock'
     $k = 0
     foreach ($p in @($o.parts)) {
         if ($valid -notcontains $p.type) { $errs += "part ${k}: unknown type '$($p.type)' (valid: $($valid -join ', '))" }
@@ -206,12 +208,13 @@ print("AUDITBBOX", round(maxs[0]-mins[0],4), round(maxs[1]-mins[1],4), round(max
     $miny = if ($log -match 'AUDITMINZ (-?[\d.]+)') { [double]$Matches[1] } else { $null }
     if ($null -eq $miny) { return @("AUDIT FAILED: could not measure model") }
     $objNames = @([regex]::Matches($log, 'AUDITOBJ (\S+)') | ForEach-Object { $_.Groups[1].Value })
+    $touchTxt = if ([Math]::Abs($miny) -le 0.005) { "model RESTS EXACTLY ON the ground plane (lowest point z=$miny - it is NOT floating)" } else { "lowest point z=$miny" }
     if ($log -match 'AUDITBBOX ([\d.]+) ([\d.]+) ([\d.]+)') {
-        $script:AuditFacts = "bounding box $($Matches[1]) x $($Matches[2]) x $($Matches[3]) metres (X x Y x Z-height); lowest point z=$miny; mesh parts present: $($objNames -join ', ')"
+        $script:AuditFacts = "bounding box $($Matches[1]) x $($Matches[2]) x $($Matches[3]) metres (X x Y x Z-height); $touchTxt; mesh parts present: $($objNames -join ', ')"
     } else { $script:AuditFacts = '' }
     if ($miny -lt -0.005) { $issues += ("GROUND: model extends below ground (lowest point z={0}). Rebuild so the whole model sits exactly on z=0, nothing buried." -f $miny) }
     elseif ($miny -gt 0.02) { $issues += ("GROUND: model floats above the ground (lowest point z={0}). It must rest exactly on z=0." -f $miny) }
-    if ($spec -match '(?i)lying flat|lies flat|lying along|long axis horizontal') {
+    if ($assetBrief -match '(?i)lying flat|lies flat|lying along|long axis horizontal') {
         if ($log -match 'AUDITBBOX ([\d.]+) ([\d.]+) ([\d.]+)') {
             $dx = [double]$Matches[1]; $dy = [double]$Matches[2]; $dz = [double]$Matches[3]
             $longestH = [Math]::Max($dx, $dy)
@@ -244,6 +247,31 @@ else:
     Set-Content -LiteralPath $pyPath -Value $py -Encoding utf8
     $log = & $blender --background --python $pyPath 2>&1 | Out-String
     if ($log -match 'JUNK_REMOVED') { Tick "stripped leftover default objects from GLB" }
+}
+
+function Invoke-SelfRender([string]$glbPath, [int]$iter) {
+    $dir = "$OutDir\selfrender_iter$iter"
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    $py = Join-Path (Split-Path $PSCommandPath) 'builders\render_asset.py'
+    $log = & $blender --background --python $py -- $glbPath $dir 2>&1 | Out-String
+    Set-Content -LiteralPath "$dir\render.log" -Value $log -Encoding utf8
+    return @(Get-ChildItem $dir -Filter view*.png -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.FullName })
+}
+
+function Invoke-CreaseAudit([string]$glbPath) {
+    $py = Join-Path (Split-Path $PSCommandPath) 'builders\diag_mesh.py'
+    $log = & $blender --background --python $py -- $glbPath 2>&1 | Out-String
+    Set-Content -LiteralPath "$OutDir\crease_audit.log" -Value $log -Encoding utf8
+    $facts = @()
+    $issues = @()
+    foreach ($m in [regex]::Matches($log, 'OBJ (\S+) polys \d+ smooth \d+\r?\nBUCKETS >90:(\d+) 45-90:(\d+) 25-45:(\d+)')) {
+        $obj = $m.Groups[1].Value
+        $sharp = [int]$m.Groups[2].Value + [int]$m.Groups[3].Value + [int]$m.Groups[4].Value
+        $facts += "$obj sharp-edges(>25deg)=$sharp"
+        if ($sharp -gt $script:SharpEdgeLimit) { $issues += ("CREASES: part '{0}' has {1} edges sharper than 25 degrees - that part reads faceted/blocky instead of smooth. Rebuild it with more sides/samples via the library primitives." -f $obj, $sharp) }
+    }
+    $script:CreaseFacts = $facts -join '; '
+    return $issues
 }
 
 function Run-BlenderBuild([string]$pyPath, [string]$glbPath, [int]$attempt = 0) {
@@ -279,14 +307,17 @@ for ($i = 1; $i -le $MaxIters; $i++) {
 You do NOT write python or bpy code. The deterministic builder library handles ALL geometry craft (contiguity, smooth shading, taper, tip orientation, ground contact). Your job is ONLY design: which parts, what proportions, where, what colour.
 Reply with ONE ``````json block and nothing else. Schema:
 {"asset": "<name>", "auto_ground": true,
+ "surface_noise": {"frequency": 8-16, "amplitude": 0.001-0.003, "seed": int},
  "materials": {"<name>": {"color": [r, g, b], "roughness": 0.0-1.0}},
  "parts": [
-   {"type": "bent_cylinder", "name": "...", "material": "...", "waypoints": [[x,y,z], ...2+ points along the shape's spine], "radius_start": m, "radius_end": m, "sides": 16},
-   {"type": "cylinder", "name": "...", "material": "...", "from": [x,y,z], "to": [x,y,z], "radius": m},
+   {"type": "bent_cylinder", "name": "...", "material": "...", "waypoints": [[x,y,z], ...2+ points along the shape's spine], "radii": [one radius per waypoint], "sides": 24},
+   {"type": "cylinder", "name": "...", "material": "...", "from": [x,y,z], "to": [x,y,z], "radius": m, "collar": 1.6},
    {"type": "cone_tip", "name": "...", "material": "...", "base": [x,y,z] ON the body, "tip": [x,y,z] pointing OUTWARD, "radius": m},
+   {"type": "splintered_tip", "name": "...", "material": "...", "base": [x,y,z] ON the body end, "direction": [x,y,z] pointing OUTWARD, "radius": m, "seed": int, "spikes": 5-9},
    {"type": "box", "name": "...", "material": "...", "center": [x,y,z], "size": [dx,dy,dz], "rot_deg": [rx,ry,rz]},
-   {"type": "sphere", "name": "...", "material": "...", "center": [x,y,z], "radius": m}]}
-Units are METRES. Waypoints of a bent_cylinder share endpoints so segments weld automatically - never place separate cylinders end-to-end yourself.
+   {"type": "sphere", "name": "...", "material": "...", "center": [x,y,z], "radius": m},
+   {"type": "rock", "name": "...", "material": "...", "center": [x,y,z], "radius": m, "seed": int, "squash": [sx,sy,sz], "lumpiness": 0.1-0.25, "flatten": 0.0-0.6, "facet": 0.0-1.0, "smooth": true|false}]}
+Units are METRES. bent_cylinder is ONE continuous swept tube through all waypoints (radii list gives a smooth taper; omit for constant radius). "collar" adds an organic knuckle where a cylinder leaves its parent body - use on every branch/twig. surface_noise adds directional grain over the WHOLE model.
 "@
     }
     if ($ReferenceImage -and (Test-Path $ReferenceImage)) {
@@ -296,7 +327,9 @@ Units are METRES. Waypoints of a bent_cylinder share endpoints so segments weld 
         $modeWord = if ($isBuilder) { 'json parameter list' } else { 'script' }
         $prompt += "`n`n========== YOUR PREVIOUS ATTEMPT FAILED JUDGEMENT ========== `nBelow is the critique of the render your previous attempt produced. Rewrite the COMPLETE $modeWord fixing every listed problem. Keep everything that was not criticised.`n`nCRITIQUE:`n$critique"
     }
-    $imgs = @(); foreach ($r in $RefImages) { if ($r -and (Test-Path $r)) { $imgs += $r } }; if ($ReferenceImage) { $imgs += $ReferenceImage }; if ($critique -and (Test-Path "$OutDir\$AssetName`_$($i-1).png")) { $imgs += "$OutDir\$AssetName`_$($i-1).png" }
+    $imgs = @(); foreach ($r in $RefImages) { if ($r -and (Test-Path $r)) { $imgs += $r } }; if ($ReferenceImage) { $imgs += $ReferenceImage }
+    if ($critique -and $script:PrevSelfViews) { $imgs += @($script:PrevSelfViews | Where-Object { Test-Path $_ }) }
+    if ($critique -and (Test-Path "$OutDir\$AssetName`_$($i-1).png")) { $imgs += "$OutDir\$AssetName`_$($i-1).png" }
     if ($RefImages.Count -gt 0 -and $i -eq 1) { $prompt += "`n`n========== REFERENCE PHOTOS ========== `nReal reference photo(s) of the subject are attached. Match the subject's real anatomy, part placement and proportions (stylised chunky-cartoon, but structurally correct)." }
 
     if (-not $isBuilder) {
@@ -383,9 +416,18 @@ Units are METRES. Waypoints of a bent_cylinder share endpoints so segments weld 
     Get-ChildItem $OutDir -Filter *.blend* -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
     Remove-JunkObjects $glbPath
     $auditIssues = @(Invoke-Audit $glbPath)
+    Tick "=== iteration $i : self-render + crease audit ==="
+    $selfViews = @(Invoke-SelfRender $glbPath $i)
+    foreach ($ci in @(Invoke-CreaseAudit $glbPath)) { Tick "AUDIT: $ci"; $auditIssues += $ci }
+    if ($script:CreaseFacts) { $script:AuditFacts = "$($script:AuditFacts); edge audit: $($script:CreaseFacts)" }
+    if ($selfViews.Count -lt 2) { Tick "warning: self-render produced $($selfViews.Count) view(s)" }
     foreach ($ai in $auditIssues) { Tick "AUDIT: $ai" }
     Tick "built OK, DIMS $($build.dims)"
 
+    if ($selfViews.Count -ge 2) {
+        Tick "=== iteration $i : judge sees Blender self-renders (studio skipped) ==="
+    }
+    else {
     Tick "=== iteration $i : godot studio render (4 angles) ==="
     $png = "$OutDir\$AssetName`_$i.png"
     $shot = "$wwProject\screenshots\assetloop_latest.png"
@@ -424,12 +466,17 @@ Units are METRES. Waypoints of a bent_cylinder share endpoints so segments weld 
     $g.Dispose()
     $strip.Save($png, [System.Drawing.Imaging.ImageFormat]::Png)
     $strip.Dispose()
+    }
 
     Tick "=== iteration $i : judge ==="
     $judgeImages = @()
     foreach ($r in $RefImages) { if ($r -and (Test-Path $r)) { $judgeImages += $r } }
-    $yawPngs = @(Get-ChildItem "$OutDir\$AssetName`_$i`_yaw*.png" -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.FullName })
-    if ($yawPngs.Count -gt 0) { $judgeImages += $yawPngs } else { $judgeImages += $png }
+    if ($selfViews.Count -ge 2) {
+        $judgeImages += $selfViews
+    } else {
+        $yawPngs = @(Get-ChildItem "$OutDir\$AssetName`_$i`_yaw*.png" -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.FullName })
+        if ($yawPngs.Count -gt 0) { $judgeImages += $yawPngs } else { $judgeImages += $png }
+    }
     if ($RefImages.Count -gt 0) {
         $nRefs = $judgeImages.Count - [Math]::Max($yawPngs.Count, 1)
         $expectedParts = ''
@@ -437,7 +484,7 @@ Units are METRES. Waypoints of a bent_cylinder share endpoints so segments weld 
             try { $expectedParts = "The model was DESIGNED to contain these parts: $((($jsonText | ConvertFrom-Json).parts | ForEach-Object { $_.name }) -join ', '). Do not claim a part is missing unless you also explain why the design fails to read as that part." } catch {}
         }
         $judgePrompt = @"
-You are a HARSH 3D art director. The asset being judged is: a $AssetName (see the ASSET BRIEF below). The FIRST $nRefs image(s) are REAL reference photos showing what this thing looks like in reality - they may show it in context. Judge ONLY the subject itself and IGNORE everything else in the photos (foliage, background, surroundings are NOT part of the asset). The remaining images are our game model rendered from the game engine, one image per view, in order: front view, right side view, back view, left side view.
+You are a HARSH 3D art director. The asset being judged is: a $AssetName (see the ASSET BRIEF below). The FIRST $nRefs image(s) are REAL reference photos showing what this thing looks like in reality - they may show it in context. Judge ONLY the subject itself and IGNORE everything else in the photos (foliage, background, surroundings are NOT part of the asset). The remaining images are our game model rendered from four views around it, in order.
 
 MEASURED FACTS from a mechanical audit (ground truth - never contradict these): $script:AuditFacts
 $expectedParts
@@ -480,6 +527,7 @@ VERDICT: FAIL   (if anything is wrong)
     }
     Log-Inbox ("iter ${i}: verdict=$verdict dims=$($build.dims)`nPROMPT-JUDGE: (spec checklist)`nOUTPUT:`n" + $judge.Substring(0, [Math]::Min(700, $judge.Length)))
     if ($verdict -eq 'PASS') { break }
+    $script:PrevSelfViews = $selfViews
 }
 
 $report.Add("FINAL VERDICT: $verdict")

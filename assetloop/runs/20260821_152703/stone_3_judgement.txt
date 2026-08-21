@@ -1,0 +1,7 @@
+1. PASS: The geometry is sufficiently faceted and angular to avoid looking like a primitive sphere.
+2. FAIL: The model is clipping through the ground plane in a way that suggests it is floating or sinking rather than resting on a flat base. There is no clear, intentional contact patch.
+3. PASS: The color is a neutral, matte grey, which fits the dry stone aesthetic.
+4. PASS: The scale relative to the scene context appears appropriate for a small, handheld prop.
+
+MOST_WRONG: The mesh is clipping into the floor; you need to align the bottom vertices to a flat plane (Z=0) so the asset sits flush on the ground.
+VERDICT: FAIL

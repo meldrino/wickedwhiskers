@@ -378,11 +378,14 @@ func _try_fish(fish: Node3D) -> void:
 	if to_lake.length() < 0.01:
 		return
 	var dir := to_lake.normalized()
-	var r := Terrain.shore_distance(dir)
+	# Shore point on the CAT'S side: cast the crossing ray from the center
+	# back toward the cat, not outward past the far bank.
+	var back := -dir
+	var r := Terrain.shore_distance(back)
 	var shore := Vector3(
-		Terrain.lake.center.x + dir.x * (r - 0.4),
+		Terrain.lake.center.x + back.x * (r - 0.4),
 		0,
-		Terrain.lake.center.y + dir.y * (r - 0.4))
+		Terrain.lake.center.y + back.y * (r - 0.4))
 	_pending_fish = true
 	if not _request_walk(shore, true):
 		_pending_fish = false
@@ -391,6 +394,23 @@ func _try_fish(fish: Node3D) -> void:
 
 func _pouncing() -> bool:
 	return _pounce_t >= 0.0
+
+
+func _catch_with_rod() -> void:
+	var first_cast := not GameState.has_fishing_rod
+	if first_cast:
+		GameState.spend_rod()
+	if _clicked_fish != null and is_instance_valid(_clicked_fish):
+		_clicked_fish.queue_free()
+	_clicked_fish = null
+	stop_walk()
+	GameState.add_food(1)
+	var lines: Array[String] = []
+	if first_cast:
+		lines.append("Whiskers: (lashes the stick and string into a fishing rod and flicks the line out...)")
+	lines.append("SNAP! The goldfish seizes the bait and lands in your paws.")
+	lines.append("Fish: Oh carp.")
+	Hud.show_dialogue(lines)
 
 
 func _start_pounce() -> void:
@@ -461,7 +481,7 @@ func _finish_pounce() -> void:
 		_drip.emitting = true
 	_clicked_fish = null
 	Hud.show_dialogue([
-		"Fish: Ha Ha Whiskers — you can't reach me and there is no-fin you can do about it!",
+		"Fish: Ha Ha Whiskers — no rod, no-fin you can do about it!",
 		"Whiskers: (climbs back onto the bank, soaked and dripping, and glares at the smug goldfish.)",
 	])
 
@@ -539,7 +559,7 @@ func _try_craft_trap() -> void:
 		Hud.toast("You already have a convoluted mouse trap placed.")
 		return
 	if not GameState.can_afford_trap():
-		Hud.toast("Need 1 string + 2 sticks for a convoluted mouse trap.")
+		Hud.toast("Need 1 string + 2 sticks + 2 stones for a convoluted mouse trap.")
 		return
 	GameState.spend_trap()
 	GameState.trap_placed = true
@@ -645,7 +665,10 @@ func _physics_process(delta: float) -> void:
 			velocity.z = move_toward(velocity.z, 0.0, move_speed)
 			if _pending_fish:
 				_pending_fish = false
-				_start_pounce()
+				if GameState.has_fishing_rod or GameState.can_afford_rod():
+					_catch_with_rod()
+				else:
+					_start_pounce()
 			if pending_interact != null:
 				var it := pending_interact
 				pending_interact = null

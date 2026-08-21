@@ -311,6 +311,42 @@ def build_sphere(p):
     return bm
 
 
+def build_rock(p):
+    """Natural stone: uvsphere deformed by seeded low-frequency lumps, squashed,
+    with a flattened resting face so it sits believably on the ground."""
+    r = max(float(p.get('radius', 0.05)), 5e-4)
+    seed = int(p.get('seed', 5))
+    squash = p.get('squash', [1.0, 0.85, 0.72])
+    amp = float(p.get('lumpiness', 0.2))
+    facet = min(max(float(p.get('facet', 0.0)), 0.0), 1.0)
+    rnd = random.Random(seed)
+    ph = [rnd.uniform(0, 6.28318) for _ in range(8)]
+    bm = bmesh.new()
+    default_subd = 2 if facet > 0.3 else 4
+    ret = bmesh.ops.create_icosphere(bm, subdivisions=int(p.get('subdivisions', default_subd)), radius=r)
+    for v in ret['verts']:
+        n = v.co.normalized()
+        d = 1.0 + amp * ((math.sin(n.x * 2.1 + ph[0]) * math.sin(n.y * 1.7 + ph[1]) +
+                          math.sin(n.y * 2.3 + ph[2]) * math.sin(n.z * 1.9 + ph[3])) / 2.0 +
+                         (math.sin(n.x * 4.3 + ph[4]) * math.sin(n.z * 3.7 + ph[5]) +
+                          math.sin(n.y * 4.1 + ph[6]) * math.sin(n.x * 3.3 + ph[7])) / 8.0)
+        d += facet * rnd.uniform(-amp, amp) * 0.9
+        v.co = n * (r * d)
+    bm.transform(Matrix.Diagonal((float(squash[0]), float(squash[1]), float(squash[2]), 1.0)))
+    fl = min(max(float(p.get('flatten', 0.35)), 0.0), 0.8)
+    for v in bm.verts:
+        t = min(max(-v.co.z / (r * 0.8), 0.0), 1.0)
+        v.co.z *= 1.0 - fl * t * t
+    zmin = min(v.co.z for v in bm.verts)
+    cut = zmin + (0.0 - zmin) * (0.15 + 0.25 * fl)
+    for v in bm.verts:
+        if v.co.z < cut:
+            v.co.z = cut
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    bm.transform(Matrix.Translation(Vector(p['center'])))
+    return bm
+
+
 BUILDERS = {
     'bent_cylinder': build_bent_cylinder,
     'cylinder': build_cylinder,
@@ -318,6 +354,7 @@ BUILDERS = {
     'splintered_tip': build_splintered_tip,
     'box': build_box,
     'sphere': build_sphere,
+    'rock': build_rock,
 }
 
 try:
@@ -329,7 +366,7 @@ try:
         if t not in BUILDERS:
             raise ValueError("part %d has unknown type '%s' (valid: %s)" % (idx, t, ', '.join(sorted(BUILDERS))))
         bm = BUILDERS[t](p)
-        add_mesh(p.get('name', 'part_%d' % idx), bm, p.get('material'), True)
+        add_mesh(p.get('name', 'part_%d' % idx), bm, p.get('material'), bool(p.get('smooth', True)))
     if data.get('auto_ground', True):
         meshes = [o for o in bpy.context.scene.objects if o.type == 'MESH']
         mz = min((v.co).z for o in meshes for v in o.data.vertices)

@@ -1,17 +1,21 @@
-ASSET BRIEF: GARDEN STONE for Wicked Whiskers (follows the shared style sheet above).
+MODE: builder
+FAMILY: rock
+ASSET: stone (pickup)
 
-A single chunky garden stone. Size ~30 cm across. Origin at ground under stone centre; stone resting naturally at y=0.
+========== WHAT TO BUILD ==========
+A single natural stone the cat can pick up. It will become a mouse-trap crafting
+ingredient (alongside sticks and string), so it must read INSTANTLY as "a stone"
+at gameplay distance: an irregular grey lump with a flattened resting face.
 
-Parts (~6+): main body an icosphere/uvsphere randomly scaled and squashed (NOT a perfect sphere), plus 3-4 smaller lumps merged visually into the surface to break the silhouette, one flat-ish facet suggestion (a squashed box intersecting the bottom), a few shallow crack hints via thin dark boxes inset into the surface.
-
-Colours: stone grey #8C8C90 = (0.55, 0.55, 0.56) roughness 0.9; lumps slightly varied #7A7A80 = (0.48, 0.48, 0.50); cracks near-black #333338 = (0.20, 0.20, 0.22); a faint mossy patch on top #6B8F4E = (0.42, 0.56, 0.31).
+Design contract:
+- ONE rock part, radius 0.05-0.07 m, sitting exactly on the ground (auto_ground on).
+- STYLIZED FACETED look (house style): "facet": 0.5-0.8, "smooth": false, lumpiness 0.15-0.25,
+  squash around [1.0, 0.8-0.9, 0.6-0.75], flatten 0.4-0.55, any seed you like.
+- Material: use style-sheet stone palette (grey or warm-grey), roughness 0.9-0.95.
+- Do NOT add extra parts. One stone, one part.
 
 ========== JUDGE CHECKLIST ==========
-1. Reads unmistakably as a natural STONE/rock (not a sphere, not a cube)?
-2. Irregular silhouette with lumps - clearly not a primitive?
-3. Matte stony grey with at least one moss or crack detail?
-4. Sits flat on the ground plane, stable-looking?
-5. Size ~30 cm across?
-6. No metallic sheen, no white blowout?
-7. Bottom looks grounded (flat-ish contact area)?
-8. Single coherent model - nothing floating?
+1. Reads as a stylized game rock: angular faceted planes, irregular silhouette - NOT a smooth potato/egg/sphere.
+2. Has a DISTINCT flattened resting face visibly touching the ground plane.
+3. Colour is natural dry stone (grey/warm grey), matte, not saturated, not brown bark.
+4. Size believable for a cat to carry (fist-to-skull sized).

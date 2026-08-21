@@ -3,9 +3,10 @@
 # human sees in Blender. Usage:
 #   blender --background --python render_asset.py -- <glb> <outdir>
 import bpy
+import bmesh
 import math
 import sys
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 glb, outdir = argv[0], argv[1]
@@ -37,6 +38,8 @@ scene.render.engine = 'BLENDER_WORKBENCH'
 scene.display.shading.light = 'STUDIO'
 scene.display.shading.color_type = 'MATERIAL'
 scene.display.shading.show_cavity = True
+scene.display.shading.show_shadows = True
+scene.display.shading.shadow_intensity = 0.3
 scene.render.resolution_x = 1024
 scene.render.resolution_y = 768
 
@@ -44,10 +47,24 @@ world = bpy.data.worlds.new('bg')
 world.color = (0.18, 0.18, 0.20)
 scene.world = world
 
-for i, yaw in enumerate((30, 120, 210, 300)):
+_bm = bmesh.new()
+bmesh.ops.create_circle(_bm, cap_ends=True, segments=64, radius=1.0)
+floor_data = bpy.data.meshes.new('floor')
+_bm.to_mesh(floor_data)
+_bm.free()
+fw = diag * 3.0
+floor_data.transform(Matrix.Diagonal((fw, fw, 1.0, 1.0)))
+floor_data.transform(Matrix.Translation(Vector((ctr.x, ctr.y, mins[2] - 0.0004))))
+floor_mat = bpy.data.materials.new('floor_mat')
+floor_mat.diffuse_color = (0.32, 0.32, 0.34, 1.0)
+floor_data.materials.append(floor_mat)
+floor = bpy.data.objects.new('Floor', floor_data)
+bpy.context.collection.objects.link(floor)
+
+for i, (yaw, hf) in enumerate(((30, 0.5), (120, 0.5), (215, 0.08), (300, 0.3))):
     a = math.radians(yaw)
     d = diag * 1.05 + 0.12
-    cam.location = ctr + Vector((math.cos(a) * d, math.sin(a) * d, diag * 0.5))
+    cam.location = ctr + Vector((math.cos(a) * d, math.sin(a) * d, diag * hf))
     direc = (ctr - cam.location).normalized()
     cam.rotation_euler = direc.to_track_quat('-Z', 'Y').to_euler()
     scene.render.filepath = "%s\\view%d.png" % (outdir, i + 1)

@@ -993,3 +993,50 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   forai/ww.html Lessons (bak ww.html.bak.202608210005; working copy /home/andy/ww.html was
   STALE at 284 lines vs deployed 447 - refreshed from live BEFORE editing, avoiding a repeat
   of the 08-13 overwrite incident). 200 OK verified.
+
+- STICKS DONE + BUILDER LIBRARY PIVOT (2026-08-21 ~09:00-14:40): replaced raw-bpy codegen with
+  deterministic builder library (assetloop/builders/build_asset.py): gemini designs JSON part
+  lists (bent_cylinder/cylinder/cone_tip/splintered_tip/box/sphere, sweep_spline w/ Catmull-Rom
+  path + monotonic radius taper, fixed-up ring frames, collars, longitudinal grain noise,
+  auto_ground min-Z). SIX-SECTION STICK ROOT CAUSE: duplicate `def build_bent_cylinder` in
+  build_asset.py - old segment-gluing copy shadowed every fix; tests 2-6 were identical broken
+  meshes. Lesson: grep for duplicate defs when "fixes do nothing". New tooling: render_asset.py
+  (headless workbench self-renders = judge sees what user sees), diag_mesh.py (numeric crease
+  audit - buckets; clean shaft = nothing >25 deg except cap rims), layout_batch.py (review scene).
+  User approved test8; 4 variants (a slim/b stout/c bare/d twiggy) = 5 types; copied to
+  assets/sticks/, pickup.gd spawns random type at 1.5x, main.gd spawns on grass top (+0.04)
+  scattered field-wide (>=8m apart, landmark/water-safe, one near spawn). Smoketest PASS.
+  Owner rulings in rules.txt: sweeping curves, no zigzag main body, NO splinter tips on sticks,
+  branches may be separate. NEXT: stones x5 (mouse-trap ingredient w/ sticks) -> wire
+  self-render+audit into loop as judge input first.
+
+## 2026-08-21 (late) — stones live, pond grass fixed for real, fishing rod works
+
+- Stones integrated: 5 GLB variants in assets/stones/ (4 batch + loop best), pickup.gd
+  spawns random variant at 1.4x, main.gd scatters 6 stones via shared _scatter_positions
+  (7 sticks + 6 stones, min-gap/landmark/water/spawn rules).
+- Trap recipe now 1 string + 2 sticks + 2 STONES: TRAP_STONE_COST, can_afford_trap/
+  spend_trap extended, trap_materials_status() split from ladder's materials_status()
+  so bird.gd stays string+sticks. Toasts updated. Smoke grants stones now.
+- POND GRASS (user-reported x3): stopped trusting math, screenshotted + pixel-classified.
+  Real causes: (1) terrain painted grass-green right up to and UNDER the translucent
+  water (water_edge_color band only reached 45% of depression radius) -> looked like
+  grass growing in the pond; (2) zero bare margin at the waterline with hscale=8 blades.
+  Fixes: TerrainGenerator.generate_colors height-based shore tint (h < wl+0.3 ->
+  water_edge_color), grass_exclusion WATER_MARGIN 0.03 + WATER_RIM 0.35 bare ring.
+  Verified by before/after pixel maps: sand fringe now borders every water edge,
+  far-bank water visible where a green wall used to be.
+- Fishing rod implemented (user ask): click fish with >=1 stick + >=1 string -> cat walks
+  to shore (player.gd _try_fish) -> _catch_with_rod(): spends stick+string once,
+  has_fishing_rod=true, +1 food, dialogue. No materials -> old pounce+taunt ("no rod,
+  no-fin you can do about it"). GameState: ROD_*_COST, has_fishing_rod, new_game reset.
+- BUGFIX _try_fish shore math: crossing ray was cast OUTWARD from lake center (far
+  bank walk ~7m through the pond); now casts back toward the cat (-dir).
+- BUGFIX smoke: Dumbleclaw trade left Hud panel open (blocked fishing), dawn stage
+  leaves cinematic_active=true (froze player physics) -> smoke closes/resets both.
+  New SMOKE fish_rod stage: fish_rod=true caught=true food=4 full-suite green.
+- Tooling: main.gd --pond screenshot mode gained --pondframes=N (let grass stream in)
+  and --pondeye=H (shore-level camera at pond). Pixel-classifier PowerShell one-liner
+  maps water/grass/sand per cell - this is how we verify visuals without eyeballs.
+- In flight / next: rod has no held mesh yet (invisible while fishing); fish respawn?
+  currently consumed permanently; asset loop could build a proper rod model.

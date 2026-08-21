@@ -1,12 +1,12 @@
 **********************
 PowerShell transcript start
-Start time: 20260821010506
+Start time: 20260821082114
 Username: LAPTOP-J5TKEBVT\Andy
 RunAs User: LAPTOP-J5TKEBVT\Andy
 Configuration Name: 
 Machine: LAPTOP-J5TKEBVT (Microsoft Windows NT 10.0.26200.0)
 Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -ExecutionPolicy Bypass -File C:\crypto\wicked whiskers\assetloop\overnight_batch.ps1
-Process ID: 24912
+Process ID: 21340
 PSVersion: 7.6.3
 PSEdition: Core
 GitCommitId: 7.6.3
@@ -17,15 +17,8 @@ PSRemotingProtocolVersion: 2.4
 SerializationVersion: 1.1.0.1
 WSManStackVersion: 3.0
 **********************
-01:05:06 === START tractor ===
-01:10:28 === DONE tractor: verdict=NO-VERDICT glbs=0 dir=C:\crypto\wicked ===
-01:10:33 === START mouse ===
-01:15:41 === DONE mouse: verdict=NO-VERDICT glbs=0 dir=C:\crypto\wicked ===
-01:15:46 === START fish ===
-01:20:49 === DONE fish: verdict=NO-VERDICT glbs=0 dir=C:\crypto\wicked ===
-01:20:49 STOPPING: 3 consecutive assets with no GLB - gemini quota likely exhausted.
-01:20:49 BATCH DONE 2026-08-21 01:20:49
-**********************
-PowerShell transcript end
-End time: 20260821012049
-**********************
+08:21:15 === START tractor ===
+08:25:07 === DONE tractor: verdict=NO-VERDICT glbs=1 dir=20260821_082115 ===
+08:25:12 === START mouse ===
+08:30:08 === DONE mouse: verdict=NO-VERDICT glbs=0 dir=20260821_082715 ===
+08:30:13 === START fish ===

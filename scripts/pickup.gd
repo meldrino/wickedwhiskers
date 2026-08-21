@@ -8,6 +8,14 @@ const STICK_SCENES: Array[PackedScene] = [
 	preload("res://assets/sticks/stick_d.glb"),
 ]
 
+const STONE_SCENES: Array[PackedScene] = [
+	preload("res://assets/stones/stone_v1.glb"),
+	preload("res://assets/stones/stone_v2.glb"),
+	preload("res://assets/stones/stone_v3.glb"),
+	preload("res://assets/stones/stone_v4.glb"),
+	preload("res://assets/stones/stone_v5.glb"),
+]
+
 @export var kind := "string"
 @export var amount := 1
 @export var loot_id := ""
@@ -34,6 +42,9 @@ func _collect(body: Node3D) -> void:
 		"stick":
 			GameState.add_sticks(amount)
 			name = "a stick"
+		"stone":
+			GameState.add_stones(amount)
+			name = "a stone"
 		"food":
 			GameState.add_food(amount)
 			name = "a tasty scrap"
@@ -66,6 +77,13 @@ func _build_mesh() -> void:
 			inst.rotation = Vector3(0.0, randf() * TAU, 0.06)
 			inst.scale = Vector3.ONE * 1.5
 			add_child(inst)
+			return
+		"stone":
+			var sscene: PackedScene = STONE_SCENES[randi() % STONE_SCENES.size()]
+			var sinst: Node3D = sscene.instantiate()
+			sinst.rotation = Vector3(0.0, randf() * TAU, 0.0)
+			sinst.scale = Vector3.ONE * 1.4
+			add_child(sinst)
 			return
 		"food":
 			var sm := SphereMesh.new()

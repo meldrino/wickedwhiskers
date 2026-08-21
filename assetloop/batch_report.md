@@ -1,9 +1,6 @@
-# overnight batch 2026-08-21 01:05:06
-01:05:06 === START tractor ===
-01:10:28 === DONE tractor: verdict=NO-VERDICT glbs=0 dir=C:\crypto\wicked ===
-01:10:33 === START mouse ===
-01:15:41 === DONE mouse: verdict=NO-VERDICT glbs=0 dir=C:\crypto\wicked ===
-01:15:46 === START fish ===
-01:20:49 === DONE fish: verdict=NO-VERDICT glbs=0 dir=C:\crypto\wicked ===
-01:20:49 STOPPING: 3 consecutive assets with no GLB - gemini quota likely exhausted.
-01:20:49 BATCH DONE 2026-08-21 01:20:49
+# overnight batch 2026-08-21 08:21:14
+08:21:15 === START tractor ===
+08:25:07 === DONE tractor: verdict=NO-VERDICT glbs=1 dir=20260821_082115 ===
+08:25:12 === START mouse ===
+08:30:08 === DONE mouse: verdict=NO-VERDICT glbs=0 dir=20260821_082715 ===
+08:30:13 === START fish ===

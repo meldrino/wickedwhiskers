@@ -138,6 +138,29 @@ func _maybe_screenshot() -> void:
 		var pond_from := Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
 		var pond_to := Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5)
 		player.camera.look_at_from_position(pond_from, pond_to, Vector3.UP)
+		var pond_frames := 5
+		for a in args:
+			if a.begins_with("--pondframes="):
+				pond_frames = int(a.get_slice("=", 1))
+		for i in range(pond_frames):
+			await get_tree().process_frame
+		for a in args:
+			if a.begins_with("--pondeye="):
+				var eye_h := float(a.get_slice("=", 1))
+				var dir := Vector2(1, 1).normalized()
+				var sr := Terrain.shore_distance(dir)
+				var sp := Vector3(
+					Terrain.lake.center.x + dir.x * (sr - 0.6),
+					0,
+					Terrain.lake.center.y + dir.y * (sr - 0.6))
+				sp.y = Terrain.height_at(sp.x, sp.z) + eye_h
+				player.camera.look_at_from_position(sp,
+					Vector3(Terrain.lake.center.x, Terrain.water_level - 0.05, Terrain.lake.center.y),
+					Vector3.UP)
+				print("PONDEYE cam=(%.2f, %.3f, %.2f) shore_r=%.2f wl=%.3f wr=%.1f lake=(%.1f,%.1f) r=%.1f" % [
+					sp.x, sp.y, sp.z, sr, Terrain.water_level, Terrain.water_radius,
+					Terrain.lake.center.x, Terrain.lake.center.y, Terrain.lake.radius])
+				break
 	elif "--ground" in args and player != null:
 		player.camera_frozen = true
 		player.camera_holder.position = player.global_position + Vector3(0, 0.4, 0)
@@ -508,6 +531,7 @@ func _run_smoke() -> void:
 
 	GameState.add_string(1)
 	GameState.add_sticks(2)
+	GameState.add_stones(2)
 	var shed_door := get_node("Shed/Door_shed")
 	shed_door._on_combo(GameState.combo)
 	print("SMOKE shed_unlocked=%s has_keys=%s string=%d" % [GameState.shed_unlocked, GameState.has_keys, GameState.string_count])
@@ -535,6 +559,7 @@ func _run_smoke() -> void:
 
 	var dc2 := get_node("Dumbleclaw")
 	dc2._on_choice(1)
+	Hud.close_dialogue()
 	print("SMOKE after_trade food=%d gold=%d" % [GameState.food_count, GameState.gold])
 
 	var farmhouse_door := get_node("Farmhouse/Door_farmhouse")
@@ -546,6 +571,25 @@ func _run_smoke() -> void:
 	farmhouse_door.interact()
 	Hud.close_dialogue()
 	print("SMOKE is_day=%s catfood_used=%s food=%d" % [GameState.is_day, GameState.catfood_used, GameState.food_count])
+
+	GameState.add_string(1)
+	GameState.add_sticks(1)
+	var player := get_tree().get_first_node_in_group("player")
+	var lake_node := get_node("Lake")
+	var school: Node = lake_node.get_node_or_null("Fish")
+	var fish_caught := false
+	if player != null and school != null:
+		GameState.cinematic_active = false
+		player.global_position = Vector3(Terrain.lake.center.x + 2.0, 0.0, Terrain.lake.center.y + 2.0)
+		player.call("_try_fish", school.get("fish"))
+		for i in range(600):
+			await get_tree().process_frame
+			if GameState.food_count >= 3 and GameState.has_fishing_rod:
+				fish_caught = true
+				break
+	print("SMOKE fish_rod=%s caught=%s food=%d string=%d sticks=%d" % [
+		GameState.has_fishing_rod, fish_caught, GameState.food_count,
+		GameState.string_count, GameState.stick_count])
 	print("SMOKE DONE")
 	get_tree().quit()
 
@@ -941,10 +985,20 @@ func _build_logs() -> void:
 
 
 func _spawn_pickups() -> void:
+	for kind in ["stick", "stone"]:
+		var count := 7 if kind == "stick" else 6
+		for p in _scatter_positions(count):
+			var st := preload("res://scripts/pickup.gd").new()
+			st.kind = kind
+			st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.04, p.z)
+			add_child(st)
+
+
+func _scatter_positions(count: int) -> Array[Vector3]:
 	var placed: Array[Vector3] = []
 	var attempts := 0
 	var min_gap := 8.0
-	while placed.size() < 7 and attempts < 600:
+	while placed.size() < count and attempts < 600:
 		attempts += 1
 		if attempts == 300:
 			min_gap = 5.0
@@ -963,11 +1017,7 @@ func _spawn_pickups() -> void:
 		if not ok:
 			continue
 		placed.append(p)
-	for p in placed:
-		var st := preload("res://scripts/pickup.gd").new()
-		st.kind = "stick"
-		st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.04, p.z)
-		add_child(st)
+	return placed
 
 
 func _spawn_dumbleclaw() -> void:

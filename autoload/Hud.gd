@@ -204,10 +204,10 @@ func _process(delta: float) -> void:
 	var tbar := ""
 	for i in range(10):
 		tbar += "▓" if float(i) / 10.0 < ts else "░"
-	inventory_label.text = "Day %d   Lives: %d/%d   Food: %d   Gold: %d\nHunger %s   Energy %s   String: %d   Sticks: %d%s" % [
+	inventory_label.text = "Day %d   Lives: %d/%d   Food: %d   Gold: %d\nHunger %s   Energy %s   String: %d   Sticks: %d   Stones: %d%s" % [
 		GameState.day_index, GameState.lives, GameState.MAX_LIVES,
 		GameState.food_count, GameState.gold,
-		hbar, tbar, GameState.string_count, GameState.stick_count,
+		hbar, tbar, GameState.string_count, GameState.stick_count, GameState.stone_count,
 		"   (keys!)" if GameState.has_keys else "",
 	]
 	if toast_time > 0.0:

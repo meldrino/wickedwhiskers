@@ -151,9 +151,9 @@ func _make_trap() -> void:
 	if GameState.trap_placed:
 		Hud.toast("Your mouse trap is already out there waiting.")
 		return
-	match GameState.materials_status():
+	match GameState.trap_materials_status():
 		"none":
-			Hud.toast("You don't have the right materials — a trap needs string and sticks.")
+			Hud.toast("You don't have the right materials — a trap needs string, sticks and stones.")
 		"half":
 			Hud.toast("You only have half the materials you need for the trap.")
 		"full":
