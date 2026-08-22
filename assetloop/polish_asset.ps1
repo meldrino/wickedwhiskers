@@ -21,6 +21,7 @@ $ww = 'C:\crypto\wicked whiskers'
 $blender = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
 $buildPy = "$ww\assetloop\builders\build_asset.py"
 $renderPy = "$ww\assetloop\builders\render_asset.py"
+$probePy = "$ww\assetloop\builders\probe_geometry.py"
 $vision = 'C:\crypto\bigpickle\gemini-vision.ps1'
 $allowedTypes = @('bent_cylinder', 'cylinder', 'cone_tip', 'splintered_tip', 'box', 'sphere', 'rock')
 if (-not $OutRoot) { $OutRoot = "$ww\assetloop\polish" }
@@ -76,7 +77,15 @@ function Build-Spec([string]$specFile) {
     if ($log -notmatch 'ASSET_BUILT') { return @{ ok = $false } }
     $d = ([regex]::Match($log, 'DIMS \(([^)]+)\)').Groups[1].Value)
     $nums = @($d -split ',\s*' | ForEach-Object { [double]$_ })
-    return @{ ok = $true; dimsText = $d; dims = $nums }
+    $probe = ''
+    try {
+        & $blender --background --python $probePy -- $glb *> "$outDir\work\probe_last.txt"
+        $probe = (Get-Content "$outDir\work\probe_last.txt" | Where-Object { $_ -match '^PROBE (parts|inside)' }) -join "`n"
+        $warned = @($probe -split "`n" | Where-Object { $_ -match 'DETACHED|BURIED|NO_ROOT|BARELY' })
+        if ($warned.Count) { Log "GEOMETRY WARNINGS: $($warned -join ' | ')" }
+        else { Log "geometry probe clean ($(@($probe -split "`n").Count) lines)" }
+    } catch { Log 'geometry probe failed to run (non-fatal)' }
+    return @{ ok = $true; dimsText = $d; dims = $nums; probe = $probe }
 }
 
 function Approve([string]$tier, [string]$note) {
@@ -86,6 +95,13 @@ function Approve([string]$tier, [string]$note) {
     if ($note) { Add-Content -LiteralPath $report -Value "NOTE: $note" -Encoding utf8 }
     Log "APPROVED ($tier) -> $outDir\approved"
     exit 0
+}
+
+function Get-LCP([string]$a, [string]$b) {
+    $n = [Math]::Min($a.Length, $b.Length)
+    $i = 0
+    while ($i -lt $n -and $a[$i] -eq $b[$i]) { $i++ }
+    return $i
 }
 
 Log "POLISH START $Name spec=$SpecPath briefLen=$($Brief.Length) maxRounds=$MaxRounds"
@@ -112,6 +128,9 @@ for ($round = 1; $round -le $MaxRounds; $round++) {
 You are a HARSH 3D art director judging game model '$Name'. NO reference photos - rely on your knowledge of the real object.
 ASSET BRIEF (the contract): $Brief
 MEASURED FACTS from mechanical audit (ground truth): bbox dims in metres = ($($b.dimsText)); all parts passed a sharp-edge audit.
+GEOMETRY PROBE (measured part positions - trust this over the images for any inside/outside/floating/buried question):
+$($b.probe)
+Do NOT claim a part is floating or buried when the probe reports ROOTED_VISIBLE or CHAIN_ROOTED for it.
 The images are four views around the model, in order. Judge ONLY the subject.
 
 CALIBRATION: harsh about real problems, NOT a perfectionist. Stylized low-poly cozy cat-game asset - it does NOT need realism.
@@ -140,7 +159,7 @@ VERDICT: PASS   or   PASS-WITH-NOTES   or   FAIL$historyBlock
     if ($norm.Length -gt 50) { $norm = $norm.Substring(0, 50) }
     for ($h = 0; $h -lt $mostWrongHistory.Count - 1; $h++) {
         $old = $mostWrongHistory[$h]
-        if ($old.Length -ge 10 -and ($old.StartsWith($norm) -or $norm.StartsWith($old))) {
+        if ($old.Length -ge 10 -and (Get-LCP $old $norm) -ge 25) {
             Log "FLIP-FLOP: '$mw' re-raised after being fixed in round $($h + 1)"
             Approve 'PASS-WITH-NOTES' 'flip-flop guard (oscillating judge)'
         }
