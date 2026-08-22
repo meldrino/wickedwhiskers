@@ -1,0 +1,13 @@
+This asset is a failure of basic construction and visual fidelity. As an art director, I am looking for a "chunky, toy-like" stick, but what you have delivered is a collection of disjointed, low-quality primitives that fail to adhere to the most basic construction rules.
+
+**Discrepancies:**
+
+1.  **Non-Contiguous Geometry (FAIL):** The "Main_Shaft" is clearly constructed from separate, non-welded cylinders rather than a single contiguous mesh. You can see the visible seams where the segments meet. The brief explicitly mandated a "bent_cylinder through waypoints" to ensure a smooth, single-piece look.
+2.  **Visible Faceting (FAIL):** The construction rule for smooth primitives was violated. The cylinders show harsh, visible edges (faceting) rather than the required smooth-shaded, 16+ radial segment geometry. This makes the asset look like a low-effort prototype rather than a finished game model.
+3.  **Failed Integration:** The side branches and forks appear "glued on" rather than growing out of the shaft. They lack the required organic transition into the main body, violating the "side branches/forks join INTO the shaft" rule.
+4.  **Incorrect Tip Construction:** The "Frayed_Tip" is a simple cone that looks like a pencil point. It lacks the "frayed/broken" look requested and does not properly integrate with the shaft.
+5.  **Missing Surface Detail:** The "Bark_Ridge" parts are non-existent or completely unreadable. There is no surface variation to break up the silhouette, making the stick look like a smooth, extruded plastic tube.
+6.  **Colour/Material Failure:** The model appears to be a single, flat, uninspired beige. It fails to utilize the specified palette for the bark brown (#6B4A2B) and the lighter inner wood colour (#C9A870) for the tip, resulting in a model that lacks the requested visual depth.
+
+MOST_WRONG: The use of separate, faceted cylinders for the main shaft instead of a single, smooth, contiguous mesh.
+VERDICT: FAIL

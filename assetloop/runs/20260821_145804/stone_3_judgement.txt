@@ -1,0 +1,7 @@
+1. 0 (This is a smooth, organic blob/egg, not a stylized rock. It lacks any facets or angular geometry.)
+2. 0 (There is no visible flat base; the silhouette is rounded and tapers into the ground plane, making it look like it's melting into the floor.)
+3. 1 (The colour is a neutral grey, which is acceptable for a base stone.)
+4. 1 (The scale is appropriate for a carryable object.)
+
+MOST_WRONG: The mesh topology is completely smooth; you need to implement low-poly, faceted geometry with sharp edges to achieve a "stylized rock" look instead of a smooth egg.
+VERDICT: FAIL

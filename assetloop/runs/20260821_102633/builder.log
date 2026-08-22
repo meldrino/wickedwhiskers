@@ -1,0 +1,27 @@
+C:\crypto\wicked whiskers\assetloop\builders\build_asset.py:22: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+10:31:37 | INFO: Starting glTF 2.0 export
+10:31:37 | INFO: Extracting primitive: Bark_Ridge_1
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Extracting primitive: Bark_Ridge_2
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Extracting primitive: Fork_A
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Extracting primitive: Fork_B
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Extracting primitive: Frayed_Tip
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Extracting primitive: Main_Shaft
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Extracting primitive: Side_Branch_1
+10:31:37 | INFO: Primitives created: 1
+10:31:37 | INFO: Finished glTF 2.0 export in 0.04547882080078125 s
+
+DIMS (0.08, 0.064, 0.547)
+ASSET_BUILT
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

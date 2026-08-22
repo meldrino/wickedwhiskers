@@ -1,0 +1,13 @@
+This asset is a failure of basic construction and adherence to the visual language of *Wicked Whiskers*.
+
+**Discrepancies:**
+
+1.  **Non-Contiguous Construction:** The asset is clearly composed of separate, visible cylinders butt-joined together rather than a single, fluidly bent mesh. The "kinks" at the joints are jarring and violate the "contiguous is non-negotiable" rule.
+2.  **Visible Faceting:** The cylinders lack smooth shading. The polygonal edges are clearly visible along the shaft and branches, failing the "smooth primitives" rule which requires 16+ segments and smooth shading.
+3.  **Forked Branch Geometry:** The "fork" at the thick end looks like two cylinders glued onto the side of the shaft rather than a natural, organic split integrated into the main body.
+4.  **Bark Ridges:** The brief requested bark ridges as part of the surface variation; the current model appears to have no distinct surface detailing, just a uniform, flat-shaded brown surface.
+5.  **Broken Tip Orientation:** The `Broken_Tip` (cone) is poorly integrated. It looks like a sharp thorn rather than a frayed, broken wooden end.
+6.  **Silhouette:** The silhouette is jagged and unnatural due to the segmented construction, failing the "simple readable silhouettes" requirement. It looks like a low-effort construction kit rather than a stylized cartoon asset.
+
+MOST_WRONG: The use of segmented, butt-joined cylinders instead of a single, smooth, contiguous bent mesh.
+VERDICT: FAIL

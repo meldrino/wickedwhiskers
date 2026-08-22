@@ -1,0 +1,13 @@
+This asset is a complete failure. You have ignored almost every instruction in the brief.
+
+1. **Orientation Failure:** The asset is standing vertically (+Y axis). The brief explicitly stated it must lie FLAT on the ground along the Z-axis.
+2. **Missing Geometry:** The "frayed/broken tip" cone is entirely absent. The ends of your cylinders are blunt and flat, which looks like a cheap pipe, not a wooden stick.
+3. **Lack of Detail:** There are no "bark ridge" boxes embedded in the surface. The model is a perfectly smooth, featureless cylinder with some sticks glued to it.
+4. **Incorrect Branching:** The branches look "glued-on" rather than integrated. The brief required them to start *inside* the shaft and angle out naturally. Yours are perpendicular, stiff, and lack the requested organic flow.
+5. **No Taper:** The shaft maintains a uniform thickness from end to end. The brief required a specific taper (0.016 to 0.010).
+6. **Palette/Material Violation:** The colour is a flat, uninspired beige. It does not match the required "bark brown" (#6B4A2B) or the "lighter inner wood" (#C9A870) for the tips.
+7. **Silhouette:** The silhouette is lifeless. It lacks the gentle, organic bends requested in the brief, making it look like a piece of factory-extruded plastic rather than a fallen twig.
+
+MOST_WRONG: The orientation is completely wrong; the stick is standing upright instead of lying flat on the ground plane as per the mandatory orientation contract.
+
+VERDICT: FAIL

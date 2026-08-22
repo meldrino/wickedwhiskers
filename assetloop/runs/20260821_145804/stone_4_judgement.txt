@@ -1,0 +1,7 @@
+1. 0/1 - This is a smooth, featureless blob. It has zero faceted planes and no rock-like silhouette. It is a potato.
+2. 0/1 - There is no visible flat resting face; it looks like it is floating or clipping into the floor rather than sitting on it.
+3. 1/1 - The colour is a neutral grey, which is acceptable for a base material.
+4. 1/1 - The scale is acceptable.
+
+MOST_WRONG: The geometry is a perfectly smooth subdivision surface; you need to implement low-poly hard-surface modeling (or a decimate modifier) to create angular, faceted planes.
+VERDICT: FAIL

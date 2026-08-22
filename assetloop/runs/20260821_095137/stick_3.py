@@ -1,0 +1,85 @@
+import bpy
+import bmesh
+from mathutils import Matrix, Vector, Euler
+import math
+
+def create_material(name, color, roughness):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+def create_segment(bm, radius, length, pos, rot):
+    # Create cylinder-like segment
+    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=8, radius1=radius, radius2=radius, depth=length)
+    
+    # Transform to position and rotation
+    mat = Matrix.Rotation(rot[0], 4, 'X') @ Matrix.Rotation(rot[1], 4, 'Y') @ Matrix.Rotation(rot[2], 4, 'Z')
+    mat.translation = pos
+    bmesh.ops.transform(bm, matrix=mat, verts=bm.verts)
+
+# Setup materials
+bark_mat = create_material("Bark", (0.42, 0.29, 0.17), 0.85)
+tip_mat = create_material("Tip", (0.79, 0.66, 0.44), 0.85)
+
+# Build stick
+bm = bmesh.new()
+
+# Main shaft segments (gentle curve along Z)
+# 5 segments, length 0.11 each = 0.55m
+segments = []
+curr_pos = Vector((0, 0.02, -0.275)) # Start at -Z
+for i in range(5):
+    # Slight bend: rotate each segment slightly
+    angle = (i - 2) * 0.05
+    create_segment(bm, 0.015, 0.11, curr_pos + Vector((0, 0, 0.055)), (angle, 0, 0))
+    curr_pos += Vector((0, math.sin(angle)*0.11, 0.11 * math.cos(angle)))
+
+# Side branch
+create_segment(bm, 0.008, 0.08, Vector((0, 0.02, 0)), (0, 1.2, 0))
+
+# Forked end
+create_segment(bm, 0.007, 0.05, Vector((0, 0.02, 0.275)), (0.5, 0, 0.5))
+create_segment(bm, 0.007, 0.05, Vector((0, 0.02, 0.275)), (-0.5, 0, -0.5))
+
+# Bark ridges (thin boxes)
+for i in range(3):
+    box = bmesh.ops.create_cube(bm, size=1.0)
+    bmesh.ops.scale(bm, vec=(0.005, 0.005, 0.15), verts=box['verts'])
+    bmesh.ops.rotate(bm, cent=(0,0,0), matrix=Matrix.Rotation(i*1.2, 4, 'Z'), verts=box['verts'])
+    bmesh.ops.translate(bm, vec=(0, 0.03, 0), verts=box['verts'])
+
+# Frayed tip (cone)
+tip = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=0.015, radius2=0, depth=0.03)
+bmesh.ops.translate(bm, vec=(0, 0.02, -0.29), verts=tip['verts'])
+
+# Create mesh and object
+me = bpy.data.meshes.new("WoodenStick")
+bm.to_mesh(me)
+bm.free()
+
+ob = bpy.data.objects.new("WoodenStick", me)
+bpy.context.collection.objects.link(ob)
+
+# Apply materials
+ob.data.materials.append(bark_mat)
+# Assign tip material to the last few faces (the cone tip)
+for poly in ob.data.polygons[-6:]:
+    poly.material_index = 1
+ob.data.materials.append(tip_mat)
+
+# Ensure it sits on Y=0
+bbox_min = min((ob.matrix_world @ v.co).y for v in ob.data.vertices)
+ob.location.y -= bbox_min
+
+# Export
+bpy.ops.export_scene.gltf(filepath="C:\\crypto\\wicked whiskers\\assetloop\\runs\\20260821_095137\\stick_3.glb", export_format='GLB')
+
+# Output metrics
+print("ASSET_BUILT")
+dims = ob.dimensions
+print(f"DIMS Vector(({dims.x:.3f}, {dims.y:.3f}, {dims.z:.3f}))")
+
+

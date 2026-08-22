@@ -1,0 +1,15 @@
+15:02:30 | INFO: Data are loaded, start creating Blender stuff
+15:02:30 | INFO: Blender create Mesh node HelixWrap
+15:02:30 | INFO: Blender create Mesh node LooseEnd
+15:02:30 | INFO: Blender create Mesh node TwineBall
+15:02:30 | INFO: glTF import finished in 0.01s
+PROBE parts=3 bbox=(0.187,0.119,0.112)
+PROBE pair HelixWrap|LooseEnd overlap=(0.061,0.062,0.043)
+PROBE pair HelixWrap|TwineBall overlap=(0.110,0.110,0.082)
+PROBE pair LooseEnd|TwineBall overlap=(0.058,0.059,0.035)
+PROBE inside LooseEnd in HelixWrap pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+PROBE inside TwineBall in HelixWrap pct=12 -> ROOTED_VISIBLE (mean root depth 0.001m)
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

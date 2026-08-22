@@ -1,0 +1,7 @@
+1. **TwineBall / HelixWrapA/B**: The model is not densely wound with overlapping coils; it is merely a bare sphere wrapped in a single sparse, loose spiral coil like a bedspring or slinky, exposing massive areas of the smooth underlying sphere.
+2. **HelixWrapA/B**: The winding lacks multi-directional layering and criss-crossing characteristic of a ball of twine.
+3. **HelixWrapA (Bottom)**: Coils at the base detach significantly from the inner sphere, floating in mid-air in wide concentric loops.
+
+MOST_WRONG: The asset looks like a bare sphere inside a loose spring cage rather than a densely wound ball of twine.
+VERDICT: FAIL
+

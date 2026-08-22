@@ -1,0 +1,8 @@
+1. **FAIL**: This is a perfect, smooth, symmetrical potato. It lacks any geological character, sharp edges, or irregular lumps.
+2. **PASS**: It has a flattened base and sits flush on the plane.
+3. **PASS**: The shading is smooth and free of visible faceting.
+4. **FAIL**: The color is a flat, lifeless, uniform charcoal grey. It looks like digital clay, not a natural stone.
+5. **PASS**: The scale is appropriate for the requested size.
+
+MOST_WRONG: The silhouette is too organic and symmetrical; you need to introduce aggressive, randomized vertex displacement to break the "potato" shape and create sharp, rocky edges.
+VERDICT: FAIL

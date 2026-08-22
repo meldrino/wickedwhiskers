@@ -1,0 +1,188 @@
+08:26:17 gemini busy (gemini-flash-latest), waiting 30s (attempt 1/6)
+08:26:52 gemini busy (gemini-flash-latest), waiting 60s (attempt 2/6)
+08:28:19 gemini busy (gemini-flash-latest), waiting 90s (attempt 3/6)
+08:29:50 switching to fallback model gemini-3.1-flash-lite
+The error occurs because `bmesh` objects do not have a `.co` attribute. You must iterate over the `verts` collection of the bmesh and access the `.co` attribute of each individual vertex.
+
+Here is the corrected script:
+
+```python
+import bpy
+import bmesh
+import math
+import mathutils
+from mathutils import Matrix, Vector
+
+# ---------------------------------------------------------
+# 1. Clean scene
+# ---------------------------------------------------------
+bpy.ops.wm.read_factory_settings(use_empty=True)
+
+# ---------------------------------------------------------
+# 2. Materials
+# ---------------------------------------------------------
+def create_material(name, color_rgba, roughness=0.5):
+    mat = bpy.data.materials.new(name=name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = color_rgba
+        bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+mat_grey = create_material("MouseGrey", (0.60, 0.60, 0.63, 1.0), roughness=0.7)
+mat_light = create_material("MouseLight", (0.79, 0.77, 0.74, 1.0), roughness=0.7)
+mat_pink = create_material("MousePink", (0.85, 0.54, 0.54, 1.0), roughness=0.55)
+mat_black = create_material("MouseBlack", (0.08, 0.08, 0.09, 1.0), roughness=0.25)
+
+# ---------------------------------------------------------
+# 3. Helper to create object from bmesh
+# ---------------------------------------------------------
+def create_mesh_object(name, bm, material=None):
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(ob)
+    if material:
+        ob.data.materials.append(material)
+    return ob
+
+# ---------------------------------------------------------
+# 4. Geometry Generation
+# ---------------------------------------------------------
+
+# --- Body & Head ---
+bm_body = bmesh.new()
+bmesh.ops.create_uvsphere(bm_body, u_segments=20, v_segments=14, radius=0.019)
+for v in bm_body.verts:
+    z_factor = 1.0 - (v.co.z / 0.02) * 0.2
+    v.co.x *= 0.95 * z_factor
+    v.co.y *= 0.85
+    v.co.z *= 1.3
+T_body = Matrix.Translation(Vector((0.0, 0.021, -0.004)))
+bmesh.ops.transform(bm_body, matrix=T_body, verts=bm_body.verts)
+ob_body = create_mesh_object("Mouse_Body", bm_body, mat_grey)
+
+bm_belly = bmesh.new()
+bmesh.ops.create_uvsphere(bm_belly, u_segments=16, v_segments=12, radius=0.014)
+for v in bm_belly.verts:
+    v.co.x *= 0.8
+    v.co.y *= 0.45
+    v.co.z *= 1.2
+T_belly = Matrix.Translation(Vector((0.0, 0.013, -0.002)))
+bmesh.ops.transform(bm_belly, matrix=T_belly, verts=bm_belly.verts)
+ob_belly = create_mesh_object("Mouse_Belly", bm_belly, mat_light)
+
+bm_head = bmesh.new()
+bmesh.ops.create_uvsphere(bm_head, u_segments=18, v_segments=14, radius=0.0135)
+for v in bm_head.verts:
+    v.co.x *= 0.95
+    v.co.y *= 0.9
+    v.co.z *= 1.05
+T_head = Matrix.Translation(Vector((0.0, 0.023, 0.018)))
+bmesh.ops.transform(bm_head, matrix=T_head, verts=bm_head.verts)
+ob_head = create_mesh_object("Mouse_Head", bm_head, mat_grey)
+
+bm_snout = bmesh.new()
+bmesh.ops.create_cone(bm_snout, cap_ends=True, cap_tris=False, segments=16, radius1=0.0085, radius2=0.0022, depth=0.014)
+R_snout = Matrix.Rotation(math.radians(180), 4, 'X')
+T_snout = Matrix.Translation(Vector((0.0, 0.0195, 0.033)))
+bmesh.ops.transform(bm_snout, matrix=T_snout @ R_snout, verts=bm_snout.verts)
+ob_snout = create_mesh_object("Mouse_Snout", bm_snout, mat_grey)
+
+bm_nose = bmesh.new()
+bmesh.ops.create_uvsphere(bm_nose, u_segments=12, v_segments=8, radius=0.0023)
+T_nose = Matrix.Translation(Vector((0.0, 0.0195, 0.0405)))
+bmesh.ops.transform(bm_nose, matrix=T_nose, verts=bm_nose.verts)
+ob_nose = create_mesh_object("Mouse_Nose", bm_nose, mat_pink)
+
+for side, sign in [("L", 1.0), ("R", -1.0)]:
+    bm_eye = bmesh.new()
+    bmesh.ops.create_uvsphere(bm_eye, u_segments=12, v_segments=8, radius=0.0022)
+    T_eye = Matrix.Translation(Vector((sign * 0.0078, 0.026, 0.026)))
+    bmesh.ops.transform(bm_eye, matrix=T_eye, verts=bm_eye.verts)
+    create_mesh_object(f"Mouse_Eye_{side}", bm_eye, mat_black)
+
+for side, sign in [("L", 1.0), ("R", -1.0)]:
+    bm_ear = bmesh.new()
+    bmesh.ops.create_uvsphere(bm_ear, u_segments=16, v_segments=12, radius=0.011)
+    for v in bm_ear.verts:
+        v.co.x *= 0.95; v.co.y *= 0.95; v.co.z *= 0.22
+    R_ear = Matrix.Rotation(math.radians(sign * -28), 4, 'Z') @ Matrix.Rotation(math.radians(-15), 4, 'X') @ Matrix.Rotation(math.radians(sign * 15), 4, 'Y')
+    T_ear = Matrix.Translation(Vector((sign * 0.0125, 0.034, 0.016)))
+    bmesh.ops.transform(bm_ear, matrix=T_ear @ R_ear, verts=bm_ear.verts)
+    create_mesh_object(f"Mouse_EarOuter_{side}", bm_ear, mat_grey)
+
+    bm_inear = bmesh.new()
+    bmesh.ops.create_uvsphere(bm_inear, u_segments=16, v_segments=12, radius=0.008)
+    for v in bm_inear.verts:
+        v.co.x *= 0.95; v.co.y *= 0.95; v.co.z *= 0.18
+    T_inear = Matrix.Translation(Vector((sign * 0.0125, 0.034, 0.0175)))
+    bmesh.ops.transform(bm_inear, matrix=T_inear @ R_ear, verts=bm_inear.verts)
+    create_mesh_object(f"Mouse_EarInner_{side}", bm_inear, mat_pink)
+
+# --- Legs ---
+legs_config = [("Front_L", 0.011, 0.018, True), ("Front_R", -0.011, 0.018, True), ("Back_L", 0.013, -0.012, False), ("Back_R", -0.013, -0.012, False)]
+for name, x_pos, z_pos, is_front in legs_config:
+    bm_leg = bmesh.new()
+    if is_front:
+        bmesh.ops.create_cone(bm_leg, cap_ends=True, cap_tris=False, segments=10, radius1=0.0035, radius2=0.0028, depth=0.012)
+        R_leg = Matrix.Rotation(math.radians(90), 4, 'X')
+        T_leg = Matrix.Translation(Vector((x_pos, 0.007, z_pos)))
+        bmesh.ops.transform(bm_leg, matrix=T_leg @ R_leg, verts=bm_leg.verts)
+        create_mesh_object(f"Mouse_Leg_{name}", bm_leg, mat_grey)
+        bm_paw = bmesh.new()
+        bmesh.ops.create_uvsphere(bm_paw, u_segments=10, v_segments=8, radius=0.003)
+        for v in bm_paw.verts: v.co.x *= 1.0; v.co.y *= 0.5; v.co.z *= 1.3
+        T_paw = Matrix.Translation(Vector((x_pos, 0.0018, z_pos + 0.003)))
+        bmesh.ops.transform(bm_paw, matrix=T_paw, verts=bm_paw.verts)
+        create_mesh_object(f"Mouse_Paw_{name}", bm_paw, mat_pink)
+    else:
+        bm_thigh = bmesh.new()
+        bmesh.ops.create_uvsphere(bm_thigh, u_segments=12, v_segments=10, radius=0.0075)
+        for v in bm_thigh.verts: v.co.x *= 0.8; v.co.y *= 1.1; v.co.z *= 1.2
+        T_thigh = Matrix.Translation(Vector((x_pos, 0.014, z_pos)))
+        bmesh.ops.transform(bm_thigh, matrix=T_thigh, verts=bm_thigh.verts)
+        create_mesh_object(f"Mouse_Thigh_{name}", bm_thigh, mat_grey)
+        bm_foot = bmesh.new()
+        bmesh.ops.create_uvsphere(bm_foot, u_segments=10, v_segments=8, radius=0.0035)
+        for v in bm_foot.verts: v.co.x *= 0.9; v.co.y *= 0.45; v.co.z *= 1.5
+        T_foot = Matrix.Translation(Vector((x_pos * 1.05, 0.0018, z_pos + 0.005)))
+        bmesh.ops.transform(bm_foot, matrix=T_foot, verts=bm_foot.verts)
+        create_mesh_object(f"Mouse_Foot_{name}", bm_foot, mat_pink)
+
+# --- Tail ---
+tail_pts = [Vector((0.000, 0.016, -0.026)), Vector((0.002, 0.016, -0.042)), Vector((0.006, 0.018, -0.058)), Vector((0.012, 0.024, -0.072)), Vector((0.018, 0.033, -0.082))]
+tail_radii = [0.0026, 0.0021, 0.0017, 0.0013, 0.0009]
+bm_tail = bmesh.new()
+for i in range(len(tail_pts) - 1):
+    p1, p2, r1, r2 = tail_pts[i], tail_pts[i+1], tail_radii[i], tail_radii[i+1]
+    vec = p2 - p1
+    bm_seg = bmesh.new()
+    bmesh.ops.create_cone(bm_seg, cap_ends=True, cap_tris=False, segments=10, radius1=r2, radius2=r1, depth=vec.length)
+    rot_q = Vector((0, 0, 1)).rotation_difference(vec.normalized())
+    T_mat = Matrix.Translation((p1 + p2) * 0.5) @ rot_q.to_matrix().to_4x4()
+    bmesh.ops.transform(bm_seg, matrix=T_mat, verts=bm_seg.verts)
+    for v in bm_seg.verts: bm_tail.verts.new(v.co)
+    bm_tail.verts.ensure_lookup_table()
+    vert_offset = len(bm_tail.verts) - len(bm_seg.verts)
+    for f in bm_seg.faces: bm_tail.faces.new([bm_tail.verts[vert_offset + v.index] for v in f.verts])
+    bm_seg.free()
+
+bm_tip = bmesh.new()
+bmesh.ops.create_uvsphere(bm_tip, u_segments=8, v_segments=6, radius=tail_radii[-1])
+bmesh.ops.transform(bm_tip, matrix=Matrix.Translation(tail_pts[-1]), verts=bm_tip.verts)
+for v in bm_tip.verts: bm_tail.verts.new(v.co)
+bm_tail.verts.ensure_lookup_table()
+vert_offset = len(bm_tail.verts) - len(bm_tip.verts)
+for f in bm_tip.faces: bm_tail.faces.new([bm_tail.verts[vert_offset + v.index] for v in f.verts])
+bm_tip.free()
+create_mesh_object("Mouse_Tail", bm_tail, mat_pink)
+
+# ---------------------------------------------------------
+# 5. Export
+# ---------------------------------------------------------
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+print("ASSET_BUILT")
+```

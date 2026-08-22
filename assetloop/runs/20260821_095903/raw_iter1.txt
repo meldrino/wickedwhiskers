@@ -1,0 +1,73 @@
+09:59:44 gemini busy (gemini-flash-latest), waiting 30s (attempt 1/6)
+10:00:26 gemini busy (gemini-flash-latest), waiting 60s (attempt 2/6)
+10:01:36 gemini busy (gemini-flash-latest), waiting 90s (attempt 3/6)
+10:03:06 switching to fallback model gemini-3.1-flash-lite
+```python
+import bpy
+import bmesh
+import mathutils
+import math
+
+def create_material(name, color, roughness):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+# Setup materials
+mat_bark = create_material("Bark", (0.42, 0.29, 0.17), 0.85)
+mat_inner = create_material("InnerWood", (0.79, 0.66, 0.44), 0.85)
+
+def create_segment(bm, radius, length, pos, rot):
+    # Create cylinder-like segment using bmesh cone
+    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=8, radius1=radius, radius2=radius, depth=length)
+    # Apply rotation and position
+    for v in bm.verts:
+        v.co.rotate(rot)
+        v.co += pos
+
+# Build the stick
+me = bpy.data.meshes.new("WoodenStick")
+bm = bmesh.new()
+
+# Main shaft segments (gentle bend along Z)
+segments = 5
+total_len = 0.55
+seg_len = total_len / segments
+for i in range(segments):
+    z_pos = -0.275 + (i * seg_len) + (seg_len/2)
+    # Slight bend: rotate each segment slightly
+    angle = math.radians(i * 5)
+    rot = mathutils.Euler((angle, 0, 0), 'XYZ')
+    create_segment(bm, 0.015, seg_len, mathutils.Vector((0, 0, z_pos)), rot)
+
+# Stubby side branch
+stub = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=0.008, radius2=0.008, depth=0.08)
+for v in stub['geom']:
+    if isinstance(v, bmesh.types.BMVert):
+        v.co.rotate(mathutils.Euler((0, math.radians(45), 0), 'XYZ'))
+        v.co += mathutils.Vector((0.02, 0, 0))
+
+# Frayed tip (tiny cone)
+tip = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=6, radius1=0.012, radius2=0.002, depth=0.03)
+for v in tip['geom']:
+    if isinstance(v, bmesh.types.BMVert):
+        v.co += mathutils.Vector((0, 0, -0.29))
+
+bm.to_mesh(me)
+bm.free()
+
+ob = bpy.data.objects.new("WoodenStick", me)
+bpy.context.collection.objects.link(ob)
+ob.data.materials.append(mat_bark)
+
+# Export
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+
+# Calculate dimensions
+dims = ob.dimensions
+print("ASSET_BUILT")
+print(f"DIMS Vector(({dims.x:.3f}, {dims.y:.3f}, {dims.z:.3f}))")
+```

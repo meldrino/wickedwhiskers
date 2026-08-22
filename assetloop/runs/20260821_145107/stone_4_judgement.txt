@@ -1,0 +1,8 @@
+1. 0 - This is a potato. It lacks the jagged, irregular silhouette of a natural stone.
+2. 0 - It looks like a rounded object resting on a plane, not a stone with a distinct, flattened base.
+3. 1 - The shading is smooth, but the geometry is too soft and lacks the structural "planes" of a rock.
+4. 1 - The color is acceptable as a base grey, though it lacks any texture or material variance.
+5. 1 - The scale is appropriate for the requested size.
+
+MOST_WRONG: The silhouette is too organic and rounded; it needs aggressive sculpting to create sharp, irregular facets and a distinct flat bottom.
+VERDICT: FAIL

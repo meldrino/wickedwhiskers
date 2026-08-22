@@ -1,0 +1,96 @@
+```python
+import bpy
+import bmesh
+import math
+from mathutils import Matrix, Vector
+
+def create_material(name, color, roughness):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+def create_part(name, mesh_data, mat):
+    ob = bpy.data.objects.new(name, mesh_data)
+    bpy.context.collection.objects.link(ob)
+    ob.data.materials.append(mat)
+    return ob
+
+# Setup materials
+bark_mat = create_material("Bark", (0.42, 0.29, 0.17), 0.85)
+inner_mat = create_material("InnerWood", (0.79, 0.66, 0.44), 0.85)
+
+# Build the stick
+bm = bmesh.new()
+# Create 5 segments for a bent shaft
+# Segments along Z axis, slightly offset to create a bend
+segments = []
+for i in range(5):
+    me = bpy.data.meshes.new("segment")
+    bm_seg = bmesh.new()
+    bmesh.ops.create_cone(bm_seg, cap_ends=True, cap_tris=False, segments=8, radius1=0.03, radius2=0.03, depth=0.11)
+    
+    # Apply rotation and position for bend
+    angle = math.radians(i * 3)
+    mat_trans = Matrix.Translation((0, 0, i * 0.11 - 0.275)) @ Matrix.Rotation(angle, 4, 'X')
+    bmesh.ops.transform(bm_seg, matrix=mat_trans, verts=bm_seg.verts)
+    
+    bm_seg.to_mesh(me)
+    bm_seg.free()
+    segments.append(me)
+
+# Create side branch
+bm_branch = bmesh.new()
+bmesh.ops.create_cone(bm_branch, cap_ends=True, cap_tris=False, segments=6, radius1=0.015, radius2=0.015, depth=0.08)
+bmesh.ops.rotate(bm_branch, cent=(0,0,0), matrix=Matrix.Rotation(math.radians(90), 4, 'X'), verts=bm_branch.verts)
+bmesh.ops.translate(bm_branch, vec=(0, 0.03, 0), verts=bm_branch.verts)
+me_branch = bpy.data.meshes.new("side_branch")
+bm_branch.to_mesh(me_branch)
+bm_branch.free()
+
+# Create frayed tip (cone)
+bm_tip = bmesh.new()
+bmesh.ops.create_cone(bm_tip, cap_ends=True, cap_tris=False, segments=6, radius1=0.02, radius2=0.0, depth=0.05)
+bmesh.ops.translate(bm_tip, vec=(0, 0, -0.3), verts=bm_tip.verts)
+me_tip = bpy.data.meshes.new("frayed_tip")
+bm_tip.to_mesh(me_tip)
+bm_tip.free()
+
+# Create bark ridges (thin boxes)
+me_ridges = bpy.data.meshes.new("ridges")
+bm_r = bmesh.new()
+for i in range(3):
+    bmesh.ops.create_cube(bm_r, size=1.0)
+    bmesh.ops.scale(bm_r, vec=(0.01, 0.01, 0.2), verts=bm_r.verts)
+    bmesh.ops.translate(bm_r, vec=(0.02 + (i*0.01), 0, 0), verts=bm_r.verts)
+bm_r.to_mesh(me_ridges)
+bm_r.free()
+
+# Link objects
+for i, me in enumerate(segments):
+    create_part(f"shaft_{i}", me, bark_mat)
+create_part("branch", me_branch, bark_mat)
+create_part("tip", me_tip, inner_mat)
+create_part("ridges", me_ridges, bark_mat)
+
+# Export
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+
+# Calculate bounds
+min_v = Vector((0,0,0))
+max_v = Vector((0,0,0))
+for ob in bpy.data.objects:
+    for v in ob.bound_box:
+        world_v = ob.matrix_world @ Vector(v)
+        min_v.x = min(min_v.x, world_v.x)
+        max_v.x = max(max_v.x, world_v.x)
+        min_v.y = min(min_v.y, world_v.y)
+        max_v.y = max(max_v.y, world_v.y)
+        min_v.z = min(min_v.z, world_v.z)
+        max_v.z = max(max_v.z, world_v.z)
+
+print("ASSET_BUILT")
+print(f"DIMS Vector(({max_v.x-min_v.x:.2f}, {max_v.y-min_v.y:.2f}, {max_v.z-min_v.z:.2f}))")
+```

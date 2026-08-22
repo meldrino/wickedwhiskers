@@ -1,0 +1,14 @@
+This asset is a failure. As a 3D Art Director, I expect adherence to the visual language and construction rules provided. You have ignored the core requirements for geometry and aesthetic style.
+
+**Discrepancies:**
+
+1.  **Construction Quality (FAIL):** The model is clearly built from separate, disjointed primitives. The brief explicitly mandates a "contiguous" model using a single bent cylinder through waypoints. Your model has visible seams and butt-joints between the main shaft and the branches, which violates the "non-negotiable" rule for organic shapes.
+2.  **Style Violation:** The brief specifies "chunky, rounded, toy-like low-poly cartoon." The current model looks like a collection of thin, sharp, default cylinders. It lacks the "chunky" silhouette required for the *Wicked Whiskers* style.
+3.  **Geometry/Tapering:** The taper is non-existent or incorrect. The branches appear to be uniform-thickness cylinders rather than naturally tapering twigs.
+4.  **Bark Ridges:** The brief requires "2-3 very thin bark ridge boxes hugging/embedded in the shaft surface." Your model shows either no ridges or poorly integrated, floating geometry that does not read as bark.
+5.  **Frayed Tip:** The "frayed/broken tip" is just a sharp, tiny cone. It does not read as a broken, woody end; it looks like a spike.
+6.  **Colour/Material:** The colour application is flat and lacks the specified contrast between the bark brown and the lighter inner wood at the tip. The roughness appears uniform, failing to distinguish the different material properties.
+7.  **Branch Integration:** The branches are "glued-on" perpendicular cylinders. The rulebook explicitly states they must join INTO the shaft, angled at 30-60 degrees.
+
+MOST_WRONG: The model is composed of separate, butt-joined primitives instead of a single, contiguous bent cylinder as required by the construction rules.
+VERDICT: FAIL

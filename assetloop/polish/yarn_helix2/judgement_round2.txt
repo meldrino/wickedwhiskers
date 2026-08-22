@@ -1,0 +1,6 @@
+1. **HelixWrapA / HelixWrapB / TwineBall**: The fundamental issue from Round 1 has not been addressed. The asset is still constructed as a single smooth, featureless core sphere wrapped in a sparse, widely spaced spiral tube. It completely fails the contract requirement of being "densely wound with tight overlapping coils covering the whole surface."
+2. **HelixWrapA / HelixWrapB**: The windings only wrap in a single parallel horizontal direction with zero overlapping or criss-crossing strands, reading instantly as a mechanical spring/slinky around a ball rather than wound garden twine.
+
+MOST_WRONG: The ball is not densely wound; it remains a bare, smooth sphere exposed inside a sparse spiral cage.
+VERDICT: FAIL
+

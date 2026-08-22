@@ -1086,3 +1086,24 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
 - Judge calibration: harsh but NOT perfectionist, 2-second visibility bar, MUST upgrade
   verdict when a flagged issue is fixed. First real critique (goldfish_v2 tail detached)
   was geometrically confirmed correct - judge earns trust, guards handle the edge case.
+
+## 2026-08-22 (afternoon) - geometry probe + first JUDGE-APPROVED asset
+
+- Andy out to BBQ; standing orders: probe until true -> fish until judge happy (max 10)
+  -> then string/rod/trees/house through same loop.
+- GEOMETRY PROBE (assetloop/builders/probe_geometry.py): headless Blender, measures
+  per-part facts pictures cannot show - pairwise bbox overlap, % of each part's surface
+  INSIDE the largest part, chain-rooting via connectivity graph. Lessons baked in:
+  closest_point_on_mesh wants LOCAL coords (GLB importer leaves non-identity transforms);
+  bbox enclosure alone false-positives on elongated bodies (eyes vs fish body).
+- polish_asset.ps1 upgrades: probe facts fed to judge every round ("trust this over the
+  images for inside/outside questions"); EXACT builder schema injected into reviser
+  prompt (Gemini was dropping required keys like cone_tip 'base' -> BUILD_ERROR loops);
+  pre-validation of required keys per type; real build errors surfaced into rejection
+  feedback.
+- GOLDFISH_V1: FAIL r1 (tail bridge read blocky) -> patches -> APPROVED r6
+  PASS-WITH-NOTES via flip-flop guard (judge re-raised an already-fixed fin complaint -
+  guard worked as designed). Approved glb copied over assets/fish/goldfish_v1.glb.
+  Still UNWIRED into Godot - needs Andy eyeball + fish.gd swap decision.
+- Queue launched: yarn_string (ball of twine, large-radius wraps per bead-chain lesson),
+  then rod v1-v3 judging, tree_oak, house_cottage (new specs written).

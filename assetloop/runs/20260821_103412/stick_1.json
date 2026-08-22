@@ -1,0 +1,73 @@
+{
+  "asset": "wooden_stick",
+  "auto_ground": true,
+  "materials": {
+    "bark_brown": {"color": [0.42, 0.29, 0.17], "roughness": 0.85},
+    "inner_wood": {"color": [0.79, 0.66, 0.44], "roughness": 0.85}
+  },
+  "parts": [
+    {
+      "type": "bent_cylinder",
+      "name": "Shaft",
+      "material": "bark_brown",
+      "waypoints": [
+        [0, 0.02, -0.26],
+        [0, -0.01, -0.13],
+        [0, 0.02, 0],
+        [0, -0.01, 0.13],
+        [0, 0.01, 0.26]
+      ],
+      "radius_start": 0.016,
+      "radius_end": 0.010,
+      "sides": 16
+    },
+    {
+      "type": "cylinder",
+      "name": "Side_Branch",
+      "material": "bark_brown",
+      "from": [0, 0.01, -0.08],
+      "to": [0.04, 0.05, -0.08],
+      "radius": 0.007
+    },
+    {
+      "type": "cylinder",
+      "name": "Fork_A",
+      "material": "bark_brown",
+      "from": [0, 0.01, 0.20],
+      "to": [0.03, 0.03, 0.25],
+      "radius": 0.006
+    },
+    {
+      "type": "cylinder",
+      "name": "Fork_B",
+      "material": "bark_brown",
+      "from": [0, 0.01, 0.20],
+      "to": [-0.03, 0.03, 0.25],
+      "radius": 0.006
+    },
+    {
+      "type": "cone_tip",
+      "name": "Broken_Tip",
+      "material": "inner_wood",
+      "base": [0, 0, -0.26],
+      "tip": [0, 0, -0.32],
+      "radius": 0.010
+    },
+    {
+      "type": "box",
+      "name": "Bark_Ridge_1",
+      "material": "bark_brown",
+      "center": [0.012, 0.01, 0.05],
+      "size": [0.005, 0.005, 0.04],
+      "rot_deg": [0, 0, 15]
+    },
+    {
+      "type": "box",
+      "name": "Bark_Ridge_2",
+      "material": "bark_brown",
+      "center": [-0.01, 0.01, -0.1],
+      "size": [0.004, 0.004, 0.03],
+      "rot_deg": [0, 0, -10]
+    }
+  ]
+}

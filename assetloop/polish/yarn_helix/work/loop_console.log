@@ -1,0 +1,11 @@
+14:56:10 POLISH START yarn_helix spec=C:\crypto\wicked whiskers\assetloop\builders\yarn_helix.json briefLen=233 maxRounds=4
+14:56:14 round 1 built OK dims=(0.187, 0.119, 0.112)
+14:57:11 round 1: verdict=FAIL most_wrong='The 'TwineBall' is a featureless, smooth sphere that lacks any texture or winding detail to represent actual yarn.'
+14:57:47 round 1: patch accepted, dims=(0.187, 0.119, 0.112)
+14:58:45 round 2: verdict=FAIL most_wrong='The 'TwineBall' lacks any winding detail, consisting of only two isolated loops instead of a dense, realistic coil.'
+14:59:22 round 2: patch accepted, dims=(0.187, 0.119, 0.112)
+15:00:20 round 3: verdict=FAIL most_wrong='The 'HelixWrap' is far too sparse, failing to represent the dense, multi-layered winding of a ball of string.'
+15:00:57 round 3: patch accepted, dims=(0.187, 0.119, 0.112)
+15:01:54 round 4: verdict=FAIL most_wrong='The 'HelixWrap' lacks a continuous, overlapping winding pattern, appearing as isolated rings rather than a single length of twine.'
+15:02:30 round 4: patch accepted, dims=(0.187, 0.119, 0.112)
+15:02:30 ROUND CAP reached without approval - staging last views for human review

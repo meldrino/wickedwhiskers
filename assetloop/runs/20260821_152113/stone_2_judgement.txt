@@ -1,0 +1,7 @@
+1. **PASS:** It has the requested angular, faceted, low-poly aesthetic.
+2. **FAIL:** It is hovering. There is a visible gap between the bottom vertices and the ground plane; it lacks a true, stable "resting face" that makes it feel grounded in the world.
+3. **PASS:** The color is a neutral, matte grey, appropriate for dry stone.
+4. **PASS:** The scale feels correct for the intended use case.
+
+MOST_WRONG: The mesh is floating; the bottom vertices need to be snapped to the Z=0 plane to create a flush, stable contact point.
+VERDICT: FAIL

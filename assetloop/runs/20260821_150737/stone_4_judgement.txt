@@ -1,0 +1,7 @@
+1. **FAIL**: The silhouette is far too rounded and uniform. It looks like a low-poly brain or a cluster of grapes rather than a rock. It lacks the sharp, singular planar faces required for a stylized aesthetic.
+2. **FAIL**: There is no flattened resting face. The bottom is rounded and jagged, meaning it would physically roll around on the ground plane rather than sit solidly.
+3. **PASS**: The grey, matte tone is acceptable for a base material.
+4. **PASS**: The scale is appropriate for the requested size.
+
+MOST_WRONG: The mesh is a deformed sphere; you need to generate a convex hull or a base primitive with a flat bottom and distinct, large planar faces instead of high-frequency noise.
+VERDICT: FAIL

@@ -1,0 +1,7 @@
+1. **FAIL.** It is a noisy, uniform, low-poly blob. There is no clear directional faceting or deliberate angularity; it looks like a displaced sphere (a "potato").
+2. **FAIL.** The base is rounded and uneven. It does not have a flat, stable resting face, meaning it would roll around in-engine rather than sitting firmly on the ground.
+3. **PASS.** The colour is a neutral, matte grey, which fits the dry stone requirement.
+4. **PASS.** The scale relative to the ground plane suggests a portable, fist-sized object.
+
+MOST_WRONG: The silhouette is a rounded blob; you need to generate a mesh with a flat bottom face and distinct, large-scale planar cuts instead of uniform, noisy triangulation.
+VERDICT: FAIL

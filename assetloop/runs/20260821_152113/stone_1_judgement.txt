@@ -1,0 +1,7 @@
+1. **FAIL**: While it has facets, the overall silhouette is too symmetrical and rounded—it reads as a "low-poly pebble" or an egg, lacking the sharp, craggy, irregular character required for a stylized rock.
+2. **FAIL**: The mesh is clearly floating or clipping poorly; there is no sense of a flat, weighted base resting firmly on the ground plane. The contact shadow is inconsistent and detached.
+3. **PASS**: The color is a neutral, matte, dry-stone grey. This is the only point that isn't a disaster.
+4. **PASS**: The scale relative to the ground plane suggests it is small enough to be portable.
+
+MOST_WRONG: The silhouette is far too rounded and symmetrical; it needs aggressive vertex displacement to break the "egg" shape and a truly flat bottom face to sit flush on the ground.
+VERDICT: FAIL

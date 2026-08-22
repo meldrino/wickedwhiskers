@@ -1,1 +1,1 @@
-after awaits, ticking=1 fps=1.0
+maybe_screenshot args=["--smoketest"]

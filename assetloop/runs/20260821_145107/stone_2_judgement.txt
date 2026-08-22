@@ -1,0 +1,8 @@
+1. **FAIL.** This is a perfectly smooth, featureless potato. It lacks the sharp edges, fractures, or irregular geometry required to read as a "stone."
+2. **FAIL.** The silhouette is rounded at the base, implying it would roll if nudged. It lacks a definitive, flat resting plane.
+3. **PASS.** The shading is smooth, but it’s only smooth because the geometry is too simple; it looks like a soft clay blob rather than a rock.
+4. **PASS.** The color is neutral and matte, which is the only thing you got right.
+5. **PASS.** The scale is acceptable for the prompt.
+
+MOST_WRONG: The silhouette is entirely too organic and rounded; you need to introduce aggressive, jagged noise and planar cuts to the geometry to break up the "potato" shape.
+VERDICT: FAIL

@@ -31,6 +31,7 @@ $glb = "$outDir\work\$Name.glb"
 $report = "$outDir\polish_report.txt"
 $verdictHistory = @()
 $mostWrongHistory = @()
+$mostWrongHistoryFull = @()
 
 function Log([string]$m) {
     $line = "$(Get-Date -Format 'HH:mm:ss') $m"
@@ -169,27 +170,40 @@ VERDICT: PASS   or   PASS-WITH-NOTES   or   FAIL$historyBlock
     # ---- flip-flop guard ----
     # TRUE oscillation = complaint vanished for >=1 round, then returned.
     # Same complaint in consecutive rounds is PERSISTENCE -> keep iterating.
+    # Similarity = char-LCP >= 25 OR >=45% shared significant words (word order changes).
     $norm = ($mw -replace '[^a-z0-9]', '').ToLower()
     if ($norm.Length -gt 50) { $norm = $norm.Substring(0, 50) }
-    $prevNorm = if ($mostWrongHistory.Count) { $mostWrongHistory[$mostWrongHistory.Count - 1] } else { '' }
-    $sameAsPrev = ($norm.Length -ge 10 -and (Get-LCP $norm $prevNorm) -ge 25)
+    function Test-Similar([string]$x, [string]$y) {
+        if ($x.Length -lt 10 -or $y.Length -lt 10) { return $false }
+        if ((Get-LCP $x $y) -ge 25) { return $true }
+        $wx = @($x -split '\s+' | Where-Object { $_.Length -gt 3 })
+        $wy = @($y -split '\s+' | Where-Object { $_.Length -gt 3 })
+        if (-not $wx.Count -or -not $wy.Count) { return $false }
+        $shared = @($wx | Where-Object { $wy -contains $_ }).Count
+        return ($shared / [Math]::Max($wx.Count, $wy.Count)) -ge 0.45
+    }
+    $prevNormFull = if ($mostWrongHistoryFull.Count) { $mostWrongHistoryFull[$mostWrongHistoryFull.Count - 1] } else { '' }
+    $sameAsPrev = Test-Similar $mw $prevNormFull
     if (-not $sameAsPrev) {
-        for ($h = 0; $h -lt $mostWrongHistory.Count - 1; $h++) {
-            $old = $mostWrongHistory[$h]
-            if ($old.Length -ge 10 -and (Get-LCP $old $norm) -ge 25) {
-                Log "FLIP-FLOP: '$mw' re-raised after being absent in round $($h + 2)"
-                Approve 'PASS-WITH-NOTES' 'flip-flop guard (oscillating judge)'
+        for ($h = 0; $h -lt $mostWrongHistoryFull.Count - 1; $h++) {
+            if (Test-Similar $mw $mostWrongHistoryFull[$h]) {
+                Log "FLIP-FLOP observed: judge re-raised a round-$($h + 1) issue. Logged only - approval must come from the judge's own verdict."
+                break
             }
         }
     }
     $mostWrongHistory += $norm
+    $mostWrongHistoryFull += $mw
 
     # ---- revise spec (minimal patch, guarded) ----
     $prevSpecText = Get-Content -LiteralPath $SpecPath -Raw
     $prevNames = @((($prevSpecText | ConvertFrom-Json).parts) | ForEach-Object { $_.name })
+    $probeWarns = @($b.probe -split "`n" | Where-Object { $_ -match 'DETACHED|BURIED|NO_ROOT|BARELY' })
+    $warnBlock = if ($probeWarns.Count) { "MEASURED GEOMETRY WARNINGS (the probe CONFIRMS these - fixing them takes priority over style):`n$($probeWarns -join "`n")`nTo root a detached part: move its first waypoint at least 30% INTO the named body's volume." } else { '' }
     $baseRevise = @"
 You are making a MINIMAL PATCH to the JSON part-spec of a stylized low-poly game asset '$Name'.
 BRIEF: $Brief
+$warnBlock
 HARD RULES:
 - Keep EVERY existing part, with its EXACT name. Do NOT remove, rename or repurpose parts.
 - Touch ONLY what MOST_WRONG requires. Leave every other part's numbers untouched.

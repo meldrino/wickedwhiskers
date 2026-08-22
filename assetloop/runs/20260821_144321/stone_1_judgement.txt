@@ -1,0 +1,10 @@
+Listen up. I’ve seen better-looking rocks in a parking lot gravel pile, and at least those have some character. This looks like a low-poly stress ball that got left in the sun. Here is your evaluation:
+
+1. **0/1**: This is a perfect, symmetrical ellipsoid. It screams "procedural primitive" and "potato," not "natural stone." It lacks any geological character or irregular massing.
+2. **0/1**: There is no flattened resting face. It’s a rounded, organic shape that would roll away if you breathed on it. It doesn't look like it "sits" on the ground; it looks like it's hovering or clipping into the floor plane.
+3. **0/1**: The silhouette is clearly faceted. I can count the vertices around the perimeter. It is not smooth-shaded; it’s a low-poly mesh that needs a subdivision modifier or a proper normal map bake to hide those ugly edges.
+4. **1/1**: The color is acceptable—it's a neutral, matte grey. At least you didn't mess up the base color.
+5. **1/1**: The scale is fine, assuming it's meant to be a small stone.
+
+MOST_WRONG: The silhouette is a perfect, low-poly ellipsoid; you need to apply a displacement map or sculpt irregular, asymmetrical lumps into the mesh to break up that "potato" geometry.
+VERDICT: FAIL

@@ -1,0 +1,7 @@
+1. PASS - The geometry is sufficiently faceted and angular to avoid the "potato" look.
+2. FAIL - The asset is floating. There is a visible gap between the bottom geometry and the ground plane, and it lacks a flattened base to ground it in the scene.
+3. PASS - The grey tone is neutral, matte, and appropriate for a dry stone.
+4. PASS - The scale, relative to the ground plane, appears to be within the "fist-to-skull" range.
+
+MOST_WRONG: The object is hovering; you need to flatten the bottom vertices on the Z-axis and snap them to the origin/ground plane.
+VERDICT: FAIL

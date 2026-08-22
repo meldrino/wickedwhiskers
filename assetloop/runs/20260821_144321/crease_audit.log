@@ -1,0 +1,22 @@
+14:48:57 | INFO: Data are loaded, start creating Blender stuff
+14:48:57 | INFO: Blender create Mesh node Stone_Main
+14:48:57 | INFO: glTF import finished in 0.00s
+OBJ Stone_Main polys 320 smooth 320
+BUCKETS >90:0 45-90:0 25-45:16 15-25:83 4-15:289
+CREASES_OVER_4DEG 388
+CREASE 37.8deg at (0.043, 0.032, 0.017)
+CREASE 37.7deg at (0.070, -0.009, 0.030)
+CREASE 36.7deg at (0.060, -0.033, 0.039)
+CREASE 34.5deg at (0.052, 0.021, 0.017)
+CREASE 31.3deg at (0.065, 0.008, 0.030)
+CREASE 30.9deg at (0.056, 0.022, 0.030)
+CREASE 28.8deg at (0.069, -0.021, 0.034)
+CREASE 28.0deg at (-0.063, -0.034, 0.039)
+CREASE 28.0deg at (-0.073, -0.023, 0.034)
+CREASE 27.8deg at (0.066, -0.025, 0.030)
+CREASE 27.1deg at (-0.012, 0.049, 0.016)
+CREASE 26.6deg at (0.045, 0.034, 0.030)
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

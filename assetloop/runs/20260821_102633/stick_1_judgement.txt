@@ -1,0 +1,16 @@
+This asset is a disaster. You have completely ignored the "chunky, rounded, toy-like" visual language of *Wicked Whiskers* in favor of a jagged, low-poly, angular mess that looks like it belongs in a PS1 survival horror game, not a cozy farm simulator.
+
+**Discrepancies:**
+
+1.  **Violation of Construction Quality (Smooth Primitives):** You have failed the most basic rule. The model is clearly faceted (low segment count). It looks like a series of hexagonal prisms rather than a rounded, organic stick. It looks sharp and uninviting, not "toy-like."
+2.  **Incorrect Silhouette/Bending:** The brief called for a "gentle organic bend." Your model has sharp, aggressive, zig-zagging vertices. It looks like a broken lightning bolt, not a natural piece of wood.
+3.  **Disconnected/Glued-on Geometry:** The side branches and the fork are clearly just separate objects pushed into the side of the shaft. They lack the required seamless integration into the main mesh. They look "glued on," which is explicitly forbidden.
+4.  **Missing "Chunky" Proportions:** The asset is far too thin and spindly. It lacks the "chunky" weight required for the game’s aesthetic. It looks fragile and visually noisy rather than readable and simple.
+5.  **Inverted/Missing Taper:** The taper is non-existent or inverted in sections. It looks like a uniform, jagged pipe rather than a natural stick that tapers from thick to thin.
+6.  **Missing Bark Ridges:** You failed to include the bark ridge boxes. The surface is completely flat and featureless, failing to provide the requested surface variation.
+7.  **Color/Material Failure:** The color looks like a flat, washed-out tan rather than the specified "Wood brown #8B5A2B" or the "bark brown #6B4A2B." It lacks the visual warmth required for the palette.
+8.  **Broken Tip Logic:** The "frayed/broken tip" does not read as such. It looks like a poorly aligned cone primitive that doesn't blend into the shaft.
+
+MOST_WRONG: The model is heavily faceted and angular, violating the mandatory "smooth primitives" rule and the entire "chunky, rounded" visual language of the game.
+
+VERDICT: FAIL

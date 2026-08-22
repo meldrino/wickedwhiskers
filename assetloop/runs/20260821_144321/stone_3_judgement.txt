@@ -1,0 +1,8 @@
+1. 0/1 - This is a perfect, smooth, mathematical ellipsoid. It has zero natural character, no lumps, and looks like a prop from a low-budget 90s cartoon.
+2. 0/1 - It is floating or clipping; there is no flattened resting face, just a rounded bottom that creates a tangent line with the ground.
+3. 0/1 - The silhouette is heavily faceted. You can clearly see the low-poly "bands" around the perimeter. It looks like a placeholder primitive, not a finished asset.
+4. 1/1 - The colour is acceptable for a neutral grey stone, though it lacks any texture or material depth.
+5. 1/1 - The scale is fine, assuming the player character is standard human-sized.
+
+MOST_WRONG: The mesh topology is too low-resolution and lacks "sculpted" irregularity, resulting in a visible faceted silhouette and a perfect, unnatural egg shape.
+VERDICT: FAIL
