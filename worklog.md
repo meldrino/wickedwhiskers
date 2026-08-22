@@ -1107,3 +1107,11 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   Still UNWIRED into Godot - needs Andy eyeball + fish.gd swap decision.
 - Queue launched: yarn_string (ball of twine, large-radius wraps per bead-chain lesson),
   then rod v1-v3 judging, tree_oak, house_cottage (new specs written).
+
+- STOPPED on Andy's order 22:33. State at stop: goldfish_v1 REJECTED by Andy (fresh
+  uncalibrated judge also FAILs it - primitive soup). Bar raised permanently: harsh
+  judge calibration in loop + MANDATORY independent second-opinion gate in Approve()
+  (raw FAIL downgrades to needs_human_second_opinion). goldfish_v3 spec written
+  (swept teardrop body w/ built-in peduncle, volumetric fins, embedded eyes) but its
+  loop was killed at launch. String: FIVE designs judged FAIL - parked until a
+  dedicated twine_ball procedural builder exists; needs_human staged.

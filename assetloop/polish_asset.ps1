@@ -106,8 +106,24 @@ function Approve([string]$tier, [string]$note) {
     Get-ChildItem "$outDir\work\views_last" -Filter '*.png' -ErrorAction SilentlyContinue | ForEach-Object { Copy-Item $_.FullName "$outDir\approved\" -Force }
     Copy-Item $glb "$outDir\approved\$Name.glb" -Force
     if ($note) { Add-Content -LiteralPath $report -Value "NOTE: $note" -Encoding utf8 }
-    Log "APPROVED ($tier) -> $outDir\approved"
-    exit 0
+    # MANDATORY SECOND-OPINION GATE (2026-08-22, Andy's ruling): the calibrated loop
+    # verdict alone cannot ship. A fresh, uncalibrated harsh judge must agree.
+    Log "loop verdict ($tier) - running INDEPENDENT second-opinion gate"
+    $rawPrompt = "You are a harsh 3D art director deciding if this model is good enough to ship in a polished game. These are four views around the model (stylized low-poly is the intended medium). Judge ONLY the model. List every real problem concretely (name the part). End with exactly one line: VERDICT: PASS or PASS-WITH-NOTES or FAIL"
+    $views2 = @(Get-ChildItem "$outDir\approved" -Filter 'view*.png' | Sort-Object Name | ForEach-Object { $_.FullName })
+    try { $raw = Invoke-Vision $rawPrompt $views2 } catch {
+        Log 'second-opinion judge unreachable - treating as FAIL (cannot certify without it)'
+        Move-Item "$outDir\approved" "$outDir\needs_human_second_opinion" -Force
+        exit 2
+    }
+    Set-Content -LiteralPath "$outDir\second_opinion.txt" -Value $raw -Encoding utf8
+    if ($raw -match '(?m)^VERDICT:\s*PASS-WITH-NOTES') { Log 'SECOND OPINION: PASS-WITH-NOTES -> SHIPPED'; exit 0 }
+    elseif ($raw -match '(?m)^VERDICT:\s*PASS') { Log 'SECOND OPINION: PASS -> SHIPPED'; exit 0 }
+    else {
+        Log 'SECOND OPINION: FAIL -> downgraded to needs_human_second_opinion'
+        Move-Item "$outDir\approved" "$outDir\needs_human_second_opinion" -Force
+        exit 2
+    }
 }
 
 function Get-LCP([string]$a, [string]$b) {
@@ -146,9 +162,8 @@ $($b.probe)
 Do NOT claim a part is floating or buried when the probe reports ROOTED_VISIBLE or CHAIN_ROOTED for it.
 The images are four views around the model, in order. Judge ONLY the subject.
 
-CALIBRATION: harsh about real problems, NOT a perfectionist. Stylized low-poly cozy cat-game asset - it does NOT need realism.
-PASS-WITH-NOTES = reads correctly at a glance; minor items noted but non-blocking.
-FAIL only if a player would spot the problem within ~2 seconds in-game.
+CALIBRATION (STANDARD RAISED 2026-08-22 by the creative director): stylized low-poly is the medium, but primitives are acceptable ONLY if the assembled model reads as ONE cohesive object. Automatic FAIL if any part reads as an obvious un-integrated primitive - a ball sitting on a surface, a cone/spike slapped on, a flat plane fin, a mechanical pipe connector - or if silhouette/proportions are wrong for the subject.
+PASS means you would ship it in a polished indie game without embarrassment. PASS-WITH-NOTES = genuinely good with only minor polish items. FAIL otherwise; be concrete and harsh.
 If a previously flagged issue has been fixed adequately you MUST upgrade the verdict; do not retire an old complaint only to invent a fresh one of equal severity.
 List discrepancies numbered, be concrete (name the part).
 Your reply MUST end with exactly two lines:
