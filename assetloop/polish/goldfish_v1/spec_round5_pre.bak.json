@@ -22,7 +22,7 @@
 			"rot_deg": [0, 0, 0], "material": "fin" },
 		{ "type": "cone_tip", "name": "DorsalFin",
 			"base": [0, 0.02, 0.15], "tip": [0, 0.02, 0.35],
-			"radius": 0.09, "material": "fin" },
+			"radius": 0.09 },
 		{ "type": "box", "name": "FinL",
 			"size": [0.14, 0.012, 0.09], "center": [-0.15, -0.05, -0.07],
 			"rot_deg": [20, 0, 35], "material": "fin" },

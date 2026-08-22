@@ -53,6 +53,15 @@ function Invoke-Vision([string]$prompt, [string[]]$images, [int]$maxTokens = 200
 }
 
 function Test-Spec([string]$jsonText) {
+    $requiredKeys = @{
+        bent_cylinder  = @('waypoints')
+        cylinder       = @('from', 'to')
+        cone_tip       = @('base', 'tip', 'radius')
+        splintered_tip = @('base')
+        box            = @('size', 'center')
+        sphere         = @('radius')
+        rock           = @('radius')
+    }
     try {
         $spec = $jsonText | ConvertFrom-Json
         if (-not $spec.parts -or @($spec.parts).Count -eq 0) { return 'parts empty/missing' }
@@ -60,6 +69,9 @@ function Test-Spec([string]$jsonText) {
         foreach ($p in $spec.parts) {
             if ($allowedTypes -notcontains $p.type) { return "unknown part type '$($p.type)' (valid: $($allowedTypes -join ','))" }
             if (-not $p.name) { return "part of type '$($p.type)' has no name" }
+            foreach ($k in $requiredKeys[$p.type]) {
+                if (-not ($p.PSObject.Properties.Name -contains $k)) { return "part '$($p.name)' ($($p.type)) missing required key '$k'" }
+            }
         }
         return $null
     } catch { return "unparseable JSON: $($_.Exception.Message)" }
@@ -181,6 +193,14 @@ $prevSpecText
 JUDGE CRITIQUE (fix MOST_WRONG first):
 $(($judgement -replace '``````', '').Substring(0, [Math]::Min(1400, $judgement.Length)))
 Schema: top-level materials dict (color [r g b], roughness) + parts array; part types allowed ONLY: $($allowedTypes -join ',').
+EXACT SCHEMA (required keys per type; all coords [x,y,z] metres, Z-up, whole numbers of the model scale):
+- cylinder: from, to, radius_start, radius_end (or single "radius")
+- bent_cylinder: waypoints (list of >=2 points), radii (same length as waypoints) or radius_start/radius_end
+- cone_tip: base, tip, radius
+- splintered_tip: base, direction, radius (optional seed, spikes)
+- box: size ([w,d,h]), center, optional rot_deg ([rx,ry,rz] degrees)
+- sphere: center, radius
+- rock: center, radius (optional squash, lumpiness, seed)
 Return the COMPLETE corrected JSON (every part) in one ``````json code block and nothing else.
 "@
     $accepted = $false
@@ -197,7 +217,8 @@ Return the COMPLETE corrected JSON (every part) in one ``````json code block and
             Set-Content -LiteralPath $SpecPath -Value $revised -Encoding utf8
             $b2 = Build-Spec $SpecPath
             if (-not $b2.ok) {
-                $err = 'patched spec fails to build; revert to previous geometry and apply a smaller change'
+                $berr = ([regex]::Match((Get-Content "$outDir\work\build_last.log" -Raw), 'BUILD_ERROR:\s*(.+)')).Groups[1].Value.Trim()
+                $err = "patched spec fails to build (error: $berr). Revert to previous geometry and apply a smaller change."
                 Copy-Item "$outDir\spec_round${round}_pre.bak.json" $SpecPath -Force
             }
             elseif ($lastDims.Count -eq 3) {
