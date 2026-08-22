@@ -1073,3 +1073,16 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
 - LESSON (assetloop): ring/thread primitives at mm scale fail SharpEdgeLimit by
   construction; rod guides and yarn wraps both converted to bead/sphere patterns.
 - All specs in assetloop/builders/*.json; batches under assetloop/runs/_*batch/.
+
+## 2026-08-22 (morning) - polish loop LOCKED IN
+
+- Andy (rightly) called out the overnight batch: 6 assets shipped UNJUDGED, violating the
+  2026-08-21 HARD RULE already in PROJECT_STATE.yaml. Root cause: rule lived in prose,
+  enforcement depended on me remembering it.
+- FIX: assetloop/polish_asset.ps1 = protocol mechanised. build -> render -> gemini-vision
+  judge -> FAIL => gemini rewrites spec -> rebuild -> re-judge; max 4 rounds; verdict tiers
+  PASS / PASS-WITH-NOTES / FAIL; flip-flop guard (judge re-raising retired issues =>
+  approve as notes); cap => exit 2 + needs_human\ staging for Andy's eyes.
+- Judge calibration: harsh but NOT perfectionist, 2-second visibility bar, MUST upgrade
+  verdict when a flagged issue is fixed. First real critique (goldfish_v2 tail detached)
+  was geometrically confirmed correct - judge earns trust, guards handle the edge case.

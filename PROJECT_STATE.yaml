@@ -36,6 +36,15 @@ project:
        single most-wrong thing). NEVER quenn. No exceptions while gemini API is up.
     4. fix from gemini's specifics -> re-render -> re-judge
     5. only a gemini PASS goes to the user; user eyes = final gate.
+    ENFORCEMENT (2026-08-22, after an overnight batch shipped 6 UNJUDGED assets in
+    violation of this exact rule): assetloop\polish_asset.ps1 IS steps 2-4 mechanised -
+    `pwsh -File assetloop\polish_asset.ps1 -Name <n> -SpecPath <builders\x.json>
+    -Brief "<what it must be>"`: build -> 4-view render -> gemini-vision judge -> on FAIL
+    gemini rewrites the builder JSON -> rebuild -> re-judge, max 4 rounds. Verdict tiers
+    PASS / PASS-WITH-NOTES / FAIL. Flip-flop guard auto-approves if the judge re-raises
+    an issue it retired >=2 rounds ago; round cap exits 2 and stages renders under
+    assetloop\polish\<n>\needs_human for Andy. EVERY asset (hand-spec OR gemini-script)
+    runs through it BEFORE being shown to Andy. Exit 0 = show approved\ renders.
     Re-verified post-reboot 2026-08-20: GEMINI_API_KEY intact, smoke test PASS (see worklog).
   project_dir: "C:\\crypto\\wicked whiskers"
   docs_site: https://meldrino.com/forai/ww.html
