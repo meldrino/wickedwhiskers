@@ -1062,3 +1062,14 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   specs in assetloop/builders/rod_v*.json.
 - STONES x2 new variants: stone_v6 warm flat pebble, stone_v7 dark chunk -> assets/stones/,
   STONE_SCENES pool now 7. Smoketest green.
+
+- GOLDFISH MODELS x2 (goldfish_v1 orange w/ 3-blade tail + pectorals, goldfish_v2 koi
+  white+orange patches) in assets/fish/ - candidates to REPLACE fish.gd's 3-primitive
+  procedural fish; face +Z like current build (~0.74m long). Audited clean. UNWIRED -
+  needs eyeball check first.
+- YARN BALL prototype in assets/misc/ (string item representation): lumpy wool sphere +
+  bead-chain trailing thread. Learned: tight-radius bent_cylinder tubes (r<3mm) ALWAYS
+  fold under crease audit -> use bead chains / spheres instead of rings+threads.
+- LESSON (assetloop): ring/thread primitives at mm scale fail SharpEdgeLimit by
+  construction; rod guides and yarn wraps both converted to bead/sphere patterns.
+- All specs in assetloop/builders/*.json; batches under assetloop/runs/_*batch/.
