@@ -40,8 +40,9 @@ function Log([string]$m) {
 function Invoke-Vision([string]$prompt, [string[]]$images, [int]$maxTokens = 2000) {
     $model = $JudgeModel
     for ($a = 1; $a -le 3; $a++) {
-        & $vision -Prompt $prompt -Image $images -Model $model -MaxTokens $maxTokens *> "$outDir\work\vision_last.txt"
-        if ($LASTEXITCODE -eq 0) { return (Get-Content "$outDir\work\vision_last.txt" -Raw) }
+        $code = 1
+        try { & $vision -Prompt $prompt -Image $images -Model $model -MaxTokens $maxTokens *> "$outDir\work\vision_last.txt"; $code = $LASTEXITCODE } catch { $code = 1 }
+        if ($code -eq 0) { return (Get-Content "$outDir\work\vision_last.txt" -Raw) }
         $wait = 10 * $a
         Log "gemini-vision attempt $a failed ($model), retrying in ${wait}s"
         Start-Sleep -Seconds $wait
