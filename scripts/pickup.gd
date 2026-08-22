@@ -14,6 +14,8 @@ const STONE_SCENES: Array[PackedScene] = [
 	preload("res://assets/stones/stone_v3.glb"),
 	preload("res://assets/stones/stone_v4.glb"),
 	preload("res://assets/stones/stone_v5.glb"),
+	preload("res://assets/stones/stone_v6.glb"),
+	preload("res://assets/stones/stone_v7.glb"),
 ]
 
 @export var kind := "string"

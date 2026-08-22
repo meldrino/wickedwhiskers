@@ -1051,3 +1051,14 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   headless --pondgrid for numbers until morning.
 - main.gd: --pondgrid probe moved to a render-free early path (headless-safe), counts
   dry cells inside disc + inner zone.
+
+## 2026-08-22 (overnight asset run)
+
+- FISHING ROD MODELS built via deterministic builders (no AI rounds needed): rod_v1/v2/v3
+  in assets/rods/ (~0.57m swept-spline shaft w/ monotonic taper, grip collar + butt cap,
+  3 guide BEADS instead of rings - rings audit-fail by construction at r~0.7mm -, reel =
+  foot box + spool sphere + knob). All parts under SharpEdgeLimit (max 48 = sphere cap
+  rims). NOT yet wired into _catch_with_rod (needs visual verify when desktop unlocked);
+  specs in assetloop/builders/rod_v*.json.
+- STONES x2 new variants: stone_v6 warm flat pebble, stone_v7 dark chunk -> assets/stones/,
+  STONE_SCENES pool now 7. Smoketest green.
