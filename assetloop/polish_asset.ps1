@@ -167,13 +167,19 @@ VERDICT: PASS   or   PASS-WITH-NOTES   or   FAIL$historyBlock
     if ($verdict -ne 'FAIL') { Approve $verdict '' }
 
     # ---- flip-flop guard ----
+    # TRUE oscillation = complaint vanished for >=1 round, then returned.
+    # Same complaint in consecutive rounds is PERSISTENCE -> keep iterating.
     $norm = ($mw -replace '[^a-z0-9]', '').ToLower()
     if ($norm.Length -gt 50) { $norm = $norm.Substring(0, 50) }
-    for ($h = 0; $h -lt $mostWrongHistory.Count - 1; $h++) {
-        $old = $mostWrongHistory[$h]
-        if ($old.Length -ge 10 -and (Get-LCP $old $norm) -ge 25) {
-            Log "FLIP-FLOP: '$mw' re-raised after being fixed in round $($h + 1)"
-            Approve 'PASS-WITH-NOTES' 'flip-flop guard (oscillating judge)'
+    $prevNorm = if ($mostWrongHistory.Count) { $mostWrongHistory[$mostWrongHistory.Count - 1] } else { '' }
+    $sameAsPrev = ($norm.Length -ge 10 -and (Get-LCP $norm $prevNorm) -ge 25)
+    if (-not $sameAsPrev) {
+        for ($h = 0; $h -lt $mostWrongHistory.Count - 1; $h++) {
+            $old = $mostWrongHistory[$h]
+            if ($old.Length -ge 10 -and (Get-LCP $old $norm) -ge 25) {
+                Log "FLIP-FLOP: '$mw' re-raised after being absent in round $($h + 2)"
+                Approve 'PASS-WITH-NOTES' 'flip-flop guard (oscillating judge)'
+            }
         }
     }
     $mostWrongHistory += $norm
