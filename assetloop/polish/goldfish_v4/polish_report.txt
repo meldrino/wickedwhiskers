@@ -69,3 +69,19 @@
 08:43:19 geometry probe clean (8 lines)
 08:43:19 round 4: patch accepted, dims=(0.778, 0.444, 0.447)
 08:43:19 ROUND CAP reached without approval - staging last views for human review
+10:21:42 POLISH START goldfish_v4 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v4.json briefLen=744 maxRounds=2
+10:21:47 geometry probe clean (8 lines)
+10:21:47 round 1 built OK dims=(0.793, 0.293, 0.227)
+10:22:18 round 1: verdict=FAIL most_wrong='Body silhouette is elongated and torpedo-shaped instead of a plump teardrop.'
+10:22:46 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+10:23:03 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+10:24:27 gemini-vision attempt 3 failed (gemini-flash-latest), retrying in 30s
+10:34:31 POLISH START goldfish_v4 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v4.json briefLen=466 maxRounds=1
+10:34:35 geometry probe clean (8 lines)
+10:34:35 round 1 built OK dims=(0.742, 0.303, 0.297)
+10:34:51 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+10:35:13 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+10:36:19 round 1: verdict=PASS-WITH-NOTES most_wrong='Pectoral fins stick out stiffly sideways rather than angling backward dynamically.'
+10:36:19 loop verdict (PASS-WITH-NOTES) - running INDEPENDENT second-opinion gate
+10:36:31 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+10:37:05 SECOND OPINION: FAIL -> downgraded to needs_human_second_opinion

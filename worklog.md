@@ -1159,3 +1159,15 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
 - STATE: goldfish_v4 staged in assetloop\polish\goldfish_v4\needs_human\ for Andy's eye;
   next run when quota resets: -JudgeModel gemini-3.6-flash, brief carries the KNOWN
   DEFECTS list; second-opinion gate must PASS before showing him. NOT wired into Godot.
+- Round 10/10 (10:36): plumped body to true goldfish ratio (40% depth). Calibrated
+  judge: PASS-WITH-NOTES (pectorals stiffness note only). Independent gate: FAIL again
+  - and its critique is now clearly STYLE-LEVEL, not fix-level: wants real topology -
+  eye sockets/lids, fin root transitions, uniform poly density, no intersecting shells.
+  FINDING: the JSON-primitive builder has HIT ITS CEILING. Two judges disagree because
+  they judge different mediums: assembled-stylized vs modeled-sculpted. No amount of
+  parameter patching bridges that. STOPPED at cap per protocol.
+- Next-step options for Andy: (a) goldfish_v5 via proper mesh modelling (hand .blend
+  outside res:// or scripted sculpt: base-mesh + shrinkwrap/subsurf + boolean-free
+  roots), (b) recalibrate the gate to explicitly accept assembled-stylized medium,
+  (c) ship current fish as pond placeholder until (a). Renders staged in
+  assetloop\polish\goldfish_v4\needs_human_second_opinion\.
