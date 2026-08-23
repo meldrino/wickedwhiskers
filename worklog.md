@@ -1115,3 +1115,17 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   (swept teardrop body w/ built-in peduncle, volumetric fins, embedded eyes) but its
   loop was killed at launch. String: FIVE designs judged FAIL - parked until a
   dedicated twine_ball procedural builder exists; needs_human staged.
+
+## 2026-08-22 late evening - internet reach stack (big-pickle session)
+- agent-reach installed (pip --user); yt-dlp + Exa/mcporter proven; gh 2.98.0 at C:\crypto\tools\gh\bin.
+- winget EXISTS (v1.29.290) just not on opencode PATH - corrected earlier note.
+- Playwright 1.62.1 + Chromium 151 installed (tools\playwright, profile tools\pw-profile).
+- X login via automation Chromium bot-walled ("temporarily limited") - aborted, no retries.
+- Chrome blocks CDP on default profile (2025+ hardening) -> pivoted to OpenCLI Browser
+  Bridge extension in real Chrome (@jackwener/opencli v1.8.6 npm -g).
+- RESULT: X/Twitter channel LIVE through @cryptoandytwit session: opencli twitter
+  profile/trending/timeline/search all return data. No cookies touched.
+- Reddit next: needs a reddit account logged into normal Chrome (bridge picks it up).
+- meldrino.yaml updated with all paths/policies/gotchas.
+- 2026-08-23 ~00:10: Reddit LIVE too - u/Efficient_Cloud3658 via OpenCLI bridge
+  (hot/search/read/user proven). Reach stack complete: X + Reddit + YouTube + Exa.
