@@ -1171,3 +1171,32 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   roots), (b) recalibrate the gate to explicitly accept assembled-stylized medium,
   (c) ship current fish as pond placeholder until (a). Renders staged in
   assetloop\polish\goldfish_v4\needs_human_second_opinion\.
+2026-08-23 ~12:35 - goldfish v5 sculpt loop: PASS-WITH-NOTES (neutral judge), staged
+Asset: assetloop\polish\goldfish_sculpt\approved\goldfish.glb (1.3MB, 38k tris, single
+watertight island, vertex-color paint). Builder: builders\sculpt_goldfish_v5.py.
+Verdict history: r1 FAIL (shards/jagged paint/torpedo) -> r2-r3 FAIL (pectoral holes,
+buried eyes, thin fins, mouth gouge) -> r4 FAIL ("hole in caudal") -> root-caused ->
+v56 PASS-WITH-NOTES. Mechanical proof at each step: GLB = 1 island, 0 boundary edges,
+0 non-manifold (temp\opencode\holecheck.py).
+ROOT CAUSES found today (all real bugs, worth remembering):
+1. EXACT boolean UNION silently destroyed the body when input shells self-intersected
+   at tight concave corners (thick slabs + sharp fork). Fix: JOIN all shells + VOXEL
+   remesh fuse (no booleans for union); only one tiny DIFFERENCE boolean for the
+   mouth notch on the already-fused clean manifold.
+2. THE BIG ONE: multi-material meshes export to GLB as separate PRIMITIVES per
+   material region; Blender re-import renders/analyses them as disconnected plates =
+   judges saw a fish sliced along paint boundaries ("floating shards", "holes",
+   "shattered", "non-manifold" - all artifacts of the round-trip, mesh was fine).
+   FIX: ONE material + POINT-domain color attribute 'Col' wired via ShaderNodeAttribute
+   -> Base Color. Corner-domain face-uniform colors ALSO split (per-vertex attrs must
+   be continuous) -> use POINT domain, boundaries become soft gradients for free.
+3. Deep concave caudal FORK reads as "hole punched through tail" in every render to
+   vision judges (both anchored and unanchored prompts). Solid veil fan passes.
+4. Blender 5.2 API: bmesh.ops.smooth_vert (not smooth_vertex); REMESH modifier needs
+   rm.adaptivity=0.0 explicitly or it dissolves geometry; bmesh vert.index requires
+   bm.verts.ensure_lookup_table() before island walks.
+Judge notes remaining (minor): wobbly/bumpy fin edge geometry (voxel remesh texture),
+slightly pinched fin-body junctions, slight asymmetry. Next lever if Andy wants:
+higher-quality judge model after quota reset (gemini-3.6-flash back 08:00 BST tomorrow;
+alias gemini-flash-latest flaky 503s but works with retries), or quad retopo pass.
+Quota state: alias needed 2 failed attempts before success on every call today.
