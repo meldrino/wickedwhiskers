@@ -70,13 +70,14 @@ def _cr(points):
 SAMPLES_PER_SEG = 16
 
 
-def sweep_spline(waypoints, radii, sides, cross_section=(1.0, 1.0)):
+def sweep_spline(waypoints, radii, sides, cross_section=(1.0, 1.0), round_caps=False):
     """One continuous tube swept along a Catmull-Rom spline through the
     waypoints; radius interpolated MONOTONICALLY (linear in curve parameter,
     so no overshoot necking/bulging between waypoints). No joints, no kinks.
     cross_section=(n_scale, b_scale) flattens the ring elliptically: with the
     fixed-up frame, n is world-up-ish and b is horizontal-ish, so a fin is
-    cross_section=[tall, thin] e.g. [1.0, 0.08]."""
+    cross_section=[tall, thin] e.g. [1.0, 0.08].
+    round_caps=True replaces the flat fan end-caps with rounded poles."""
     centers = _cr([Vector(w) for w in waypoints])
     sweep_spline.failed = 0
     n_wp = len(radii)
@@ -89,6 +90,21 @@ def sweep_spline(waypoints, radii, sides, cross_section=(1.0, 1.0)):
     if len(centers) != len(rs):
         m = min(len(centers), len(rs))
         centers, rs = centers[:m], rs[:m]
+    if round_caps:
+        step = max((centers[-1] - centers[0]).length * 0.004, 1e-4)
+        t_end = (centers[-1] - centers[-2]).normalized()
+        b_r, b_c = rs[-1], centers[-1]
+        for i, fr in enumerate((0.55, 0.26, 0.05)):
+            centers.append(b_c + t_end * (step * (i + 1)))
+            rs.append(max(b_r * fr, 1e-4))
+        t_start = (centers[0] - centers[1]).normalized()
+        b_r, b_c = rs[0], centers[0]
+        ins = []
+        for i, fr in enumerate((0.55, 0.26, 0.05)):
+            ins.append((b_c + t_start * (step * (i + 1)), max(b_r * fr, 1e-4)))
+        for c, r in reversed(ins):
+            centers.insert(0, c)
+            rs.insert(0, r)
     bm = bmesh.new()
     rings = []
     nsides = len(centers)
@@ -164,6 +180,10 @@ def _cross_section(p):
     return (float(cs[0]), float(cs[1]))
 
 
+def _cap_args(p, wps):
+    return (_cross_section(p), p.get('cap_style') == 'round' and len(wps) >= 2)
+
+
 def build_bent_cylinder(p):
     wps = p['waypoints']
     if len(wps) < 2:
@@ -175,7 +195,7 @@ def build_bent_cylinder(p):
         r0 = p.get('radius_start', 0.01)
         r1 = p.get('radius_end', r0)
         radii = [r0 + (r1 - r0) * (i / (n - 1)) for i in range(n)]
-    bm = sweep_spline(wps, radii, sides, _cross_section(p))
+    bm = sweep_spline(wps, radii, sides, *_cap_args(p, wps))
     collar = p.get('collar')
     if collar:
         add_collar(bm, Vector(wps[0]), radii[0] * float(collar),
@@ -228,7 +248,7 @@ def build_cylinder(p):
     sides = int(p.get('sides', 24))
     r0 = p.get('radius_start', p.get('radius', 0.01))
     r1 = p.get('radius_end', p.get('radius', r0))
-    bm = sweep_spline([p['from'], p['to']], [r0, r1], sides, _cross_section(p))
+    bm = sweep_spline([p['from'], p['to']], [r0, r1], sides, *_cap_args(p, [p['from'], p['to']]))
     collar = p.get('collar')
     if collar:
         add_collar(bm, Vector(p['from']), float(r0) * float(collar),
@@ -361,12 +381,17 @@ def build_rock(p):
     return bm
 
 
-def fuse_parts(subsurf_level):
+def fuse_parts(subsurf_level, skip=()):
     """Join every part into ONE mesh: exact boolean union (kills interior
     shells and intersection seams), optional subsurf round-over, smooth shade.
     This is the craft guarantee that the result reads as one organic object,
-    not a pile of primitives. Falls back to weld-only if boolean fails."""
-    objs = [o for o in bpy.context.scene.objects if o.type == 'MESH']
+    not a pile of primitives. Falls back to weld-only if boolean fails.
+    Parts named in `skip` are NOT fused (kept as separate shells) - e.g. eyes,
+    where boolean material inheritance can swallow their material."""
+    objs = [o for o in bpy.context.scene.objects
+            if o.type == 'MESH' and o.name not in skip]
+    skipped = [o for o in bpy.context.scene.objects
+               if o.type == 'MESH' and o.name in skip]
     if len(objs) < 2:
         print('FUSE skipped (<2 parts)')
         return
@@ -393,7 +418,8 @@ def fuse_parts(subsurf_level):
             base.modifiers.remove(sm)
     for poly in base.data.polygons:
         poly.use_smooth = True
-    print('FUSED into %s polys=%d' % (base.name, len(base.data.polygons)))
+    print('FUSED into %s polys=%d (kept separate: %s)' %
+          (base.name, len(base.data.polygons), ', '.join(o.name for o in skipped) or 'none'))
 
 
 BUILDERS = {
@@ -417,7 +443,8 @@ try:
         bm = BUILDERS[t](p)
         add_mesh(p.get('name', 'part_%d' % idx), bm, p.get('material'), bool(p.get('smooth', True)))
     if data.get('fuse', {}).get('enabled'):
-        fuse_parts(int(data['fuse'].get('subsurf', 0)))
+        fuse_parts(int(data['fuse'].get('subsurf', 0)),
+                   skip=set(data['fuse'].get('skip', [])))
     if data.get('auto_ground', True):
         meshes = [o for o in bpy.context.scene.objects if o.type == 'MESH']
         mz = min((v.co).z for o in meshes for v in o.data.vertices)

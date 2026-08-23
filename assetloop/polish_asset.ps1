@@ -40,11 +40,11 @@ function Log([string]$m) {
     Add-Content -LiteralPath $report -Value $line -Encoding utf8
 }
 
-function Invoke-Vision([string]$prompt, [string[]]$images, [int]$maxTokens = 2000) {
+function Invoke-Vision([string]$prompt, [string[]]$images, [int]$maxTokens = 2000, [double]$temp = 0.4) {
     $model = $JudgeModel
     for ($a = 1; $a -le 3; $a++) {
         $code = 1
-        try { & $vision -Prompt $prompt -Image $images -Model $model -MaxTokens $maxTokens *> "$outDir\work\vision_last.txt"; $code = $LASTEXITCODE } catch { $code = 1 }
+        try { & $vision -Prompt $prompt -Image $images -Model $model -MaxTokens $maxTokens -Temp $temp *> "$outDir\work\vision_last.txt"; $code = $LASTEXITCODE } catch { $code = 1 }
         if ($code -eq 0) { return (Get-Content "$outDir\work\vision_last.txt" -Raw) }
         $wait = 10 * $a
         Log "gemini-vision attempt $a failed ($model), retrying in ${wait}s"
@@ -175,7 +175,7 @@ Your reply MUST end with exactly two lines:
 MOST_WRONG: <single worst player-visible issue, or 'nothing'>
 VERDICT: PASS   or   PASS-WITH-NOTES   or   FAIL$historyBlock
 "@
-    $judgement = Invoke-Vision $judgePrompt $views
+    try { $judgement = Invoke-Vision $judgePrompt $views } catch { Log 'judge unreachable after retries - aborting run'; exit 3 }
     Set-Content -LiteralPath "$outDir\judgement_round$round.txt" -Value $judgement -Encoding utf8
     $mw = [regex]::Match($judgement, '(?m)^MOST_WRONG:\s*(.+)$').Groups[1].Value.Trim()
     $verdict =
@@ -235,7 +235,7 @@ $(($judgement -replace '``````', '').Substring(0, [Math]::Min(1400, $judgement.L
 Schema: top-level materials dict (color [r g b], roughness) + parts array; part types allowed ONLY: $($allowedTypes -join ',').
 EXACT SCHEMA (required keys per type; all coords [x,y,z] metres, Z-up, whole numbers of the model scale):
 - cylinder: from, to, radius_start, radius_end (or single "radius")
-- bent_cylinder: waypoints (list of >=2 points), radii (same length as waypoints) or radius_start/radius_end
+- bent_cylinder: waypoints (list of >=2 points), radii (same length as waypoints) or radius_start/radius_end; optional "cap_style": "round" (rounded pole ends - use it to avoid flat stumps), optional cross_section
 - cone_tip: base, tip, radius
 - splintered_tip: base, direction, radius (optional seed, spikes)
 - box: size ([w,d,h]), center, optional rot_deg ([rx,ry,rz] degrees)
@@ -243,12 +243,13 @@ EXACT SCHEMA (required keys per type; all coords [x,y,z] metres, Z-up, whole num
 - rock: center, radius (optional squash, lumpiness, seed)
 OPTIONAL KEYS you may use/tune:
 - any swept part may add "cross_section": [n_scale, b_scale] - flattens the tube elliptically; fins use e.g. [1.0, 0.08] (tall, thin). n is up-ish, b is sideways.
-- top-level "fuse": { "enabled": true, "subsurf": 0|1 } - fuses all parts into one smooth mesh. KEEP IT ENABLED for organic creatures; never set enabled false unless the brief demands separate pieces.
+- top-level "fuse": { "enabled": true|false } - joins all parts via boolean union. For creatures built from organic swept parts leave it FALSE: deep-rooted overlaps plus smooth shading read as one creature, while union can slice material boundaries (jagged two-tone artifacts). If used, "skip": [names] keeps listed parts separate.
 Return the COMPLETE corrected JSON (every part) in one ``````json code block and nothing else.
+OUTPUT DISCIPLINE: no narration, no planning text, no commentary before or after - ONLY the json code block. If your reply contains any sentence outside the code block the patch is void.
 "@
     $accepted = $false
-    for ($tryN = 1; $tryN -le 2 -and -not $accepted; $tryN++) {
-        $revised = Get-Fenced (Invoke-Vision $baseRevise @() 4000)
+    for ($tryN = 1; $tryN -le 3 -and -not $accepted; $tryN++) {
+        $revised = Get-Fenced (Invoke-Vision $baseRevise @() 6000 0.75)
         $err = Test-Spec $revised
         if (-not $err) {
             $newNames = @((($revised | ConvertFrom-Json).parts) | ForEach-Object { $_.name })

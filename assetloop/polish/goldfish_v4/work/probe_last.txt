@@ -1,0 +1,35 @@
+08:43:18 | INFO: Data are loaded, start creating Blender stuff
+08:43:18 | INFO: Blender create Mesh node Body
+08:43:18 | INFO: Blender create Mesh node CaudalFinDown
+08:43:18 | INFO: Blender create Mesh node CaudalFinUp
+08:43:18 | INFO: Blender create Mesh node DorsalFin
+08:43:18 | INFO: Blender create Mesh node EyeL
+08:43:18 | INFO: Blender create Mesh node EyeR
+08:43:18 | INFO: Blender create Mesh node PectoralFinL
+08:43:18 | INFO: Blender create Mesh node PectoralFinR
+08:43:18 | INFO: glTF import finished in 0.03s
+PROBE parts=8 bbox=(0.778,0.444,0.447)
+PROBE pair Body|CaudalFinDown overlap=(0.108,0.013,0.153)
+PROBE pair Body|CaudalFinUp overlap=(0.108,0.013,0.233)
+PROBE pair Body|DorsalFin overlap=(0.206,0.010,0.060)
+PROBE pair Body|EyeL overlap=(0.040,0.040,0.040)
+PROBE pair Body|EyeR overlap=(0.040,0.040,0.040)
+PROBE pair Body|PectoralFinL overlap=(0.081,0.084,0.070)
+PROBE pair Body|PectoralFinR overlap=(0.081,0.084,0.070)
+PROBE pair CaudalFinDown|CaudalFinUp overlap=(0.339,0.013,0.146)
+PROBE pair CaudalFinUp|DorsalFin overlap=(0.041,0.010,0.078)
+PROBE pair EyeL|PectoralFinL overlap=(0.025,0.034,0.014)
+PROBE pair EyeR|PectoralFinR overlap=(0.025,0.034,0.014)
+PROBE inside CaudalFinDown in Body pct=18 -> ROOTED_VISIBLE (mean root depth 0.030m)
+PROBE inside CaudalFinUp in Body pct=19 -> ROOTED_VISIBLE (mean root depth 0.037m)
+PROBE inside DorsalFin in Body pct=26 -> ROOTED_VISIBLE (mean root depth 0.019m)
+PROBE inside EyeL in Body pct=75 -> ROOTED_VISIBLE (mean root depth 0.013m)
+PROBE inside EyeR in Body pct=76 -> ROOTED_VISIBLE (mean root depth 0.013m)
+PROBE inside PectoralFinL in Body pct=18 -> ROOTED_VISIBLE (mean root depth 0.017m)
+PROBE inside PectoralFinR in Body pct=19 -> ROOTED_VISIBLE (mean root depth 0.017m)
+PROBE enclosed EyeL by Body -> check inside% above
+PROBE enclosed EyeR by Body -> check inside% above
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

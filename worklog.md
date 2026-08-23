@@ -1148,3 +1148,14 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
   gemini-3.1-flash-lite which returns degenerate 300-char JSON skeletons ->
   "reviser unstable" exits. FallbackModel now a param (launching with
   gemini-flash-latest alias); Get-Fenced hardened (brace-slice fallback).
+- goldfish_v4 loop, morning runs: run4 r2 judge PASS-WITH-NOTES -> independent gate
+  FAIL (flat caps, saw-tooth two-tone seams, wedge pectorals). Builder-level fixes:
+  cap_style round poles (no flat stumps ever), fuse disabled for fish (boolean union
+  was slicing fin materials), pectorals slimmed + re-rooted (probe caught NO_ROOT).
+- QUOTA WALL ~08:30: gemini-3.6-flash daily exhausted + 3.7-flash alias bucket dead;
+  loop fell back to 3.1-flash-lite for BOTH judging and revising - coarse patches
+  ballooned the body (0.29->0.45 depth) chasing "plump teardrop". Stopped cleanly at
+  ~8 judged rounds of max 10 rather than ship junk iterations.
+- STATE: goldfish_v4 staged in assetloop\polish\goldfish_v4\needs_human\ for Andy's eye;
+  next run when quota resets: -JudgeModel gemini-3.6-flash, brief carries the KNOWN
+  DEFECTS list; second-opinion gate must PASS before showing him. NOT wired into Godot.

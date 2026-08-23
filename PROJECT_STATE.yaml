@@ -46,6 +46,24 @@ project:
     assetloop\polish\<n>\needs_human for Andy. EVERY asset (hand-spec OR gemini-script)
     runs through it BEFORE being shown to Andy. Exit 0 = show approved\ renders.
     Re-verified post-reboot 2026-08-20: GEMINI_API_KEY intact, smoke test PASS (see worklog).
+    GOLDFISH STATUS (2026-08-23 morning, nightshift recovery): goldfish_v4 built on an
+    UPGRADED builder - cross_section [n,b] keys make organic elliptical fin sweeps,
+    cap_style:"round" replaces flat end-caps with rounded poles, optional top-level fuse
+    does join+exact-boolean-union+subsurf (fuse now OFF for the fish: union sliced
+    two-tone material boundaries into jagged seams). polish_asset.ps1 reviser fallback
+    model is now a param (-FallbackModel): NEVER let long-JSON generation fall to
+    gemini-3.1-flash-lite (degenerate 300-char skeletons -> exit 4).
+    Run history today: calibrated judge PASS-WITH-NOTES once, but the MANDATORY
+    independent second-opinion gate FAILed it (flat nose/peduncle caps - since fixed at
+    builder level via cap_style; saw-tooth material boundaries - fixed by disabling fuse;
+    fat wedge pectorals - slimmed + deep-rooted). Then quota wall: 3.6-flash daily and
+    3.7-flash buckets both exhausted ~08:30, loop degraded to lite judging AND lite
+    revising -> coarse patches ballooned the body. STOPPED CLEANLY at ~8 judged rounds
+    of Andy's max-10. Latest views staged: assetloop\polish\goldfish_v4\needs_human\.
+    NEXT SESSION (quota resets midnight PT / ~09:00 local next day): re-run loop with
+    -JudgeModel gemini-3.6-flash -FallbackModel gemini-flash-latest, same enriched brief
+    (it carries the art-director KNOWN DEFECTS list); then the second-opinion gate must
+    PASS before showing Andy.
   project_dir: "C:\\crypto\\wicked whiskers"
   docs_site: https://meldrino.com/forai/ww.html
   design_doc: "C:\\crypto\\wicked whiskers.docx"

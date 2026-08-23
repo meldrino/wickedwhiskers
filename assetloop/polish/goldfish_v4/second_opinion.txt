@@ -1,0 +1,12 @@
+This is nowhere near shippable for a polished title. It looks like an unfinished 5-minute blockout.
+
+Here is the breakdown of issues:
+
+* **Main Body:** Severe shading artifacts and pinching caused by smooth normals stretched over crude, low-density geometry. The mid-body has an awkward, unintentional hard ridge, and the body abruptly ends in an ugly, flat, blunt stump where it meets the tail.
+* **Caudal Fin (Tail):** Poorly integrated and clipped into the body stump. The mesh has lumpy, uneven thickness and pinched vertices along the central ridge, showing zero clean edge flow.
+* **Pectoral Fins:** Lifeless, thick polygon wedges lazily clipped into the side of the mesh with no transitional topology or anatomical consideration.
+* **Dorsal Fin:** A generic, primitive wedge clipped through the top ridge without clean integration.
+* **Eyes:** Basic high-poly spheres haphazardly stuck into the head mesh without sockets, lids, or stylistic consistency with the rest of the low-poly elements.
+* **Shading Inconsistency:** The model suffers from an identity crisis—partially smooth-shaded with ugly normal warping on the body, combined with sharp, poorly beveled fins.
+
+VERDICT: FAIL

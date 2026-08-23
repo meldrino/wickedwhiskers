@@ -1,0 +1,13 @@
+This model is a complete failure to meet the brief. You have ignored the primary silhouette requirements and the quality-of-life improvements requested.
+
+1. **Proportions/Silhouette:** The brief explicitly demanded a "plump round teardrop body." You have delivered a torpedo-shaped, elongated, needle-nosed projectile. This looks like a missile, not a goldfish.
+2. **Body Geometry:** The body is covered in "lumpy" horizontal ridges/banding, likely an artifact of poor topology or improper subdivision. This violates the "smooth shading" requirement.
+3. **Pectoral Fins:** Despite the specific call-out to fix "thick wedge-like pectoral fins," these remain flat, primitive, board-like slabs that lack any organic curvature or integration.
+4. **Integration:** The transition between the fins and the body is jarring. They appear as separate, un-integrated geometric primitives "slapped on" to the surface, violating the "ONE cohesive object" mandate.
+5. **Nose/Peduncle:** While the truncation is gone, the nose is far too pointed and sharp, failing the "blunt rounded nose" requirement.
+
+This asset is unusable for the project.
+
+MOST_WRONG: Incorrect body silhouette (torpedo vs. plump teardrop)
+VERDICT: FAIL
+
