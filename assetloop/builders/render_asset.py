@@ -34,18 +34,53 @@ scene = bpy.context.scene
 scene.camera = cam
 cam_data.lens = 60
 
-scene.render.engine = 'BLENDER_WORKBENCH'
-scene.display.shading.light = 'STUDIO'
-scene.display.shading.color_type = 'MATERIAL'
-scene.display.shading.show_cavity = True
-scene.display.shading.show_shadows = True
-scene.display.shading.shadow_intensity = 0.3
-scene.render.resolution_x = 1024
-scene.render.resolution_y = 768
-
 world = bpy.data.worlds.new('bg')
 world.color = (0.18, 0.18, 0.20)
 scene.world = world
+
+has_vcol = any(o.data.color_attributes for o in meshes)
+
+
+def _mat_has_image(o):
+    for m in o.data.materials:
+        if m and m.use_nodes:
+            for n in m.node_tree.nodes:
+                if n.type == 'TEX_IMAGE' and n.image:
+                    return True
+    return False
+
+
+has_imgtex = any(_mat_has_image(o) for o in meshes)
+
+if has_imgtex:
+    # UV-textured assets need a real renderer; Workbench can't show node graphs.
+    for eng in ('BLENDER_EEVEE_NEXT', 'BLENDER_EEVEE'):
+        try:
+            scene.render.engine = eng
+            break
+        except TypeError:
+            continue
+    print('SHADING_MODE %s' % ('EEVEE_TEXTURE'))
+    sun_data = bpy.data.lights.new('key', 'SUN')
+    sun_data.energy = 3.0
+    sun = bpy.data.objects.new('key', sun_data)
+    bpy.context.collection.objects.link(sun)
+    sun.rotation_euler = (math.radians(50), 0.0, math.radians(35))
+    world.use_nodes = True
+    bg_node = world.node_tree.nodes.get('Background')
+    if bg_node:
+        bg_node.inputs[0].default_value = (0.18, 0.18, 0.20, 1.0)
+        bg_node.inputs[1].default_value = 1.0
+else:
+    scene.render.engine = 'BLENDER_WORKBENCH'
+    scene.display.shading.light = 'STUDIO'
+    scene.display.shading.color_type = 'VERTEX' if has_vcol else 'MATERIAL'
+    print('SHADING_MODE %s' % scene.display.shading.color_type)
+    scene.display.shading.show_cavity = True
+    scene.display.shading.show_shadows = True
+    scene.display.shading.shadow_intensity = 0.3
+scene.render.resolution_x = 1024
+scene.render.resolution_y = 768
 
 _bm = bmesh.new()
 bmesh.ops.create_circle(_bm, cap_ends=True, segments=64, radius=1.0)
