@@ -1200,3 +1200,13 @@ slightly pinched fin-body junctions, slight asymmetry. Next lever if Andy wants:
 higher-quality judge model after quota reset (gemini-3.6-flash back 08:00 BST tomorrow;
 alias gemini-flash-latest flaky 503s but works with retries), or quad retopo pass.
 Quota state: alias needed 2 failed attempts before success on every call today.
+2026-08-23 12:51 - goldfish sculpt STOPPED by Andy mid-round. State at stop:
+builder v5.13 (no voxel remesh; JOIN shells + mouth boolean on body; shell tags via
+INT face attr 'shell'; modal POINT vertex colors; solid orange body + cream fins +
+black eyes + small dark mouth hint). Last build gf5_v513.glb: watertight shells,
+DIMS (0.814,0.17,0.268), judge PASS-WITH-NOTES x2 (v512, v513).
+OPEN QUESTION at stop: judge insists "ventral fin is black" - unconfirmed whether it
+is a real paint/tag bug or the judge misreading eyes/mouth patch; diagnostic call to
+judge was UNREACHABLE (alias 503s) when stop was called.
+Renders: %TEMP%\opencode\gf5_v57_views\view1-4.png (v513). Staged approved\ copy is
+the OLDER v56 - NOT updated to v513 yet.
