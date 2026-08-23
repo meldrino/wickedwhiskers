@@ -1129,3 +1129,22 @@ PLOT OUTLINE V3 + BOOK IDEAS PAGE UPDATE (2026-08-19): Major rewrite incorporati
 - meldrino.yaml updated with all paths/policies/gotchas.
 - 2026-08-23 ~00:10: Reddit LIVE too - u/Efficient_Cloud3658 via OpenCLI bridge
   (hot/search/read/user proven). Reach stack complete: X + Reddit + YouTube + Exa.
+
+## 2026-08-23 morning - nightshift recovery (big-pickle)
+- Nightshift FAILED: agent froze at 02:04 right after reading PROJECT_STATE.yaml;
+  watchdog caught silence 03:51 (breach json written, dialog disabled) - ~6h lost.
+  Lesson logged: freeze = provider stall, breach file = the tripwire, check it on wake.
+- ROOT CAUSE of goldfish_v3 8-round FAIL found: judge kept saying "disjointed
+  primitives" because builder exports parts as SEPARATE shells - no fusion step.
+  JSON patching could never fix it. BUILDER UPGRADED:
+    * cross_section [n,b] key on bent_cylinder/cylinder -> elliptical sweeps
+      (= organic fin membranes, e.g. [1.0, 0.08])
+    * top-level fuse {enabled, subsurf} -> join + EXACT boolean union + subsurf
+      + smooth shade = ONE mesh by construction (kills primitive-soup look)
+- goldfish_v4.json authored on top of v3 lessons; builds clean (fused 18k polys,
+  dims 0.756/0.302/0.24). polish loop relaunched with MaxRounds=10, judge
+  gemini-3.6-flash concrete (alias quota trap avoided).
+- polish_asset.ps1 reviser bug fixed: retry ladder used to drop to
+  gemini-3.1-flash-lite which returns degenerate 300-char JSON skeletons ->
+  "reviser unstable" exits. FallbackModel now a param (launching with
+  gemini-flash-latest alias); Get-Fenced hardened (brace-slice fallback).

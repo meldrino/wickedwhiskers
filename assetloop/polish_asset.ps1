@@ -13,6 +13,7 @@ param(
     [Parameter(Mandatory)] [string]$Brief,
     [int]$MaxRounds = 4,
     [string]$JudgeModel = 'gemini-flash-latest',
+    [string]$FallbackModel = 'gemini-3.1-flash-lite',
     [string]$OutRoot = ''
 )
 
@@ -48,7 +49,7 @@ function Invoke-Vision([string]$prompt, [string[]]$images, [int]$maxTokens = 200
         $wait = 10 * $a
         Log "gemini-vision attempt $a failed ($model), retrying in ${wait}s"
         Start-Sleep -Seconds $wait
-        if ($a -ge 2) { $model = 'gemini-3.1-flash-lite' }
+        if ($a -ge 2) { $model = $FallbackModel }
     }
     throw 'gemini-vision failed after retries'
 }
@@ -81,6 +82,10 @@ function Test-Spec([string]$jsonText) {
 function Get-Fenced([string]$text) {
     $m = [regex]::Match($text, '(?s)```json\s*(.*?)```')
     if ($m.Success) { return $m.Groups[1].Value }
+    $m = [regex]::Match($text, '(?s)```\s*(\{.*\})\s*```')
+    if ($m.Success) { return $m.Groups[1].Value }
+    $i = $text.IndexOf('{'); $j = $text.LastIndexOf('}')
+    if ($i -ge 0 -and $j -gt $i) { return $text.Substring($i, $j - $i + 1) }
     return $text
 }
 
@@ -236,6 +241,9 @@ EXACT SCHEMA (required keys per type; all coords [x,y,z] metres, Z-up, whole num
 - box: size ([w,d,h]), center, optional rot_deg ([rx,ry,rz] degrees)
 - sphere: center, radius
 - rock: center, radius (optional squash, lumpiness, seed)
+OPTIONAL KEYS you may use/tune:
+- any swept part may add "cross_section": [n_scale, b_scale] - flattens the tube elliptically; fins use e.g. [1.0, 0.08] (tall, thin). n is up-ish, b is sideways.
+- top-level "fuse": { "enabled": true, "subsurf": 0|1 } - fuses all parts into one smooth mesh. KEEP IT ENABLED for organic creatures; never set enabled false unless the brief demands separate pieces.
 Return the COMPLETE corrected JSON (every part) in one ``````json code block and nothing else.
 "@
     $accepted = $false

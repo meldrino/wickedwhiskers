@@ -70,10 +70,13 @@ def _cr(points):
 SAMPLES_PER_SEG = 16
 
 
-def sweep_spline(waypoints, radii, sides):
+def sweep_spline(waypoints, radii, sides, cross_section=(1.0, 1.0)):
     """One continuous tube swept along a Catmull-Rom spline through the
     waypoints; radius interpolated MONOTONICALLY (linear in curve parameter,
-    so no overshoot necking/bulging between waypoints). No joints, no kinks."""
+    so no overshoot necking/bulging between waypoints). No joints, no kinks.
+    cross_section=(n_scale, b_scale) flattens the ring elliptically: with the
+    fixed-up frame, n is world-up-ish and b is horizontal-ish, so a fin is
+    cross_section=[tall, thin] e.g. [1.0, 0.08]."""
     centers = _cr([Vector(w) for w in waypoints])
     sweep_spline.failed = 0
     n_wp = len(radii)
@@ -105,11 +108,13 @@ def sweep_spline(waypoints, radii, sides):
                 n = Vector((0, 1, 0)) - t * t.y
         n.normalize()
         b = t.cross(n)
+        cs_n = max(float(cross_section[0]), 1e-3)
+        cs_b = max(float(cross_section[1]), 1e-3)
         r = max(rs[idx], 1e-4)
         ring = []
         for k in range(sides):
             a = 2.0 * math.pi * k / sides
-            ring.append(bm.verts.new(c + n * (math.cos(a) * r) + b * (math.sin(a) * r)))
+            ring.append(bm.verts.new(c + n * (math.cos(a) * r * cs_n) + b * (math.sin(a) * r * cs_b)))
         rings.append(ring)
     for j in range(len(rings) - 1):
         for k in range(sides):
@@ -150,6 +155,15 @@ def apply_surface_noise(bm, frequency, amplitude, seed):
         v.co += v.normal * (sn(v.co) * amplitude)
 
 
+def _cross_section(p):
+    cs = p.get('cross_section')
+    if not cs:
+        return (1.0, 1.0)
+    if len(cs) != 2:
+        raise ValueError("cross_section must be [n_scale, b_scale] (2 numbers)")
+    return (float(cs[0]), float(cs[1]))
+
+
 def build_bent_cylinder(p):
     wps = p['waypoints']
     if len(wps) < 2:
@@ -161,7 +175,7 @@ def build_bent_cylinder(p):
         r0 = p.get('radius_start', 0.01)
         r1 = p.get('radius_end', r0)
         radii = [r0 + (r1 - r0) * (i / (n - 1)) for i in range(n)]
-    bm = sweep_spline(wps, radii, sides)
+    bm = sweep_spline(wps, radii, sides, _cross_section(p))
     collar = p.get('collar')
     if collar:
         add_collar(bm, Vector(wps[0]), radii[0] * float(collar),
@@ -214,7 +228,7 @@ def build_cylinder(p):
     sides = int(p.get('sides', 24))
     r0 = p.get('radius_start', p.get('radius', 0.01))
     r1 = p.get('radius_end', p.get('radius', r0))
-    bm = sweep_spline([p['from'], p['to']], [r0, r1], sides)
+    bm = sweep_spline([p['from'], p['to']], [r0, r1], sides, _cross_section(p))
     collar = p.get('collar')
     if collar:
         add_collar(bm, Vector(p['from']), float(r0) * float(collar),
@@ -347,6 +361,41 @@ def build_rock(p):
     return bm
 
 
+def fuse_parts(subsurf_level):
+    """Join every part into ONE mesh: exact boolean union (kills interior
+    shells and intersection seams), optional subsurf round-over, smooth shade.
+    This is the craft guarantee that the result reads as one organic object,
+    not a pile of primitives. Falls back to weld-only if boolean fails."""
+    objs = [o for o in bpy.context.scene.objects if o.type == 'MESH']
+    if len(objs) < 2:
+        print('FUSE skipped (<2 parts)')
+        return
+    base = objs[0]
+    bpy.context.view_layer.objects.active = base
+    for other in objs[1:]:
+        mod = base.modifiers.new('fuse_u', 'BOOLEAN')
+        mod.operation = 'UNION'
+        mod.solver = 'EXACT'
+        mod.object = other
+        try:
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+            bpy.data.objects.remove(other, do_unlink=True)
+        except Exception as e:
+            print('FUSE_BOOL_FALLBACK %s: %s' % (other.name, e))
+            base.modifiers.remove(mod)
+    if subsurf_level > 0:
+        sm = base.modifiers.new('fuse_ss', 'SUBSURF')
+        sm.levels = sm.render_levels = int(subsurf_level)
+        try:
+            bpy.ops.object.modifier_apply(modifier=sm.name)
+        except Exception as e:
+            print('FUSE_SUBSURF_SKIPPED: %s' % e)
+            base.modifiers.remove(sm)
+    for poly in base.data.polygons:
+        poly.use_smooth = True
+    print('FUSED into %s polys=%d' % (base.name, len(base.data.polygons)))
+
+
 BUILDERS = {
     'bent_cylinder': build_bent_cylinder,
     'cylinder': build_cylinder,
@@ -367,6 +416,8 @@ try:
             raise ValueError("part %d has unknown type '%s' (valid: %s)" % (idx, t, ', '.join(sorted(BUILDERS))))
         bm = BUILDERS[t](p)
         add_mesh(p.get('name', 'part_%d' % idx), bm, p.get('material'), bool(p.get('smooth', True)))
+    if data.get('fuse', {}).get('enabled'):
+        fuse_parts(int(data['fuse'].get('subsurf', 0)))
     if data.get('auto_ground', True):
         meshes = [o for o in bpy.context.scene.objects if o.type == 'MESH']
         mz = min((v.co).z for o in meshes for v in o.data.vertices)
