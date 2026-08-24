@@ -1320,3 +1320,8 @@ recovered from git log + worklog, zero loss):
 - main.gd: --fishtest reworked (shots [0.15..2.95] after cine start + 1.0s tail so on_done fires: food=1 rod=true string=0 sticks=0); --camtest and --nocat diagnostic modes kept.
 - grass_chunk.gd ghost-slot fix: visible_instance_count=_placed after fill (identity-transform ghost tufts were rendering over excluded zones - the "grass sheets above lake").
 - Smoke PASS fish_rod=true caught=true; committed e20b3f1. Awaiting Andy in-game verdict.
+
+## 2026-08-24 (afternoon) - click-bug instrumentation + session freeze
+- Andy reported: clicked a fish in real gameplay, no cutaway. Added [click]/[fish] diagnostic prints across player.gd click path (_handle_click_at guards, _pick_fish hit/miss, water fallback, _try_fish entry, arrival branch rod-vs-pounce). Smoke green. Awaiting Andy's console output from his repro - whichever branch prints IGNORED is the culprit.
+- TEMP test kit live: GameState.new_game() boots with 1 string + 1 stick (commit 9878fac) - revert after testing.
+- PROJECT FROZEN by user: pivot to trader bot rescue with full MoE (claude-expert via FCC now live, see bigpickle/meldrino.yaml ROUTE B3). Uncommitted click diagnostics committed at freeze per stop protocol.

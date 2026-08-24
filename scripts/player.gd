@@ -292,10 +292,13 @@ func stop_walk() -> void:
 
 func _handle_click_at(screen_pos: Vector2) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
+		print("[click] IGNORED chase=%s panel=%s" % [GameState.chase_active, Hud.any_panel_open()])
 		return
 	if _pouncing():
+		print("[click] IGNORED pouncing")
 		return
 	if has_destination:
+		print("[click] IGNORED already walking")
 		return
 	_waiting_cam = false
 	_wait_target = Vector3.ZERO
@@ -308,6 +311,7 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 		return
 	var fish := _pick_fish(screen_pos)
 	if fish != null:
+		print("[click] fish picked -> _try_fish")
 		_try_fish(fish)
 		return
 	var from := camera.project_ray_origin(screen_pos)
@@ -321,6 +325,7 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 		return
 	var gp: Vector3 = hit.get("position")
 	if Terrain.in_water(gp.x, gp.z):
+		print("[click] water hit -> _try_fish(null)")
 		_try_fish(null)
 		return
 	_request_walk(Vector3(gp.x, 0, gp.z))
@@ -363,10 +368,13 @@ func _go_interact(item: Interactable) -> void:
 
 func _try_fish(fish: Node3D) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
+		print("[fish] IGNORED chase=%s panel=%s" % [GameState.chase_active, Hud.any_panel_open()])
 		return
 	if _pouncing():
+		print("[fish] IGNORED pouncing")
 		return
 	if Time.get_ticks_msec() < _fish_cd:
+		print("[fish] IGNORED cooldown")
 		return
 	stop_walk()
 	_clicked_fish = fish
@@ -391,7 +399,10 @@ func _try_fish(fish: Node3D) -> void:
 	_pending_fish = true
 	if not _request_walk(shore, true):
 		_pending_fish = false
+		print("[fish] walk request failed -> pounce")
 		_start_pounce()
+	else:
+		print("[fish] walking to %v (waiting_cam=%s)" % [shore, _waiting_cam])
 
 
 func _pouncing() -> bool:
@@ -673,8 +684,11 @@ func _physics_process(delta: float) -> void:
 			if _pending_fish:
 				_pending_fish = false
 				if GameState.has_fishing_rod or GameState.can_afford_rod():
+					print("[fish] arrived -> cutaway (rod=%s string=%d sticks=%d)" % [
+						GameState.has_fishing_rod, GameState.string_count, GameState.stick_count])
 					_catch_with_rod()
 				else:
+					print("[fish] arrived -> NO materials, pounce")
 					_start_pounce()
 			if pending_interact != null:
 				var it := pending_interact
