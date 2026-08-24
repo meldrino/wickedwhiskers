@@ -117,7 +117,10 @@ design_rules:
   catching_birds: perch on a tree. Catch = ladder (crafted) lean + climb, OR drive the tractor
     into the tree to knock the bird out.
   catching_fish: pond + one fish. Catch = rod ONLY (crafted from string + sticks). Paw attempt
-    always fails ("that's oFISHial" toast).
+    always fails ("that's oFISHial" toast). Clicking the fish walks WW to a bank spot OUTSIDE
+    the ShoreWall ring (r+0.55) and plays the real-world fishing cutaway (scripts/cutaway_fish.gd,
+    commit e20b3f1): side-on profile camera, rod lashed to Hand.R bone, cast/line/ripples, goldfish
+    bezier leap into his arms; +1 food + dialogue on finish.
   materials:
     string: found in the shed (padlocked)
     sticks: found on the ground (7 pickups)
