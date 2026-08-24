@@ -1272,3 +1272,21 @@ recovered from git log + worklog, zero loss):
   GitHub now has fish-fix-2026-08-24 (= 2aeead8). Full-history push still needs
   Andy's call: rewrite+force-push or git-lfs. .gitignore STILL lacks build/ in main
   repo (only snapshot had it) - future builds may re-add the exe; consider fixing.
+
+## 2026-08-24 (cont.) - lake banks
+
+- Andy verdict on lake: grass-in-water FIXED, but shoreline jagged, worst from low
+  angles. Fix attempt #1: TerrainConfig grid 121->361 (1m->0.33m cells) + flat pad
+  under lake bowl (radius 10) so the carve is purely radial -> waterline is now an
+  exact circle r~4.49m at wl=-0.7. Commit 5260ab7.
+- Fix attempt #2: _build_bank_ring() in lake.gd - TorusMesh mud lip (rings=96,
+  tube +-0.3m, y = wl-0.08) centred on MEASURED mean shore_distance over 64 dirs,
+  not hardcoded radius. Commit c4595ec.
+- BUGFIX found while in lake.gd: ripples double-offset (world coords used as local
+  for Lake child node) -> ambient + splash rings spawned away from pond; now local.
+- Process note: Andy's open game window held the project lock and hung headless
+  smoke twice; also a parse error (`var c := Terrain.lake.center` untyped infer)
+  killed lake.gd compile once. Both resolved; smoke clean.
+- gemini judge gave 3 self-inconsistent FAILs (flip-flopped grass-in-water, called
+  fish/ripples a defect) - per protocol its verdicts on this asset are void;
+  ANDY TO VERIFY IN-GAME: rim roundness at low angle, lip look, ripples on pond.
