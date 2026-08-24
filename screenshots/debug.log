@@ -1,1 +1,1 @@
-maybe_screenshot args=[]
+maybe_screenshot args=["--smoketest"]

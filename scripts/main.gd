@@ -121,6 +121,9 @@ func _maybe_screenshot() -> void:
 	if "--cutawaytest" in args:
 		_run_cutawaytest()
 		return
+	if "--camtest" in args:
+		_run_camtest()
+		return
 	if "--fishtest" in args:
 		_run_fishtest()
 		return
@@ -647,6 +650,33 @@ func _run_smoke() -> void:
 	get_tree().quit()
 
 
+func _run_camtest() -> void:
+	print("CAMTEST start")
+	await get_tree().process_frame
+	GameState.day_time = 0.5
+	var pl := get_tree().get_first_node_in_group("player")
+	if pl != null:
+		pl.global_position = Vector3(-4.0, 0.5, -8.0)
+		pl.global_position.y = Terrain.height_at(-4.0, -8.0) + 0.1
+		pl.set("camera_frozen", true)
+		await get_tree().process_frame
+		var holder: Node3D = pl.get_node("CameraHolder")
+		var cam: Camera3D = pl.get_node("CameraHolder/Camera")
+		var eye: Vector3 = pl.global_position + Vector3(2.2, 1.4, 2.2)
+		holder.global_transform = Transform3D(Basis(), eye)
+		cam.position = Vector3.ZERO
+		holder.look_at(pl.global_position + Vector3(0, 0.4, 0), Vector3.UP)
+		await get_tree().create_timer(0.9).timeout
+		get_viewport().get_texture().get_image().save_png("res://screenshots/cam_cat.png")
+		var mr: Node3D = pl.get_node("MeshRoot")
+		mr.visible = false
+		await get_tree().create_timer(0.4).timeout
+		get_viewport().get_texture().get_image().save_png("res://screenshots/cam_nocat.png")
+		mr.visible = true
+		print("CAMTEST saved player=%v eye=%v" % [pl.global_position, eye])
+	get_tree().quit()
+
+
 func _run_fishtest() -> void:
 	print("FISHCUT start")
 	await get_tree().process_frame
@@ -656,9 +686,30 @@ func _run_fishtest() -> void:
 	var lake_node := get_node("Lake")
 	var school: Node = lake_node.get_node_or_null("Fish")
 	if player != null and school != null:
-		player.global_position = Vector3(Terrain.lake.center.x + 2.0, 0.0, Terrain.lake.center.y + 2.0)
+		var spawn_dir := Vector2(1, 1).normalized()
+		var sr := Terrain.shore_distance(spawn_dir)
+		var sx: float = Terrain.lake.center.x + spawn_dir.x * (sr + 1.0)
+		var sz: float = Terrain.lake.center.y + spawn_dir.y * (sr + 1.0)
+		player.global_position = Vector3(sx, Terrain.height_at(sx, sz) + 0.1, sz)
+		var dlake := Vector2(
+			Terrain.lake.center.x - player.global_position.x,
+			Terrain.lake.center.y - player.global_position.z)
+		player.set("yaw", atan2(dlake.x, dlake.y) + PI)
+		if "--nocat" in OS.get_cmdline_user_args():
+			(player.get_node("MeshRoot") as Node3D).visible = false
+		player.set("yaw", atan2(dlake.x, dlake.y) + PI)
+		print("FISHCUT pre: chase=%s panel=%s pounce=%.1f dist=%.2f" % [
+			GameState.chase_active, Hud.any_panel_open(),
+			player.get("_pounce_t"), dlake.length()])
 		player.call("_try_fish", school.get("fish"))
-		var shots := [1.0, 1.9, 2.6, 3.3, 4.8, 5.7]
+		for i in range(1200):
+			await get_tree().process_frame
+			if GameState.cinematic_active:
+				break
+		print("FISHCUT wait end: cine=%s dest=%s waiting_cam=%s" % [
+			GameState.cinematic_active, player.get("has_destination"),
+			player.get("_waiting_cam")])
+		var shots := [0.15, 0.75, 1.25, 1.85, 2.35, 2.95]
 		for i in range(shots.size()):
 			if i > 0:
 				await get_tree().create_timer(shots[i] - shots[i - 1]).timeout
@@ -667,7 +718,9 @@ func _run_fishtest() -> void:
 			var img := get_viewport().get_texture().get_image()
 			var p := "res://screenshots/fc_%d.png" % (i + 1)
 			img.save_png(p)
-			print("FISHCUT shot " + p)
+			var camw: Vector3 = player.get_node("CameraHolder").global_transform.origin
+			print("FISHCUT shot %s cam=%v player=%v" % [p, camw, player.global_position])
+		await get_tree().create_timer(1.0).timeout
 	print("FISHCUT done food=%d rod=%s string=%d sticks=%d" % [
 		GameState.food_count, GameState.has_fishing_rod, GameState.string_count, GameState.stick_count])
 	get_tree().quit()

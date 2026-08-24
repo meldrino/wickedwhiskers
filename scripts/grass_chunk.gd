@@ -95,6 +95,7 @@ func _process(_delta: float) -> void:
 		budget -= 1
 	if _pending > 0:
 		return
+	_new_mm.visible_instance_count = _placed
 	_mm.multimesh = _new_mm
 	_new_mm = null
 	_mm.visible = true

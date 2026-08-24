@@ -380,12 +380,14 @@ func _try_fish(fish: Node3D) -> void:
 	var dir := to_lake.normalized()
 	# Shore point on the CAT'S side: cast the crossing ray from the center
 	# back toward the cat, not outward past the far bank.
+	# Shore point just OUTSIDE the ShoreWall ring (wall spans r±0.2):
+	# stand on the bank, cast over it.
 	var back := -dir
 	var r := Terrain.shore_distance(back)
 	var shore := Vector3(
-		Terrain.lake.center.x + back.x * (r - 0.4),
+		Terrain.lake.center.x + back.x * (r + 0.55),
 		0,
-		Terrain.lake.center.y + back.y * (r - 0.4))
+		Terrain.lake.center.y + back.y * (r + 0.55))
 	_pending_fish = true
 	if not _request_walk(shore, true):
 		_pending_fish = false
@@ -404,7 +406,7 @@ func _catch_with_rod() -> void:
 	velocity = Vector3.ZERO
 	var cw: Node3D = (preload("res://scripts/cutaway_fish.gd") as Script).new()
 	get_tree().root.add_child(cw)
-	cw.play_rod_catch(first_cast, _on_rod_cutaway_done)
+	cw.play_rod_catch(first_cast, _clicked_fish, _on_rod_cutaway_done)
 
 
 func _on_rod_cutaway_done() -> void:
