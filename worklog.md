@@ -1265,3 +1265,10 @@ recovered from git log + worklog, zero loss):
 - JUDGE PROTOCOL recorded (Andy): gemini judge = iteration-only helper when he is
   away; ANDY is the final judge. Written into meldrino.yaml ww-pipeline section +
   PROJECT_STATE asset-loop protocol.
+- PUSH WORKAROUND: direct push of cutaway-finger-anatomy blocked AGAIN (exe blob
+  9b6f69df re-entered tree at 14a1e2d; orphan-snapshot idea abandoned - no shared
+  history = whole-repo upload = hang). WORKING recipe: temp clone -> branch from
+  remote tip e7f1463 -> restore snapshot content -> single commit -> push diff-only.
+  GitHub now has fish-fix-2026-08-24 (= 2aeead8). Full-history push still needs
+  Andy's call: rewrite+force-push or git-lfs. .gitignore STILL lacks build/ in main
+  repo (only snapshot had it) - future builds may re-add the exe; consider fixing.
