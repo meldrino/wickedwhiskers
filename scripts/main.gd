@@ -121,6 +121,9 @@ func _maybe_screenshot() -> void:
 	if "--cutawaytest" in args:
 		_run_cutawaytest()
 		return
+	if "--fishtest" in args:
+		_run_fishtest()
+		return
 	if "--pawtest" in args:
 		var vi := args.find("--pawtest")
 		var variant := "v1"
@@ -632,7 +635,7 @@ func _run_smoke() -> void:
 		GameState.cinematic_active = false
 		player.global_position = Vector3(Terrain.lake.center.x + 2.0, 0.0, Terrain.lake.center.y + 2.0)
 		player.call("_try_fish", school.get("fish"))
-		for i in range(600):
+		for i in range(2400):
 			await get_tree().process_frame
 			if GameState.food_count >= 3 and GameState.has_fishing_rod:
 				fish_caught = true
@@ -641,6 +644,32 @@ func _run_smoke() -> void:
 		GameState.has_fishing_rod, fish_caught, GameState.food_count,
 		GameState.string_count, GameState.stick_count])
 	print("SMOKE DONE")
+	get_tree().quit()
+
+
+func _run_fishtest() -> void:
+	print("FISHCUT start")
+	await get_tree().process_frame
+	GameState.add_string(1)
+	GameState.add_sticks(1)
+	var player := get_tree().get_first_node_in_group("player")
+	var lake_node := get_node("Lake")
+	var school: Node = lake_node.get_node_or_null("Fish")
+	if player != null and school != null:
+		player.global_position = Vector3(Terrain.lake.center.x + 2.0, 0.0, Terrain.lake.center.y + 2.0)
+		player.call("_try_fish", school.get("fish"))
+		var shots := [1.0, 1.9, 2.6, 3.3, 4.8, 5.7]
+		for i in range(shots.size()):
+			if i > 0:
+				await get_tree().create_timer(shots[i] - shots[i - 1]).timeout
+			else:
+				await get_tree().create_timer(shots[i]).timeout
+			var img := get_viewport().get_texture().get_image()
+			var p := "res://screenshots/fc_%d.png" % (i + 1)
+			img.save_png(p)
+			print("FISHCUT shot " + p)
+	print("FISHCUT done food=%d rod=%s string=%d sticks=%d" % [
+		GameState.food_count, GameState.has_fishing_rod, GameState.string_count, GameState.stick_count])
 	get_tree().quit()
 
 

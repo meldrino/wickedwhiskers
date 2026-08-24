@@ -400,14 +400,19 @@ func _catch_with_rod() -> void:
 	var first_cast := not GameState.has_fishing_rod
 	if first_cast:
 		GameState.spend_rod()
+	stop_walk()
+	velocity = Vector3.ZERO
+	var cw: Node3D = (preload("res://scripts/cutaway_fish.gd") as Script).new()
+	get_tree().root.add_child(cw)
+	cw.play_rod_catch(first_cast, _on_rod_cutaway_done)
+
+
+func _on_rod_cutaway_done() -> void:
+	GameState.add_food(1)
 	if _clicked_fish != null and is_instance_valid(_clicked_fish):
 		_clicked_fish.queue_free()
 	_clicked_fish = null
-	stop_walk()
-	GameState.add_food(1)
 	var lines: Array[String] = []
-	if first_cast:
-		lines.append("Whiskers: (lashes the stick and string into a fishing rod and flicks the line out...)")
 	lines.append("SNAP! The goldfish seizes the bait and lands in your paws.")
 	lines.append("Fish: Oh carp.")
 	Hud.show_dialogue(lines)
