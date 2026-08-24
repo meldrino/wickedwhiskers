@@ -25,8 +25,9 @@ func _ready() -> void:
 	_build_shore_wall()
 	_build_fish()
 	var src_dir := Vector2(0.45, -0.89).normalized()
-	_ripple_origin = c + src_dir * (_surface_r - 0.7)
+	_ripple_origin = src_dir * (_surface_r - 0.7)
 	_ripple_max_scale = (_surface_r * 1.1) / 0.6
+	_build_bank_ring()
 
 
 func _water_radius() -> float:
@@ -133,9 +134,9 @@ func _make_ripple(at: Vector2, start_a: float) -> void:
 
 
 func splash(at: Vector3) -> void:
-	var pos := Vector2(at.x, at.z)
-	_make_ripple(pos, 0.7)
-	_make_ripple(pos, 0.6)
+	var local := Vector2(at.x, at.z) - Vector2(Terrain.lake.center.x, Terrain.lake.center.y)
+	_make_ripple(local, 0.7)
+	_make_ripple(local, 0.6)
 	_make_droplets(at)
 
 
@@ -190,6 +191,28 @@ func _build_shore_wall() -> void:
 		cs.rotation = Vector3(0, -atan2(b.x - a.x, b.y - a.y), 0)
 		wall.add_child(cs)
 	add_child(wall)
+
+
+func _build_bank_ring() -> void:
+	var n := 64
+	var r_sum := 0.0
+	for i in range(n):
+		var ang := i * TAU / n
+		r_sum += Terrain.shore_distance(Vector2(cos(ang), sin(ang)))
+	var r_ring := r_sum / n
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.33, 0.24, 0.15)
+	mat.roughness = 1.0
+	var tm := TorusMesh.new()
+	tm.inner_radius = r_ring - 0.3
+	tm.outer_radius = r_ring + 0.3
+	tm.rings = 96
+	tm.ring_segments = 16
+	tm.material = mat
+	var ring := MeshInstance3D.new()
+	ring.mesh = tm
+	ring.position = Vector3(0, water_level - 0.08, 0)
+	add_child(ring)
 
 
 func _build_fish() -> void:
