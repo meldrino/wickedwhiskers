@@ -185,12 +185,13 @@ build_status:
     tractor: (10,0,-20), red box build + 4 wheels + number plate
     pond: (-11,0,-16), sunken lake (S1 garden): heightfield-carved bowl (TerrainGenerator
       smoothstep carve, flat pad radius 10 under the bowl so the waterline is an exact
-      circle r~4.49m at wl=-0.7; grid 361 = 0.33m cells since commit 5260ab7), deep dark
-      bed + muddy shallows shelf for depth, metallic water with animated noise-normal
-      ripples + sky reflections, smooth TorusMesh mud bank lip (rings=96, tube +-0.3m,
-      y=wl-0.08) centred on measured mean shore_distance over 64 dirs (lake.gd
-      _build_bank_ring), reeds + grass shoreline, orbiting glint + expanding ripple rings
-      (double-offset bug fixed 2026-08-24: ripples are LOCAL to Lake node now),
+      circle r~4.49m at wl=-0.7; grid 721 = 0.167m cells since commit e8a2ea1 - Andy
+      APPROVED the shoreline 2026-08-24 "good enough"; NO bank lip mesh: a TorusMesh mud
+      ring was tried and rejected by Andy same day), deep dark bed + muddy shallows shelf
+      for depth, metallic water (128-seg rim) with animated noise-normal ripples + sky
+      reflections, reeds + grass shoreline, orbiting glint + expanding ripple rings
+      (per-ring containment cap keeps them inside the disc; rings=48 flattened y*0.22;
+      double-offset bug fixed 2026-08-24: ripples are LOCAL to Lake node now),
       one swimming fish under the surface; --pond screenshot camera
     bird tree: (20,0,-4), perched bird
     dumbleclaw: (4,0,-14), wizard cat (barrel body, robe, beard, glasses, pointy hat)

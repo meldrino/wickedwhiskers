@@ -1296,3 +1296,6 @@ recovered from git log + worklog, zero loss):
   Fix commit 3a1b0f1: per-ring containment cap = _surface_r - spawn offset - 0.35,
   48-seg thin tube flattened y*0.22, ambient origin moved to 0.45r, cadence 0.9s.
   Andy to verify in-game.
+- LOCKED IN: Andy verdict on final build (grid 721 + 128-seg rim, no lip, contained
+  ripples): "thats good enough". Lake shoreline saga CLOSED 2026-08-24. Import
+  metadata + final screenshot swept into commit 141f368.
