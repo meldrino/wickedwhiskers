@@ -1299,3 +1299,9 @@ recovered from git log + worklog, zero loss):
 - LOCKED IN: Andy verdict on final build (grid 721 + 128-seg rim, no lip, contained
   ripples): "thats good enough". Lake shoreline saga CLOSED 2026-08-24. Import
   metadata + final screenshot swept into commit 141f368.
+- GitHub backup refreshed: lake-fix-2026-08-24 = b16a5fd (verified ls-remote). RECIPE
+  UPDATE (cost me 2 rejected pushes): exclude build/ BEFORE committing - a snapshot
+  commit that ever contains build/wicked-whiskers.exe poisons the whole pack even if
+  a later commit rm's it (GitHub rejects >100MB blobs anywhere in new history).
+  Correct order: clone -> branch e7f1463 -> write .gitignore with build/ -> reset
+  --mixed e7f1463 -> add -A -> ONE commit -> push. Temp clone removed.
