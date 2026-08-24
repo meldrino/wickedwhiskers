@@ -1305,3 +1305,18 @@ recovered from git log + worklog, zero loss):
   a later commit rm's it (GitHub rejects >100MB blobs anywhere in new history).
   Correct order: clone -> branch e7f1463 -> write .gitignore with build/ -> reset
   --mixed e7f1463 -> add -A -> ONE commit -> push. Temp clone removed.
+
+## 2026-08-24 (cont) - fishing cutaway v3 (real-world) + ShoreWall gameplay fix
+
+- Andy verdict on v1 SubViewport paw-diorama: not first person, grass sheets above lake -> spec simplified twice; final = REAL WORLD ONLY: pick camera angle + WW spot/facing, rod in hand, fish lands.
+- cutaway_fish.gd rewritten as real-world minimal cutaway: no viewport/scenery recreation; saves+restores camera holder/camera local/mesh yaw; rod via BoneAttachment3D on Hand.R; bobber at 0.5*shore_distance on cast bearing; real clicked fish AI-frozen then bezier leap into catch_pos; beats cast 0-0.95 / line 0.62 / ripples 1.15+1.75 / leap 2.0-2.8 / DURATION 3.6.
+- Debugging saga (pixel forensics, not judge trust):
+  1) "empty" frames = night: --noon must come AFTER -- in user args.
+  2) frames uniform = shots taken during walk: fishtest spawned WW INSIDE the pond; now spawns outside bank at Terrain.height_at+0.1 and aims player.yaw at lake (else _waiting_cam stalls forever).
+  3) REAL GAMEPLAY BUG FOUND: _try_fish walked WW to r-0.4 (inside pond) but ShoreWall boxes span r+-0.2 -> from land he ground against the wall at zero velocity forever (smoke passed only because it spawns inside the ring). Fixed: target r+0.55 (stand on bank, cast over wall).
+  4) camtest false alarm: without camera_frozen=true player code re-grabs holder every frame.
+  5) hue detectors miss the dark-shaded cat; difference imaging (frame with MeshRoot vs hidden) is the reliable presence check: diff_px=2308 centroid (807,458) = cat centered in cinematic frame.
+- Final composition: cat-centric side-on profile eye=player+sperp*3.2+dir*0.6+up1.35 focus=player+dir*0.85+up0.45.
+- main.gd: --fishtest reworked (shots [0.15..2.95] after cine start + 1.0s tail so on_done fires: food=1 rod=true string=0 sticks=0); --camtest and --nocat diagnostic modes kept.
+- grass_chunk.gd ghost-slot fix: visible_instance_count=_placed after fill (identity-transform ghost tufts were rendering over excluded zones - the "grass sheets above lake").
+- Smoke PASS fish_rod=true caught=true; committed e20b3f1. Awaiting Andy in-game verdict.
