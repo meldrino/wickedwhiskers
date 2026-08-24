@@ -3,7 +3,7 @@ extends RefCounted
 
 const CAT := 0.5
 
-var size := 121
+var size := 361
 var extent := 60.0
 var seed := 0
 
@@ -47,6 +47,7 @@ static func whiskers() -> TerrainConfig:
 		{ "center": Vector2(0.0, -34.0), "radius": 16.0 },
 		{ "center": Vector2(10.0, -20.0), "radius": 9.0 },
 		{ "center": Vector2(16.0, -10.0), "radius": 8.0 },
+		{ "center": Vector2(-11.0, -16.0), "radius": 10.0 },
 	]
 	return c
 
