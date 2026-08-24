@@ -1290,3 +1290,9 @@ recovered from git log + worklog, zero loss):
 - gemini judge gave 3 self-inconsistent FAILs (flip-flopped grass-in-water, called
   fish/ripples a defect) - per protocol its verdicts on this asset are void;
   ANDY TO VERIFY IN-GAME: rim roundness at low angle, lip look, ripples on pond.
+- Andy verdict on bank ring: lip removed (added nothing). Real bugs it exposed:
+  ripples OVERSPILLED the disc (global max scale, off-centre spawns) and read as
+  octagonal "star points" (TorusMesh rings=8 + tube fattening while scaling).
+  Fix commit 3a1b0f1: per-ring containment cap = _surface_r - spawn offset - 0.35,
+  48-seg thin tube flattened y*0.22, ambient origin moved to 0.45r, cadence 0.9s.
+  Andy to verify in-game.
