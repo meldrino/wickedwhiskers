@@ -66,7 +66,18 @@ func _start_jump() -> void:
 	_jump = 0.001
 
 
+const FISH_GLB := "res://assets/fish/goldfish_v3.glb"
+
+
 func _build_fish() -> Node3D:
+	var packed: PackedScene = load(FISH_GLB)
+	if packed != null:
+		var f := Node3D.new()
+		var model: Node3D = packed.instantiate()
+		model.rotation_degrees.y = 90.0
+		model.scale = Vector3.ONE * 0.65
+		f.add_child(model)
+		return f
 	var orange := StandardMaterial3D.new()
 	orange.albedo_color = Color(0.98, 0.72, 0.42)
 	orange.metallic = 0.25
