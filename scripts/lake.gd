@@ -1,7 +1,7 @@
 extends Node3D
 
-const RIPPLE_INTERVAL := 0.5
-const RIPPLE_LIFE := 2.0
+const RIPPLE_INTERVAL := 0.9
+const RIPPLE_LIFE := 2.2
 
 var water_level := 0.0
 var _water: MeshInstance3D = null
@@ -11,7 +11,6 @@ var _swim_t := 0.0
 var _ripple_t := 0.0
 var _ripples: Array = []
 var _ripple_origin := Vector2.ZERO
-var _ripple_max_scale := 4.0
 var rng := RandomNumberGenerator.new()
 
 
@@ -25,9 +24,7 @@ func _ready() -> void:
 	_build_shore_wall()
 	_build_fish()
 	var src_dir := Vector2(0.45, -0.89).normalized()
-	_ripple_origin = src_dir * (_surface_r - 0.7)
-	_ripple_max_scale = (_surface_r * 1.1) / 0.6
-	_build_bank_ring()
+	_ripple_origin = src_dir * (_surface_r * 0.45)
 
 
 func _water_radius() -> float:
@@ -104,7 +101,8 @@ func _physics_process(delta: float) -> void:
 		var k: float = r["t"] / life
 		var ring: MeshInstance3D = r["mesh"]
 		var mat: StandardMaterial3D = r["mat"]
-		ring.scale = Vector3.ONE * lerpf(0.35, _ripple_max_scale, k)
+		var s: float = lerpf(0.35, r["max_s"], k)
+		ring.scale = Vector3(s, s * 0.22, s)
 		mat.albedo_color.a = r["start_a"] * (1.0 - k)
 		if k >= 1.0:
 			ring.queue_free()
@@ -120,17 +118,25 @@ func _make_ripple(at: Vector2, start_a: float) -> void:
 	mat.albedo_color = Color(0.9, 0.97, 1.0)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var tm := TorusMesh.new()
-	tm.inner_radius = 0.42
-	tm.outer_radius = 0.5
-	tm.rings = 8
-	tm.ring_segments = 48
+	tm.inner_radius = 0.46
+	tm.outer_radius = 0.54
+	tm.rings = 48
+	tm.ring_segments = 8
 	tm.material = mat
 	var ring := MeshInstance3D.new()
 	ring.mesh = tm
 	ring.position = Vector3(at.x, water_level + 0.015, at.y)
 	add_child(ring)
+	var allowed: float = maxf(0.6, _surface_r - at.length() - 0.35)
+	_ripples.append({
+		"mesh": ring,
+		"mat": mat,
+		"t": 0.0,
+		"life": RIPPLE_LIFE,
+		"start_a": start_a,
+		"max_s": allowed / 0.54,
+	})
 	mat.albedo_color.a = start_a
-	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": RIPPLE_LIFE, "start_a": start_a})
 
 
 func splash(at: Vector3) -> void:
@@ -191,28 +197,6 @@ func _build_shore_wall() -> void:
 		cs.rotation = Vector3(0, -atan2(b.x - a.x, b.y - a.y), 0)
 		wall.add_child(cs)
 	add_child(wall)
-
-
-func _build_bank_ring() -> void:
-	var n := 64
-	var r_sum := 0.0
-	for i in range(n):
-		var ang := i * TAU / n
-		r_sum += Terrain.shore_distance(Vector2(cos(ang), sin(ang)))
-	var r_ring := r_sum / n
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.33, 0.24, 0.15)
-	mat.roughness = 1.0
-	var tm := TorusMesh.new()
-	tm.inner_radius = r_ring - 0.3
-	tm.outer_radius = r_ring + 0.3
-	tm.rings = 96
-	tm.ring_segments = 16
-	tm.material = mat
-	var ring := MeshInstance3D.new()
-	ring.mesh = tm
-	ring.position = Vector3(0, water_level - 0.08, 0)
-	add_child(ring)
 
 
 func _build_fish() -> void:
