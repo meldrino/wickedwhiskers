@@ -58,6 +58,10 @@ func _ready() -> void:
 func new_game() -> void:
 	string_count = 0
 	stick_count = 0
+	# TEMP TEST KIT (Andy, 2026-08-24): boot with rod materials so the
+	# fishing cutaway can be tested without gathering. Revert to 0/0.
+	string_count = 1
+	stick_count = 1
 	stone_count = 0
 	has_fishing_rod = false
 	food_count = 0
