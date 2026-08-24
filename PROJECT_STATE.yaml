@@ -35,7 +35,8 @@ project:
        anatomy counts, orientation vs spec, proportions, artifacts; verdict PASS/FAIL + the
        single most-wrong thing). NEVER quenn. No exceptions while gemini API is up.
     4. fix from gemini's specifics -> re-render -> re-judge
-    5. only a gemini PASS goes to the user; user eyes = final gate.
+    5. only a gemini PASS goes to the user; ANDY is the FINAL judge (gemini =
+       iteration-only helper while he is away - Andy, 2026-08-24).
     ENFORCEMENT (2026-08-22, after an overnight batch shipped 6 UNJUDGED assets in
     violation of this exact rule): assetloop\polish_asset.ps1 IS steps 2-4 mechanised -
     `pwsh -File assetloop\polish_asset.ps1 -Name <n> -SpecPath <builders\x.json>
@@ -288,6 +289,12 @@ build_status:
       center bed + lighter muddy shallows shelf (no see-through edges); torus bank ring;
       reeds + grass tufts shoreline; orbiting glint + expanding/fading ripple rings.
       Rod crafted from the choice panel; catch adds food + advances quest
+      ORIENTATION FACT (2026-08-24, measured via GLB vertex-slab probe): goldfish_v3.glb
+      natively faces -Z (thin tall slab = fan tail at +Z, chunky head at -Z); child
+      rotation_degrees.y MUST be 180 so the nose rides rig +Z - swim/jump math aims rig
+      +Z along velocity (yaw atan2(heading.x,z), pitch -atan2(vy,h)), so any other child
+      yaw reads as broadside/sideways leaps. Ballistic jumps (ee3cc48): momentum along
+      swim heading, gravity arc, nose pitches with vy. taunt() = _start_jump().
     mouse.gd: wander/flee + chase comedy (never catches), choice Chase/trap/leave, trap
       places trap scene + lures mouse to it (to_trap state), trap catch adds food; box volume
     bird.gd: perched bird, choices Climb(fails)/ladder/craft tractor(drive)/leave

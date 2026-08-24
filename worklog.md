@@ -1210,3 +1210,58 @@ is a real paint/tag bug or the judge misreading eyes/mouth patch; diagnostic cal
 judge was UNREACHABLE (alias 503s) when stop was called.
 Renders: %TEMP%\opencode\gf5_v57_views\view1-4.png (v513). Staged approved\ copy is
 the OLDER v56 - NOT updated to v513 yet.
+2026-08-23 13:40 - Hunyuan3D breakthrough day:
+- Official HF Space tencent/Hunyuan3D-2: texgen dead server-side (HAS_TEXTUREGEN
+  False -> NameError on /generation_all); t2d disabled. /shape_generation works as
+  guest: fed our v513 goldfish render, got clean white mesh (1 island, 41k verts).
+- tencent/Hunyuan3D-2.1 /generation_all WORKS with Andy's free HF token (stored at
+  ~/.cache/huggingface/token, LOCAL ONLY - never commit/paste). Returns white +
+  textured GLBs. ZeroGPU guest quota blocks it; token lifts cap.
+- textured goldfish GLB: 20k verts, 356 apparent islands = UV-seam splits only;
+  weld 1e-4 -> 1 island. Andy eyeballed contact sheet: "pretty good".
+- render_asset.py upgraded: EEVEE path when materials have image textures
+  (Workbench cannot show node graphs) - committed ba15cbb. Pixel-sampled renders to
+  prove texture present.
+- gemini-flash-latest alias 503 all day; lite fallback contradicts itself ("no
+  texture" while praising color palette). Authoritative re-judge after quota reset
+  08:00 BST. Recurring real critiques across runs: fin-body junction pinching,
+  abrupt tail transition, barbels read as floaters.
+NEXT: hy3d_fetch.ps1 productization (ref img -> GLB -> weld -> check -> render ->
+judge gate); re-judge textured fish after reset; maybe multiview refs test.
+2026-08-24 01:05 - goldfish regen round 2 (Andy notes: gold fins=same as body, no
+dangly bit, rounder tail):
+- Built ref variant from sculpt_goldfish_v5.py via string-patch (TEMP:
+  make_ref_variant.ps1 -> sculpt_goldfish_ref.py): rounded 13-pt caudal outline,
+  Pelvic membrane deleted, cream==body orange. gf_ref_v2.glb watertight 10894 polys.
+- Free ZeroGPU quota EXHAUSTED (~5 GPU-min/day/account; gen_all needs 270s).
+  Resets ~12:48 today. PRO = 40min/day if we ever need volume.
+- Shape-only /shape_generation DID fit -> hy_ref2_shape.glb generated + clay
+  contact sheet opened for Andy (tail shape + dangly-bit check NOW).
+PENDING: texture run after reset; judge re-verdict after 08:00.
+2026-08-24 07:57 - NEW FISH IS IN THE GAME (commit ac93882):
+- hy_ref6_shape.glb (Hunyuan 2.1 shape-gen from approved ref v6) tinted flat
+  body-orange -> assets/fish/goldfish_v3.glb; Godot --import refreshed.
+- fish.gd: _build_fish() now loads res://assets/fish/goldfish_v3.glb
+  (rot y=90deg, scale 0.65 - TUNABLE if Andy reports sideways swimming/size),
+  falls back to old primitives if GLB missing.
+- Headless smoke test clean (no script errors).
+- PROTOCOL (Andy): gemini judge = iteration-only helper when he is away;
+  ANDY is the final judge. Write into meldrino.yaml.
+PENDING: Hunyuan TEXTURED version replaces goldfish_v3.glb after ZeroGPU reset
+(~12:48 today); same for judge availability 08:00.
+2026-08-24 08:55 - sideways-leap bug ROOT-CAUSED + fixed (window died mid-session,
+recovered from git log + worklog, zero loss):
+- ee3cc48 aimed rig +Z along velocity but left guessed child rot y=90 -> still
+  broadside. Vertex-slab probe (temp probe_glb.py, decodes GLB POSITION accessors):
+  goldfish_v3.glb long axis = Z; HI-Z slab thin (Xwidth 0.05) + tallest (Yspread
+  0.27) = vertical FAN TAIL; LO-Z chunky (0.20) = HEAD. Native facing = -Z.
+- Fix: child rotation_degrees.y 90 -> 180 so NOSE rides rig +Z; nose leads travel
+  in circle-swim AND ballistic jumps (yaw=atan2(heading), pitch=-atan2(vy,h)).
+- taunt() latent bug: stale-zero vectors -> world-origin flash frame + instant
+  reset; now calls _start_jump() (dodge leap along current heading).
+- Headless smoke PASS (fish_rod=true caught=true, no script errors).
+- ANDY TO VERIFY IN-GAME (eyes = final gate): watch a jump arc - nose up out,
+  arc, nose-down re-entry, no broadside.
+- JUDGE PROTOCOL recorded (Andy): gemini judge = iteration-only helper when he is
+  away; ANDY is the final judge. Written into meldrino.yaml ww-pipeline section +
+  PROJECT_STATE asset-loop protocol.

@@ -31,7 +31,7 @@ func _ready() -> void:
 
 
 func taunt(f: Node3D) -> void:
-	_jump = 0.05
+	_start_jump()
 	_jump_wait = JUMP_WAIT_MAX
 
 
@@ -83,7 +83,7 @@ func _build_fish() -> Node3D:
 	if packed != null:
 		var f := Node3D.new()
 		var model: Node3D = packed.instantiate()
-		model.rotation_degrees.y = 90.0
+		model.rotation_degrees.y = 180.0
 		model.scale = Vector3.ONE * 0.65
 		f.add_child(model)
 		return f
