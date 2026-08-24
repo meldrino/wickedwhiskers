@@ -71,6 +71,7 @@ func _build_water() -> void:
 
 	_water = MeshInstance3D.new()
 	var wm := CylinderMesh.new()
+	wm.radial_segments = 128
 	_surface_r = _water_radius()
 	wm.top_radius = _surface_r
 	wm.bottom_radius = _surface_r

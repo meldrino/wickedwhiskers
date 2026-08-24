@@ -3,7 +3,7 @@ extends RefCounted
 
 const CAT := 0.5
 
-var size := 361
+var size := 721
 var extent := 60.0
 var seed := 0
 
