@@ -11,9 +11,15 @@ const SWIM_SPEED := 1.1
 const SUBMERGE := 0.45
 const JUMP_WAIT_MIN := 3.5
 const JUMP_WAIT_MAX := 6.0
-const JUMP_DUR := 1.1
-const JUMP_HEIGHT := 2.2
-const JUMP_ARC := 0.8
+const GRAV := 9.8
+const JUMP_V_H := 2.4
+const JUMP_V_V_MIN := 4.6
+const JUMP_V_V_MAX := 6.0
+
+var _jump_origin := Vector3.ZERO
+var _jump_head := Vector3.ZERO
+var _jump_v_v := 0.0
+var _jump_airtime := 0.0
 
 
 func _ready() -> void:
@@ -35,12 +41,14 @@ func _physics_process(delta: float) -> void:
 
 	if _jump > 0.0:
 		_jump += delta
-		var p: float = clamp(_jump / JUMP_DUR, 0.0, 1.0)
-		var rise := sin(p * PI) * JUMP_HEIGHT
-		fish.position = Vector3(_jump_dir.x * p * JUMP_ARC, wl - SUBMERGE + rise, _jump_dir.z * p * JUMP_ARC)
-		fish.rotation.y = _jump_dir_angle()
-		fish.rotation.z = sin(p * PI) * 0.35
-		if _jump >= JUMP_DUR:
+		var t: float = min(_jump, _jump_airtime)
+		var vy: float = _jump_v_v - GRAV * t
+		fish.position = _jump_origin + _jump_head * (JUMP_V_H * t) \
+				+ Vector3(0.0, _jump_v_v * t - 0.5 * GRAV * t * t, 0.0)
+		fish.rotation.y = atan2(_jump_head.x, _jump_head.z)
+		fish.rotation.x = -atan2(vy, JUMP_V_H)
+		fish.rotation.z = 0.0
+		if _jump >= _jump_airtime:
 			_jump = 0.0
 			_jump_wait = randf_range(JUMP_WAIT_MIN, JUMP_WAIT_MAX)
 	else:
@@ -52,17 +60,18 @@ func _physics_process(delta: float) -> void:
 		var cz := sin(ang) * SWIM_RADIUS
 		var bob := sin(swim_t * 1.6) * 0.08
 		fish.position = Vector3(cx, wl - SUBMERGE + bob, cz)
-		fish.rotation.y = ang + PI * 0.5
+		fish.rotation.y = -ang
+		fish.rotation.x = 0.0
 		fish.rotation.z = sin(swim_t * 3.0) * 0.12
 
 
-func _jump_dir_angle() -> float:
-	return atan2(-_jump_dir.z, _jump_dir.x)
-
-
 func _start_jump() -> void:
-	var a := randf_range(0.0, TAU)
-	_jump_dir = Vector3(cos(a), 0.0, sin(a))
+	var ang := swim_t * SWIM_SPEED
+	_jump_head = Vector3(-sin(ang), 0.0, cos(ang)).normalized()
+	_jump_origin = fish.position
+	_jump_v_v = randf_range(JUMP_V_V_MIN, JUMP_V_V_MAX)
+	_jump_airtime = 2.0 * _jump_v_v / GRAV
+	_jump_dir = Vector3.ZERO
 	_jump = 0.001
 
 
