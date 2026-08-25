@@ -1325,3 +1325,33 @@ recovered from git log + worklog, zero loss):
 - Andy reported: clicked a fish in real gameplay, no cutaway. Added [click]/[fish] diagnostic prints across player.gd click path (_handle_click_at guards, _pick_fish hit/miss, water fallback, _try_fish entry, arrival branch rod-vs-pounce). Smoke green. Awaiting Andy's console output from his repro - whichever branch prints IGNORED is the culprit.
 - TEMP test kit live: GameState.new_game() boots with 1 string + 1 stick (commit 9878fac) - revert after testing.
 - PROJECT FROZEN by user: pivot to trader bot rescue with full MoE (claude-expert via FCC now live, see bigpickle/meldrino.yaml ROUTE B3). Uncommitted click diagnostics committed at freeze per stop protocol.
+
+## 2026-08-25 — grass hscale fix + git cleanup + Mark's Mac session
+
+### Grass hscale investigation
+- Mark (VNC'd into laptop + also has local copy on Mac) reported WW "waist high in grass".
+- Root cause: hscale=8.0 in grass_system.gd:52, set during Aug 11 vision testing.
+  At hscale=8.0: blade height = (0.008+0.008)*8.0*1.15 = ~14.7cm (cat is 0.47m = waist high).
+- Changed hscale to 1.0: blades become ~1.8cm. User: "not enough grass".
+- REVERTED to hscale=8.0 per user — fix properly in future session. See PROJECT_STATE
+  "2026-08-25 SESSION" block for full details and pending decisions.
+- Also found: grass_system.gd setup() call has 4 args but grass_chunk.gd expects 6.
+  My "fix" was reverted as retrograde. Mismatch from branch merge picking up different
+  versions. Fix deferred.
+
+### Git repo cleanup
+- Purged build/wicked-whiskers.exe (196MB) from entire git history via filter-branch.
+  This was blocking all pushes (GitHub rejects >100MB blobs anywhere in history).
+- Added build/*.exe + build/*.exe.* to .gitignore.
+- Added game_errors.txt + game_output.txt to .gitignore.
+- Merged cutaway-finger-anatomy into master (was 41 commits ahead).
+- Deleted all stale branches: backup-2026-08-23/b/c, clean-push, push-2026-08-25,
+  fish-fix-2026-08-24, lake-fix-2026-08-24, marks-branch, cutaway-finger-anatomy.
+- Repo now has single branch: master. Clean.
+
+### Mark's Mac session
+- Mark VNC'd into laptop + also running local copy on Mac via Godot.
+- HTTP file server (py -m http.server 8080) set up for Mark to browse files.
+- Game runs on Mac but interactions (click fish, click Dumbleclaw) don't work — likely
+  Wine/CrossOver input mapping issues or Mac Godot export needed.
+- Mark thinned grass in his local copy to cope with Mac GPU.
