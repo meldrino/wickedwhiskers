@@ -1,0 +1,11 @@
+20:18:32 POLISH START yarn_helix2 spec=C:\crypto\wicked whiskers\assetloop\builders\yarn_helix2.json briefLen=262 maxRounds=4
+20:18:37 round 1 built OK dims=(0.191, 0.119, 0.11)
+20:18:56 round 1: verdict=FAIL most_wrong='The asset looks like a bare sphere inside a loose spring cage rather than a densely wound ball of twine.'
+20:19:36 round 1: patch accepted, dims=(0.191, 0.119, 0.11)
+20:19:54 round 2: verdict=FAIL most_wrong='The ball is not densely wound; it remains a bare, smooth sphere exposed inside a sparse spiral cage.'
+20:20:34 round 2: patch accepted, dims=(0.191, 0.119, 0.11)
+20:21:32 round 3: verdict=FAIL most_wrong='The model is a sphere with a sparse wire wrapped around it, not a densely wound ball of twine.'
+20:22:13 round 3: patch accepted, dims=(0.191, 0.119, 0.11)
+20:23:11 round 4: verdict=FAIL most_wrong='The model is a sparse helical coil around a bare sphere, failing to represent a densely wound ball of twine.'
+20:23:51 round 4: patch accepted, dims=(0.191, 0.119, 0.11)
+20:23:51 ROUND CAP reached without approval - staging last views for human review

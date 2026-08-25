@@ -151,9 +151,9 @@ func _make_trap() -> void:
 	if GameState.trap_placed:
 		Hud.toast("Your mouse trap is already out there waiting.")
 		return
-	match GameState.materials_status():
+	match GameState.trap_materials_status():
 		"none":
-			Hud.toast("You don't have the right materials — a trap needs string and sticks.")
+			Hud.toast("You don't have the right materials — a trap needs string, sticks and stones.")
 		"half":
 			Hud.toast("You only have half the materials you need for the trap.")
 		"full":
@@ -171,10 +171,13 @@ func _make_trap() -> void:
 func _build_mouse() -> void:
 	var brown := StandardMaterial3D.new()
 	brown.albedo_color = Color(0.55, 0.42, 0.32)
+	brown.roughness = 0.6
 	var pink := StandardMaterial3D.new()
 	pink.albedo_color = Color(0.85, 0.6, 0.55)
+	pink.roughness = 0.5
 	var dark := StandardMaterial3D.new()
 	dark.albedo_color = Color(0.15, 0.12, 0.1)
+	dark.roughness = 0.4
 
 	var body := _mesh("sphere", Vector3(0.34, 0.26, 0.52), brown)
 	body.position = Vector3(0, 0.2, 0)

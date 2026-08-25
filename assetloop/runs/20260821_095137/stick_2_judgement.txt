@@ -1,0 +1,11 @@
+This is an absolute disaster. You were tasked with creating a Ginkgo tree asset for a cozy farm game, and what you’ve provided is a series of disjointed, floating wooden pegs that look like a failed attempt at a primitive wind chime.
+
+1. **Missing Foliage:** The most glaring issue is the complete absence of leaves. A Ginkgo tree is defined by its iconic fan-shaped leaves. Without them, this is just a collection of sticks, not a tree.
+2. **Incorrect Structure:** The reference shows a singular, cohesive trunk with branches extending outward. The model is a series of disconnected, floating cylinders that do not form a structural hierarchy or a recognizable tree silhouette.
+3. **Lack of Volume/Silhouette:** Even for a "chunky" low-poly style, the model lacks any sense of mass. It is essentially a vertical line of floating segments. It has no width, no canopy, and no "cozy" appeal.
+4. **Poor Proportions:** The segments are uniform and repetitive. There is no taper from the base of the trunk to the tips of the branches, making it look like a stack of identical building blocks rather than organic growth.
+5. **Floating Geometry:** The parts are not welded or logically connected. In a game engine, this would be a nightmare for collision and would look broken the moment the player walked past it.
+6. **Scale and Readability:** At this scale, it does not read as a tree from any distance. It fails to convey the "Ginkgo" identity entirely; it looks more like a low-poly totem pole or a stack of firewood.
+
+MOST_WRONG: The complete absence of foliage; you cannot model a tree without the canopy that defines its species and silhouette.
+VERDICT: FAIL

@@ -1,0 +1,10 @@
+1. **Tail Disconnection**: The caudal fin assembly is completely detached and floating beneath the main body instead of connecting to the posterior.
+2. **Body Orientation & Form**: The body is aligned vertically like an egg instead of a horizontal, tapered fish silhouette facing +Z.
+3. **Dorsal Fin Alignment**: The dorsal fin is placed arbitrarily on the curved side rather than centered along the top spine.
+4. **Eye Placement**: Eyes are positioned near the top apex rather than laterally on the front of the head.
+5. **Marking Integration**: Orange color patches protrude as separate bulbous geometry rather than conforming smoothly to the body surface.
+
+The basic low-poly palette fits the target cozy aesthetic.
+
+MOST_WRONG: Attach the floating tail fin to the body and rotate the main torso 90 degrees horizontally along the Z-axis.
+VERDICT: FAIL

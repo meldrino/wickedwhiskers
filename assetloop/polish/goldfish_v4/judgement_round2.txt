@@ -1,0 +1,13 @@
+This asset is a failure. Despite previous feedback, the fundamental silhouette remains a "torpedo" rather than the required "plump round teardrop." You have ignored the core design brief regarding the body shape.
+
+1. **Body Silhouette:** The model is still essentially a cylinder/capsule. It lacks the organic, rounded volume of a goldfish. It is rigid, mechanical, and lacks the "plump" character requested.
+2. **Truncated Peduncle:** You have failed to address the flat, truncated cap face at the peduncle. It looks like a mechanical attachment point rather than an integrated organic tail base.
+3. **Pectoral Fins:** These remain thick, wedge-like, and primitive. They lack the delicate, flowing quality of a goldfish fin and look like stiff, flat-shaded geometric inserts.
+4. **Integration:** While the geometry is technically "rooted," the lack of smooth blending between the fins and the body creates a "primitive soup" aesthetic. The fins appear "slapped on" rather than growing out of the body.
+5. **Dorsal Fin:** The shape is too rigid and triangular; it lacks the "tall flowing" quality specified in the brief.
+
+You have failed to evolve the silhouette or the integration quality.
+
+MOST_WRONG: Incorrect body silhouette (torpedo vs. plump teardrop)
+VERDICT: FAIL
+

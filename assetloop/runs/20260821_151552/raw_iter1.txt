@@ -1,0 +1,36 @@
+15:15:54 gemini busy (gemini-flash-latest), waiting 30s (attempt 1/6)
+15:16:24 gemini busy (gemini-flash-latest), waiting 60s (attempt 2/6)
+15:17:25 gemini busy (gemini-flash-latest), waiting 90s (attempt 3/6)
+15:18:55 switching to fallback model gemini-3.1-flash-lite
+```json
+{
+  "asset": "stone",
+  "auto_ground": true,
+  "surface_noise": {
+    "frequency": 12,
+    "amplitude": 0.002,
+    "seed": 42
+  },
+  "materials": {
+    "stone_grey": {
+      "color": [0.33, 0.33, 0.36],
+      "roughness": 0.95
+    }
+  },
+  "parts": [
+    {
+      "type": "rock",
+      "name": "Main_Stone",
+      "material": "stone_grey",
+      "center": [0, 0, 0.04],
+      "radius": 0.06,
+      "seed": 101,
+      "squash": [1.0, 0.85, 0.65],
+      "lumpiness": 0.2,
+      "flatten": 0.5,
+      "facet": 0.7,
+      "smooth": false
+    }
+  ]
+}
+```

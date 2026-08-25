@@ -1,0 +1,13 @@
+Listen, I’ve seen better geometry in a preschooler's block bin. This is an absolute disaster. You call this a tractor? It looks like a malfunctioning toaster on wheels.
+
+1. **FAIL:** This does not read as a tractor; it reads as a generic, unidentifiable geometric mess.
+2. **FAIL:** The wheels are white/grey, not near-black, and they look like floating cylinders rather than functional tractor tyres.
+3. **FAIL:** The body is primarily grey, not red, and there is absolutely no cabin, no windows, and no roof to be seen.
+4. **FAIL:** There are no mudguards or fenders whatsoever.
+5. **FAIL:** There is no exhaust pipe.
+6. **FAIL:** There is no number plate.
+7. **FAIL:** The proportions are completely nonsensical; it’s a blocky, abstract pile of primitives.
+8. **FAIL:** The wheels appear to be floating or clipping poorly, and the entire assembly lacks any structural cohesion.
+
+MOST_WRONG: The entire model is a collection of untextured, incorrectly colored primitives that fail to represent any of the requested tractor features.
+VERDICT: FAIL

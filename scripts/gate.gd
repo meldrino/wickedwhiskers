@@ -13,11 +13,27 @@ const GATE_W := 2.9
 
 
 func _ready() -> void:
-	prompt = "Click — gate"
+	prompt = "Click - gate"
 	interaction_box = Vector3(3.4, 1.4, 0.6)
-	interaction_center = Vector3(0, 0.6, 0)
+	interaction_center = Vector3(0.005, 0.6, 0.0)
+	interaction_points_extra = [Vector3(-1.445, 0.6, 0.0), Vector3(1.455, 0.6, 0.0)]
+	interaction_range = 1.0
+	walk_to_interact = false
 	super()
 	_build_gate()
+
+
+func get_interaction_point() -> Vector3:
+	return _pivot.to_global(Vector3(1.45, 0.6, 0.0))
+
+
+func get_interaction_points() -> Array[Vector3]:
+	var pts: Array[Vector3] = [
+		_pivot.to_global(Vector3(0.0, 0.6, 0.0)),
+		_pivot.to_global(Vector3(1.45, 0.6, 0.0)),
+		_pivot.to_global(Vector3(2.9, 0.6, 0.0)),
+	]
+	return pts
 
 
 func _build_gate() -> void:
@@ -45,7 +61,7 @@ func _build_gate() -> void:
 	for r in rails:
 		_add_box(_pivot, r[1], r[0], WOOD, r[2])
 	# Latch (meets the east post when closed)
-	_add_box(_pivot, Vector3(0.16, 0.18, 0.12), Vector3(1.4, 0.95, 0), WOOD_DARK)
+	_add_box(_pivot, Vector3(0.16, 0.18, 0.12), Vector3(2.85, 0.95, 0), WOOD_DARK)
 
 	var body := StaticBody3D.new()
 	var col := CollisionShape3D.new()
@@ -102,7 +118,7 @@ func interact() -> void:
 		return
 	_busy = true
 	var tween := create_tween()
-	tween.tween_property(_pivot, "rotation:y", PI / 2.0 if not _open else 0.0, 0.9) \
+	tween.tween_property(_pivot, "rotation:y", -PI / 2.0 if not _open else 0.0, 0.9) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_callback(_on_swing_done)
 

@@ -1,0 +1,14 @@
+13:56:56 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:57:13 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+This is an absolute failure of artistic direction. I asked for a "cozy, rounded" goldfish, and you have provided a collection of primitive blocks that look like they were assembled in a CAD program from the 1980s. 
+
+1. **DorsalFin**: Still a rigid, sharp-cornered rectangle. It is not "rounded" as requested in the brief.
+2. **TailUp/TailDown**: These are flat, uninspired slabs. They lack any organic curvature or "fish-like" flow, making the model look like a construction toy rather than a living creature.
+3. **FinL/FinR**: These side fins are equally blocky and sharp, clashing violently with the plump, rounded body.
+4. **General Silhouette**: The transition between the body and the tail assembly is jarringly geometric. There is zero stylistic cohesion between the soft, rounded body and the harsh, angular appendages.
+
+You have ignored the fundamental "cozy" aesthetic requirement twice now. If you cannot understand that "rounded" means removing sharp 90-degree corners from the fins and tail, you are not fit for this project.
+
+MOST_WRONG: The rigid, sharp-cornered rectangular geometry of the fins and tail.
+VERDICT: FAIL
+

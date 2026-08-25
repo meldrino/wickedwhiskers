@@ -1,0 +1,24 @@
+**********************
+PowerShell transcript start
+Start time: 20260821082114
+Username: LAPTOP-J5TKEBVT\Andy
+RunAs User: LAPTOP-J5TKEBVT\Andy
+Configuration Name: 
+Machine: LAPTOP-J5TKEBVT (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -ExecutionPolicy Bypass -File C:\crypto\wicked whiskers\assetloop\overnight_batch.ps1
+Process ID: 21340
+PSVersion: 7.6.3
+PSEdition: Core
+GitCommitId: 7.6.3
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+08:21:15 === START tractor ===
+08:25:07 === DONE tractor: verdict=NO-VERDICT glbs=1 dir=20260821_082115 ===
+08:25:12 === START mouse ===
+08:30:08 === DONE mouse: verdict=NO-VERDICT glbs=0 dir=20260821_082715 ===
+08:30:13 === START fish ===

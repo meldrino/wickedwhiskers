@@ -61,6 +61,9 @@ const ANIM_BONES := [
 @onready var camera_holder: Node3D = $CameraHolder
 @onready var mesh_root: Node3D = $MeshRoot
 
+var _pick_item: Interactable = null
+var _pick_point := Vector3.ZERO
+
 
 func _ready() -> void:
 	add_to_group("player")
@@ -72,6 +75,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if GameState.cinematic_active:
+		return
 	if _pouncing():
 		return
 	if event is InputEventMouseButton:
@@ -138,44 +143,80 @@ func set_interactable(item) -> void:
 
 func _pick_interactable(screen_pos: Vector2) -> Interactable:
 	var from := camera.project_ray_origin(screen_pos)
+	var dir := camera.project_ray_normal(screen_pos)
+	_pick_item = null
+	_pick_point = Vector3.ZERO
+	# 1. Direct hit on an object's collider: clickable anywhere on its surface
+	# (the gate panel, a door, the tractor body). The hit point drives range.
+	var qa0 := PhysicsRayQueryParameters3D.create(from, from + dir * 50.0)
+	qa0.collide_with_areas = false
+	qa0.collide_with_bodies = true
+	qa0.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(qa0)
+	if not hit.is_empty():
+		var node := hit.get("collider") as Node
+		while node != null:
+			if node is Interactable:
+				_pick_item = node
+				_pick_point = hit.get("position")
+				return node
+			node = node.get_parent()
+	# 2. Point-based fallback: cursor near a projected interaction point even
+	# when the click lands beside the object (ground next to it).
 	var best: Interactable = null
 	var best_d := INF
+	var best_wp := Vector3.ZERO
 	var vp_size := get_viewport().get_visible_rect().size
 	for item in get_tree().get_nodes_in_group("interactable"):
 		var it := item as Interactable
 		if it == null:
 			continue
-		var wp := it.get_interaction_point()
-		var to_item: Vector3 = wp - from
-		if to_item.length() > 50.0:
-			continue
-		if to_item.normalized().dot(camera.global_transform.basis.z) >= -0.05:
-			continue
-		var sp := camera.unproject_position(wp)
-		if sp.x < 0.0 or sp.y < 0.0 or sp.x > vp_size.x or sp.y > vp_size.y:
-			continue
-		var d := sp.distance_to(screen_pos)
-		if d < best_d:
-			best_d = d
+		var item_d := INF
+		var item_wp := Vector3.ZERO
+		for wp in it.get_interaction_points():
+			var to_item: Vector3 = wp - from
+			if to_item.length() > 50.0:
+				continue
+			if to_item.normalized().dot(camera.global_transform.basis.z) >= -0.05:
+				continue
+			var sp := camera.unproject_position(wp)
+			if sp.x < 0.0 or sp.y < 0.0 or sp.x > vp_size.x or sp.y > vp_size.y:
+				continue
+			var d := sp.distance_to(screen_pos)
+			if d < item_d:
+				item_d = d
+				item_wp = wp
+		if item_d < best_d:
+			best_d = item_d
+			best_wp = item_wp
 			best = it
 	if best == null or best_d > 40.0:
 		return null
 	# Occlusion: a solid wall/fence between the camera and the object blocks the
-	# click — but never the object's own colliders (e.g. the gate panel).
-	var wp2 := best.get_interaction_point()
-	var dir := (wp2 - from).normalized()
-	var qa := PhysicsRayQueryParameters3D.create(from, wp2 + dir * 0.3)
-	qa.collide_with_areas = false
-	qa.collide_with_bodies = true
-	var rids: Array[RID] = [get_rid()]
-	_collect_rids(best, rids)
-	qa.exclude = rids
-	var hb := get_world_3d().direct_space_state.intersect_ray(qa)
-	if not hb.is_empty():
+	# click — but never the object's own colliders (e.g. the gate panel). Try the
+	# points nearest the click first; a passing animal must not deaden the click.
+	var wps2 := best.get_interaction_points()
+	wps2.sort_custom(func(a: Vector3, b: Vector3) -> bool:
+		return camera.unproject_position(a).distance_to(screen_pos) < camera.unproject_position(b).distance_to(screen_pos))
+	for wp in wps2:
+		var dir2 := (wp - from).normalized()
+		var qa := PhysicsRayQueryParameters3D.create(from, wp + dir2 * 0.3)
+		qa.collide_with_areas = false
+		qa.collide_with_bodies = true
+		var rids: Array[RID] = [get_rid()]
+		_collect_rids(best, rids)
+		qa.exclude = rids
+		var hb := get_world_3d().direct_space_state.intersect_ray(qa)
+		if hb.is_empty():
+			_pick_item = best
+			_pick_point = wp
+			return best
 		var body_dist := from.distance_to(hb.get("position"))
-		if body_dist < from.distance_to(wp2) - 0.2:
-			return null
-	return best
+		if body_dist >= from.distance_to(wp) - 0.2:
+			_pick_item = best
+			_pick_point = wp
+			return best
+	return null
 
 
 func _collect_rids(node: Node, rids: Array[RID]) -> void:
@@ -229,7 +270,7 @@ func _clamp_camera_in_room() -> void:
 	if scene == null or scene.name != "Shed":
 		return
 	var cam := camera_holder.to_global(camera.position)
-	var half := Vector3(2.25, 1.35, 1.65)
+	var half := Vector3(1.35, 1.05, 1.05)
 	var clamped := Vector3(
 		clampf(cam.x, -half.x, half.x),
 		clampf(cam.y, 0.25, half.y),
@@ -251,14 +292,13 @@ func stop_walk() -> void:
 
 func _handle_click_at(screen_pos: Vector2) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
+		print("[click] IGNORED chase=%s panel=%s" % [GameState.chase_active, Hud.any_panel_open()])
 		return
 	if _pouncing():
-		return
-	var fish := _pick_fish(screen_pos)
-	if fish != null:
-		_try_fish(fish)
+		print("[click] IGNORED pouncing")
 		return
 	if has_destination:
+		print("[click] IGNORED already walking")
 		return
 	_waiting_cam = false
 	_wait_target = Vector3.ZERO
@@ -266,8 +306,13 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 	if item != null:
 		if _within_interact_range(item):
 			item.interact()
-		else:
+		elif item.walk_to_interact:
 			_go_interact(item)
+		return
+	var fish := _pick_fish(screen_pos)
+	if fish != null:
+		print("[click] fish picked -> _try_fish")
+		_try_fish(fish)
 		return
 	var from := camera.project_ray_origin(screen_pos)
 	var dir := camera.project_ray_normal(screen_pos)
@@ -280,6 +325,7 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 		return
 	var gp: Vector3 = hit.get("position")
 	if Terrain.in_water(gp.x, gp.z):
+		print("[click] water hit -> _try_fish(null)")
 		_try_fish(null)
 		return
 	_request_walk(Vector3(gp.x, 0, gp.z))
@@ -292,7 +338,7 @@ func _try_start_walk() -> void:
 	_wait_target = Vector3.ZERO
 	var item := _pick_interactable(get_viewport().get_mouse_position())
 	if item != null:
-		if not _within_interact_range(item):
+		if not _within_interact_range(item) and item.walk_to_interact:
 			_go_interact(item)
 		return
 	_walk_to_screen_point(get_viewport().get_mouse_position())
@@ -322,10 +368,13 @@ func _go_interact(item: Interactable) -> void:
 
 func _try_fish(fish: Node3D) -> void:
 	if GameState.chase_active or Hud.any_panel_open():
+		print("[fish] IGNORED chase=%s panel=%s" % [GameState.chase_active, Hud.any_panel_open()])
 		return
 	if _pouncing():
+		print("[fish] IGNORED pouncing")
 		return
 	if Time.get_ticks_msec() < _fish_cd:
+		print("[fish] IGNORED cooldown")
 		return
 	stop_walk()
 	_clicked_fish = fish
@@ -337,19 +386,49 @@ func _try_fish(fish: Node3D) -> void:
 	if to_lake.length() < 0.01:
 		return
 	var dir := to_lake.normalized()
-	var r := Terrain.shore_distance(dir)
+	# Shore point on the CAT'S side: cast the crossing ray from the center
+	# back toward the cat, not outward past the far bank.
+	# Shore point just OUTSIDE the ShoreWall ring (wall spans r±0.2):
+	# stand on the bank, cast over it.
+	var back := -dir
+	var r := Terrain.shore_distance(back)
 	var shore := Vector3(
-		Terrain.lake.center.x + dir.x * (r - 0.4),
+		Terrain.lake.center.x + back.x * (r + 0.55),
 		0,
-		Terrain.lake.center.y + dir.y * (r - 0.4))
+		Terrain.lake.center.y + back.y * (r + 0.55))
 	_pending_fish = true
 	if not _request_walk(shore, true):
 		_pending_fish = false
+		print("[fish] walk request failed -> pounce")
 		_start_pounce()
+	else:
+		print("[fish] walking to %v (waiting_cam=%s)" % [shore, _waiting_cam])
 
 
 func _pouncing() -> bool:
 	return _pounce_t >= 0.0
+
+
+func _catch_with_rod() -> void:
+	var first_cast := not GameState.has_fishing_rod
+	if first_cast:
+		GameState.spend_rod()
+	stop_walk()
+	velocity = Vector3.ZERO
+	var cw: Node3D = (preload("res://scripts/cutaway_fish.gd") as Script).new()
+	get_tree().root.add_child(cw)
+	cw.play_rod_catch(first_cast, _clicked_fish, _on_rod_cutaway_done)
+
+
+func _on_rod_cutaway_done() -> void:
+	GameState.add_food(1)
+	if _clicked_fish != null and is_instance_valid(_clicked_fish):
+		_clicked_fish.queue_free()
+	_clicked_fish = null
+	var lines: Array[String] = []
+	lines.append("SNAP! The goldfish seizes the bait and lands in your paws.")
+	lines.append("Fish: Oh carp.")
+	Hud.show_dialogue(lines)
 
 
 func _start_pounce() -> void:
@@ -420,7 +499,7 @@ func _finish_pounce() -> void:
 		_drip.emitting = true
 	_clicked_fish = null
 	Hud.show_dialogue([
-		"Fish: Ha Ha Whiskers — you can't reach me and there is no-fin you can do about it!",
+		"Fish: Ha Ha Whiskers — no rod, no-fin you can do about it!",
 		"Whiskers: (climbs back onto the bank, soaked and dripping, and glares at the smug goldfish.)",
 	])
 
@@ -433,7 +512,7 @@ func _wet_cat(wet: bool) -> void:
 			for i in range(mi.mesh.get_surface_count()):
 				if i in orig:
 					continue
-				var src: Material = mi.surface_get_material(i)
+				var src: Material = mi.mesh.surface_get_material(i)
 				orig[i] = src
 				if src is StandardMaterial3D:
 					var m: StandardMaterial3D = src.duplicate()
@@ -452,9 +531,17 @@ func _wet_cat(wet: bool) -> void:
 
 
 func _within_interact_range(item: Interactable) -> bool:
-	var p := item.get_interaction_point()
-	p.y = global_position.y
-	return global_position.distance_to(p) <= INTERACT_RANGE
+	if _pick_item == item and _pick_point != Vector3.ZERO:
+		var q := _pick_point
+		q.y = global_position.y
+		if global_position.distance_to(q) <= item.interaction_range:
+			return true
+	for p in item.get_interaction_points():
+		var q2 := p
+		q2.y = global_position.y
+		if global_position.distance_to(q2) <= item.interaction_range:
+			return true
+	return false
 
 
 func _walk_to_screen_point(screen_pos: Vector2) -> bool:
@@ -490,7 +577,7 @@ func _try_craft_trap() -> void:
 		Hud.toast("You already have a convoluted mouse trap placed.")
 		return
 	if not GameState.can_afford_trap():
-		Hud.toast("Need 1 string + 2 sticks for a convoluted mouse trap.")
+		Hud.toast("Need 1 string + 2 sticks + 2 stones for a convoluted mouse trap.")
 		return
 	GameState.spend_trap()
 	GameState.trap_placed = true
@@ -531,6 +618,8 @@ func _try_eat() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if GameState.cinematic_active:
+		return
 	if _pounce_t >= 0.0:
 		_update_pounce(delta)
 		_animate_cat(delta)
@@ -594,7 +683,13 @@ func _physics_process(delta: float) -> void:
 			velocity.z = move_toward(velocity.z, 0.0, move_speed)
 			if _pending_fish:
 				_pending_fish = false
-				_start_pounce()
+				if GameState.has_fishing_rod or GameState.can_afford_rod():
+					print("[fish] arrived -> cutaway (rod=%s string=%d sticks=%d)" % [
+						GameState.has_fishing_rod, GameState.string_count, GameState.stick_count])
+					_catch_with_rod()
+				else:
+					print("[fish] arrived -> NO materials, pounce")
+					_start_pounce()
 			if pending_interact != null:
 				var it := pending_interact
 				pending_interact = null
@@ -675,12 +770,12 @@ func _animate_cat(delta: float) -> void:
 		poses["Toe.L"] = Vector3(0.03 * sw_l, 0.0, 0.0)
 		poses["Toe.R"] = Vector3(0.03 * sw_r, 0.0, 0.0)
 		# front legs diagonal to the hind legs
-		poses["UpperArm.L"] = Vector3(-0.35 * s, 0.0, -0.03 * s)
-		poses["UpperArm.R"] = Vector3(0.35 * s, 0.0, 0.03 * s)
-		poses["Forearm.L"] = Vector3(0.12 * sw_l, 0.0, 0.0)
-		poses["Forearm.R"] = Vector3(0.12 * sw_r, 0.0, 0.0)
-		poses["Hand.L"] = Vector3(0.04 * sw_l, 0.0, 0.0)
-		poses["Hand.R"] = Vector3(0.04 * sw_r, 0.0, 0.0)
+		poses["UpperArm.L"] = Vector3(-0.5 * s, 0.0, -0.05 * s)
+		poses["UpperArm.R"] = Vector3(0.5 * s, 0.0, 0.05 * s)
+		poses["Forearm.L"] = Vector3(0.18 * sw_l, 0.0, 0.0)
+		poses["Forearm.R"] = Vector3(0.18 * sw_r, 0.0, 0.0)
+		poses["Hand.L"] = Vector3(0.06 * sw_l, 0.0, 0.0)
+		poses["Hand.R"] = Vector3(0.06 * sw_r, 0.0, 0.0)
 		# body rock + tail swish; body sinks so the stance paws stay planted
 		poses["Spine"] = Vector3(0.06 * s, 0.0, 0.0)
 		poses["Tail01"] = Vector3(0.0, 0.0, 0.14 * s)

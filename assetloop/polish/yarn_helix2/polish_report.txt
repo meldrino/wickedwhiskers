@@ -1,0 +1,28 @@
+20:18:32 POLISH START yarn_helix2 spec=C:\crypto\wicked whiskers\assetloop\builders\yarn_helix2.json briefLen=262 maxRounds=4
+20:18:37 GEOMETRY WARNINGS: PROBE inside HelixWrapB in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside LooseEnd in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+20:18:37 round 1 built OK dims=(0.191, 0.119, 0.11)
+20:18:56 round 1: verdict=FAIL most_wrong='The asset looks like a bare sphere inside a loose spring cage rather than a densely wound ball of twine.'
+20:18:56 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+20:19:06 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+20:19:36 GEOMETRY WARNINGS: PROBE inside HelixWrapB in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside LooseEnd in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+20:19:36 round 1: patch accepted, dims=(0.191, 0.119, 0.11)
+20:19:54 round 2: verdict=FAIL most_wrong='The ball is not densely wound; it remains a bare, smooth sphere exposed inside a sparse spiral cage.'
+20:19:54 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+20:20:04 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+20:20:34 GEOMETRY WARNINGS: PROBE inside HelixWrapB in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside LooseEnd in HelixWrapA pct=1 -> BARELY_ROOTED (warn)
+20:20:34 round 2: patch accepted, dims=(0.191, 0.119, 0.11)
+20:20:45 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+20:21:02 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+20:21:32 round 3: verdict=FAIL most_wrong='The model is a sphere with a sparse wire wrapped around it, not a densely wound ball of twine.'
+20:21:33 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+20:21:43 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+20:22:13 GEOMETRY WARNINGS: PROBE inside HelixWrapB in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside LooseEnd in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+20:22:13 round 3: patch accepted, dims=(0.191, 0.119, 0.11)
+20:22:24 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+20:22:41 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+20:23:11 round 4: verdict=FAIL most_wrong='The model is a sparse helical coil around a bare sphere, failing to represent a densely wound ball of twine.'
+20:23:11 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+20:23:22 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+20:23:51 GEOMETRY WARNINGS: PROBE inside HelixWrapB in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside LooseEnd in HelixWrapA pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+20:23:51 round 4: patch accepted, dims=(0.191, 0.119, 0.11)
+20:23:51 ROUND CAP reached without approval - staging last views for human review

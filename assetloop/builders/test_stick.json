@@ -1,0 +1,24 @@
+{
+  "asset": "stick_test",
+  "materials": {
+    "bark": { "color": [0.42, 0.29, 0.17], "roughness": 0.85 },
+    "wood": { "color": [0.79, 0.66, 0.44], "roughness": 0.7 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "Shaft", "material": "bark",
+      "waypoints": [[0, 0.015, -0.26], [0, -0.01, -0.09], [0, 0.02, 0.08], [0, -0.005, 0.18], [0, 0.01, 0.26]],
+      "radius_start": 0.016, "radius_end": 0.010, "sides": 16 },
+    { "type": "cylinder", "name": "Branch1", "material": "bark",
+      "from": [0, 0.01, -0.05], "to": [0.06, 0.05, -0.02], "radius": 0.007 },
+    { "type": "cylinder", "name": "ForkA", "material": "bark",
+      "from": [0, 0.01, 0.23], "to": [0.05, 0.03, 0.32], "radius": 0.005 },
+    { "type": "cylinder", "name": "ForkB", "material": "bark",
+      "from": [0, 0.01, 0.23], "to": [-0.05, 0.02, 0.33], "radius": 0.005 },
+    { "type": "cone_tip", "name": "FrayedTip", "material": "wood",
+      "base": [0, 0.015, -0.25], "tip": [0, 0.02, -0.31], "radius": 0.011 },
+    { "type": "box", "name": "Ridge1", "material": "bark",
+      "center": [0.012, 0.02, 0.0], "size": [0.004, 0.006, 0.28], "rot_deg": [8, 0, 0] },
+    { "type": "box", "name": "Ridge2", "material": "bark",
+      "center": [-0.012, 0.018, 0.05], "size": [0.004, 0.006, 0.24], "rot_deg": [-6, 0, 4] }
+  ]
+}

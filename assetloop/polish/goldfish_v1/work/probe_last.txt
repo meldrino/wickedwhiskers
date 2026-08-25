@@ -1,0 +1,39 @@
+14:01:33 | INFO: Data are loaded, start creating Blender stuff
+14:01:33 | INFO: Blender create Mesh node BackShade
+14:01:33 | INFO: Blender create Mesh node Body
+14:01:33 | INFO: Blender create Mesh node DorsalFin
+14:01:33 | INFO: Blender create Mesh node EyeL
+14:01:33 | INFO: Blender create Mesh node EyeR
+14:01:33 | INFO: Blender create Mesh node FinL
+14:01:33 | INFO: Blender create Mesh node FinR
+14:01:33 | INFO: Blender create Mesh node TailBridge
+14:01:33 | INFO: Blender create Mesh node TailDown
+14:01:33 | INFO: Blender create Mesh node TailUp
+14:01:33 | INFO: glTF import finished in 0.02s
+PROBE parts=10 bbox=(0.439,0.714,0.499)
+PROBE pair BackShade|Body overlap=(0.219,0.291,0.086)
+PROBE pair BackShade|DorsalFin overlap=(0.180,0.180,0.108)
+PROBE pair BackShade|EyeL overlap=(0.036,0.040,0.028)
+PROBE pair BackShade|EyeR overlap=(0.043,0.040,0.028)
+PROBE pair Body|DorsalFin overlap=(0.180,0.180,0.113)
+PROBE pair Body|EyeL overlap=(0.072,0.090,0.090)
+PROBE pair Body|EyeR overlap=(0.076,0.090,0.090)
+PROBE pair Body|FinL overlap=(0.061,0.115,0.058)
+PROBE pair Body|FinR overlap=(0.065,0.115,0.058)
+PROBE pair Body|TailBridge overlap=(0.050,0.053,0.050)
+PROBE pair TailBridge|TailDown overlap=(0.020,0.081,0.050)
+PROBE pair TailBridge|TailUp overlap=(0.020,0.081,0.050)
+PROBE pair TailDown|TailUp overlap=(0.020,0.262,0.059)
+PROBE inside BackShade in Body pct=47 -> ROOTED_VISIBLE (mean root depth 0.038m)
+PROBE inside DorsalFin in Body pct=50 -> ROOTED_VISIBLE (mean root depth 0.063m)
+PROBE inside EyeL in Body pct=18 -> ROOTED_VISIBLE (mean root depth 0.011m)
+PROBE inside EyeR in Body pct=21 -> ROOTED_VISIBLE (mean root depth 0.012m)
+PROBE inside FinL in Body pct=25 -> ROOTED_VISIBLE (mean root depth 0.053m)
+PROBE inside FinR in Body pct=25 -> ROOTED_VISIBLE (mean root depth 0.055m)
+PROBE inside TailBridge in Body pct=50 -> ROOTED_VISIBLE (mean root depth 0.042m)
+PROBE inside TailDown in Body pct=0 -> CHAIN_ROOTED via TailBridge -> TailDown
+PROBE inside TailUp in Body pct=0 -> CHAIN_ROOTED via TailBridge -> TailUp
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

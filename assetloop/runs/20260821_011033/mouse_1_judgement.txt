@@ -1,0 +1,13 @@
+Listen, I don't know what kind of abstract art project you think you're running, but this is a disaster. I asked for a mouse, and you gave me a stack of primitive shapes that looks like a malfunctioning robot chair. If this showed up in my engine, I’d fire the entire art department.
+
+1. 0/1 - It looks like a blocky piece of furniture, not a mouse.
+2. 0/1 - Those are flat cylinders on the sides, not ears on top.
+3. 0/1 - There is no snout, no nose, and no eyes.
+4. 0/1 - There are no legs visible; just a base that looks like a pedestal.
+5. 0/1 - There is no tail whatsoever.
+6. 1/1 - Colors are grey and pink, at least you got the palette right.
+7. 0/1 - Scale is impossible to verify, but the geometry is completely wrong for a living creature.
+8. 0/1 - It is a collection of primitive blocks; it lacks any organic cohesion.
+
+MOST_WRONG: The entire geometry is a collection of unshaped primitive blocks that bear zero resemblance to a living creature; scrap the script and start with a sphere for a head and a tapered cone for a snout.
+VERDICT: FAIL

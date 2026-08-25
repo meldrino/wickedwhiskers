@@ -1,0 +1,13 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_002226\tractor_1.py:16: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+Traceback (most recent call last):
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_002226\tractor_1.py", line 71, in <module>
+    bm = build_cylinder(r, w)
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_002226\tractor_1.py", line 36, in build_cylinder
+    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=segments, diameter1=radius*2, diameter2=radius*2, depth=height)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: create_cone: keyword "diameter1" is invalid for this operator
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

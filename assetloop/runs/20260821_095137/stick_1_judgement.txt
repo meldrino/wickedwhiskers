@@ -1,0 +1,12 @@
+This is completely unacceptable. You were tasked with creating a Ginkgo tree, and what you’ve delivered is a vertical stack of brown cylinders that looks more like a primitive totem pole than a plant.
+
+1. **Missing Foliage:** The defining feature of a Ginkgo tree is its iconic fan-shaped leaves. You have provided zero leaves. A tree without foliage is just a stick.
+2. **Incorrect Trunk Morphology:** The reference shows a natural, tapering, textured trunk. Your model is a series of disconnected, uniform polygonal segments stacked on top of each other. It lacks any organic silhouette or taper.
+3. **Missing Canopy Structure:** There is no branching structure. The reference shows a lush, cascading canopy. Your model is a single vertical line with one tiny, misplaced protrusion.
+4. **Lack of Scale and Proportion:** The model is unnaturally thin and tall. It fails to convey the "chunky" aesthetic requested; it looks like a low-resolution placeholder asset from a 1990s prototype.
+5. **Lack of Detail/Texture:** Even for a "low-poly" style, there is no attempt at color variation, bark texture, or silhouette variation. It is a flat, uninspired brown primitive.
+
+This is not a "cozy farm game" asset; it is a failure to understand the basic silhouette of the subject matter.
+
+MOST_WRONG: The complete absence of the iconic fan-shaped Ginkgo leaves, which are the only reason anyone would identify this as a Ginkgo tree.
+VERDICT: FAIL

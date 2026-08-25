@@ -1,0 +1,10 @@
+{
+  "asset": "stone_test",
+  "auto_ground": true,
+  "surface_noise": { "frequency": 9, "amplitude": 0.0012, "seed": 8 },
+  "materials": { "stone": { "color": [0.262, 0.241, 0.220], "roughness": 0.92 } },
+  "parts": [
+    { "type": "rock", "name": "Stone", "material": "stone", "center": [0, 0, 0.05],
+      "radius": 0.06, "seed": 12, "squash": [1.0, 0.85, 0.68], "lumpiness": 0.16, "flatten": 0.38 }
+  ]
+}

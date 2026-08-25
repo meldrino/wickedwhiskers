@@ -1,0 +1,12 @@
+This is an absolute disaster. I asked for a "chunky low-poly cartoon asset" for a cozy farm game, and you’ve provided me with a stick. A literal, single-pixel-width stick.
+
+1. **Missing Ginkgo Leaves:** The defining feature of a Ginkgo tree is its iconic fan-shaped foliage. You have provided zero leaves. The tree is completely barren.
+2. **Missing Trunk Volume:** The reference shows a textured, organic, sturdy trunk. Your model is a primitive, featureless cylinder that lacks any "chunky" stylized appeal.
+3. **Missing Branching Structure:** There is no canopy, no secondary branches, and no silhouette. It is just a vertical line.
+4. **Incorrect Proportions:** Even if this were meant to be a sapling, it is far too thin and lacks the base flare/root structure visible in the reference.
+5. **Lack of Stylization:** "Cozy farm game" implies a specific aesthetic—soft edges, exaggerated shapes, and readability. This model has no artistic direction; it looks like a placeholder primitive that was accidentally exported.
+
+You haven't modeled a tree; you've modeled a toothpick. Start over and actually look at the reference.
+
+MOST_WRONG: The complete absence of the iconic fan-shaped Ginkgo leaves, which makes the subject unrecognizable.
+VERDICT: FAIL

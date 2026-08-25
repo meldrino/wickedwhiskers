@@ -1,0 +1,19 @@
+22:20:46 POLISH START goldfish_v3 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v3.json briefLen=315 maxRounds=8
+22:20:50 round 1 built OK dims=(0.256, 0.25, 0.762)
+22:21:55 round 1: verdict=FAIL most_wrong='Total lack of mesh integration (visible primitive intersections).'
+22:22:32 round 1: patch accepted, dims=(0.256, 0.25, 0.762)
+22:23:30 round 2: verdict=FAIL most_wrong='Complete lack of organic form/blending (primitive-heavy silhouette).'
+22:24:07 round 2: patch accepted, dims=(0.256, 0.25, 0.762)
+22:25:03 round 3: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:25:41 round 3: patch accepted, dims=(0.256, 0.25, 0.762)
+22:26:38 round 4: verdict=FAIL most_wrong='Complete lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:27:15 round 4: patch accepted, dims=(0.256, 0.25, 0.762)
+22:28:11 round 5: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:28:49 round 5: patch accepted, dims=(0.256, 0.25, 0.762)
+22:29:45 round 6: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:30:22 round 6: patch accepted, dims=(0.256, 0.25, 0.762)
+22:31:21 round 7: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:31:58 round 7: patch accepted, dims=(0.256, 0.25, 0.762)
+22:32:54 round 8: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:33:32 round 8: patch accepted, dims=(0.256, 0.25, 0.762)
+22:33:32 ROUND CAP reached without approval - staging last views for human review

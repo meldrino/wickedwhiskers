@@ -1,0 +1,25 @@
+14:50:13 | INFO: Data are loaded, start creating Blender stuff
+14:50:13 | INFO: Blender create Mesh node Ball
+14:50:13 | INFO: Blender create Mesh node ThreadBead1
+14:50:13 | INFO: Blender create Mesh node ThreadBead2
+14:50:13 | INFO: Blender create Mesh node ThreadBead3
+14:50:13 | INFO: Blender create Mesh node ThreadBead4
+14:50:13 | INFO: Blender create Mesh node ThreadBead5
+14:50:13 | INFO: Blender create Mesh node ThreadTip
+14:50:13 | INFO: glTF import finished in 0.01s
+PROBE parts=7 bbox=(0.138,0.108,0.110)
+PROBE pair Ball|ThreadBead1 overlap=(0.008,0.008,0.008)
+PROBE pair Ball|ThreadBead2 overlap=(0.007,0.007,0.007)
+PROBE pair Ball|ThreadBead3 overlap=(0.004,0.003,0.006)
+PROBE inside ThreadBead1 in Ball pct=16 -> ROOTED_VISIBLE (mean root depth 0.001m)
+PROBE inside ThreadBead2 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+PROBE inside ThreadBead3 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+PROBE inside ThreadBead4 in Ball pct=0 -> DETACHED_CANDIDATE
+PROBE inside ThreadBead5 in Ball pct=0 -> DETACHED_CANDIDATE
+PROBE inside ThreadTip in Ball pct=0 -> DETACHED_CANDIDATE
+PROBE enclosed ThreadBead1 by Ball -> check inside% above
+PROBE enclosed ThreadBead2 by Ball -> check inside% above
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

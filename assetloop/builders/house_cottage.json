@@ -1,0 +1,21 @@
+{
+  "materials": {
+    "plaster": { "color": [0.93, 0.88, 0.76], "roughness": 0.9 },
+    "roof_tile": { "color": [0.72, 0.36, 0.26], "roughness": 0.85 },
+    "wood_door": { "color": [0.42, 0.28, 0.17], "roughness": 0.9 },
+    "window_glass": { "color": [0.65, 0.8, 0.88], "roughness": 0.3 },
+    "stone_base": { "color": [0.55, 0.54, 0.5], "roughness": 0.95 }
+  },
+  "parts": [
+    { "type": "box", "name": "StoneFooting", "material": "stone_base", "size": [0.84, 0.64, 0.08], "center": [0.0, 0.0, 0.04] },
+    { "type": "box", "name": "Walls", "material": "plaster", "size": [0.8, 0.6, 0.42], "center": [0.0, 0.0, 0.29] },
+    { "type": "box", "name": "RoofL", "material": "roof_tile", "size": [0.88, 0.4, 0.05], "rot_deg": [-32, 0, 0], "center": [0.0, 0.17, 0.62] },
+    { "type": "box", "name": "RoofR", "material": "roof_tile", "size": [0.88, 0.4, 0.05], "rot_deg": [32, 0, 0], "center": [0.0, -0.17, 0.62] },
+    { "type": "box", "name": "GableFront", "material": "plaster", "size": [0.78, 0.06, 0.24], "center": [0.0, -0.28, 0.61] },
+    { "type": "box", "name": "GableBack", "material": "plaster", "size": [0.78, 0.06, 0.24], "center": [0.0, 0.28, 0.61] },
+    { "type": "box", "name": "Door", "material": "wood_door", "size": [0.16, 0.04, 0.26], "center": [0.18, -0.3, 0.21] },
+    { "type": "box", "name": "WindowL", "material": "window_glass", "size": [0.14, 0.04, 0.14], "center": [-0.2, -0.3, 0.33] },
+    { "type": "box", "name": "WindowR", "material": "window_glass", "size": [0.14, 0.04, 0.14], "center": [0.0, 0.31, 0.33] },
+    { "type": "box", "name": "Chimney", "material": "stone_base", "size": [0.09, 0.09, 0.26], "center": [0.22, 0.12, 0.72] }
+  ]
+}

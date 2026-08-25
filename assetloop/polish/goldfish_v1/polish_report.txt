@@ -1,0 +1,73 @@
+13:19:11 POLISH START goldfish_v1 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v1.json briefLen=579 maxRounds=4
+13:19:13 round 1 built OK dims=(0.439, 0.714, 0.499)
+13:19:47 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:20:05 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:20:34 round 1: verdict=FAIL most_wrong='The blocky, non-integrated tail connection bridge.'
+13:20:34 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:20:44 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:21:09 round 1: patch accepted, dims=(0.439, 0.714, 0.559)
+13:21:31 round 2: verdict=FAIL most_wrong='The blocky, non-integrated tail connection bridge.'
+13:21:32 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:21:42 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:22:07 round 2: revision rejected (attempt 1): patched spec fails to build; revert to previous geometry and apply a smaller change
+13:22:07 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:22:18 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:22:42 round 2: revision rejected (attempt 2): patched spec fails to build; revert to previous geometry and apply a smaller change
+13:22:42 round 2: reviser unstable after retries
+13:49:10 POLISH START goldfish_v1 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v1.json briefLen=240 maxRounds=10
+13:49:14 geometry probe clean (10 lines)
+13:49:14 round 1 built OK dims=(0.439, 0.714, 0.559)
+13:49:25 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:49:42 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:50:12 round 1: verdict=FAIL most_wrong='The blocky, disconnected TailBridge assembly.'
+13:50:13 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:50:23 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:50:47 round 1: revision rejected (attempt 1): patched spec fails to build; revert to previous geometry and apply a smaller change
+13:50:47 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:50:57 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:51:22 round 1: revision rejected (attempt 2): patched spec fails to build; revert to previous geometry and apply a smaller change
+13:51:22 round 1: reviser unstable after retries
+13:53:31 POLISH START goldfish_v1 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v1.json briefLen=240 maxRounds=10
+13:53:35 geometry probe clean (10 lines)
+13:53:35 round 1 built OK dims=(0.439, 0.714, 0.559)
+13:53:47 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:54:04 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:54:33 round 1: verdict=FAIL most_wrong='The rectangular, non-rounded DorsalFin violates the specific stylistic requirement of the brief.'
+13:54:34 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:54:44 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:55:11 geometry probe clean (10 lines)
+13:55:11 round 1: patch accepted, dims=(0.439, 0.714, 0.559)
+13:55:21 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:55:38 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:56:09 round 2: verdict=FAIL most_wrong='The flat, rigid, rectangular geometry of the fins and tail completely contradicts the "cozy" and "rounded" stylistic requirements.'
+13:56:09 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:56:19 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:56:45 geometry probe clean (10 lines)
+13:56:45 round 2: patch accepted, dims=(0.439, 0.714, 0.559)
+13:56:56 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:57:13 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:57:43 round 3: verdict=FAIL most_wrong='The rigid, sharp-cornered rectangular geometry of the fins and tail.'
+13:57:44 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:57:54 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:58:20 geometry probe clean (10 lines)
+13:58:20 round 3: patch accepted, dims=(0.439, 0.714, 0.499)
+13:58:31 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:58:48 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:59:20 round 4: verdict=FAIL most_wrong='The rigid, sharp-cornered, and flat geometry of the fins and tail, which completely contradicts the "cozy" and "rounded" stylistic requirements.'
+13:59:20 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+13:59:30 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+13:59:56 geometry probe clean (10 lines)
+13:59:56 round 4: patch accepted, dims=(0.439, 0.714, 0.499)
+14:00:07 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+14:00:24 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+14:00:56 round 5: verdict=FAIL most_wrong='The rigid, sharp-cornered, and flat geometry of the fins and tail.'
+14:00:56 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+14:01:07 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+14:01:34 geometry probe clean (10 lines)
+14:01:34 round 5: patch accepted, dims=(0.439, 0.714, 0.499)
+14:01:44 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+14:02:03 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+14:02:33 round 6: verdict=FAIL most_wrong='The rigid, sharp-cornered, and flat geometry of the fins and tail.'
+14:02:33 FLIP-FLOP: 'The rigid, sharp-cornered, and flat geometry of the fins and tail.' re-raised after being fixed in round 4
+NOTE: flip-flop guard (oscillating judge)
+14:02:33 APPROVED (PASS-WITH-NOTES) -> C:\crypto\wicked whiskers\assetloop\polish\goldfish_v1\approved

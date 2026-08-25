@@ -1,0 +1,7 @@
+1. 0/1 - This is a smooth, organic blob. It has zero angularity or faceted planes. It reads as a river stone or a stress ball, not a stylized game asset.
+2. 0/1 - There is no visible flattened resting face; the geometry appears to be a rounded primitive that is simply clipping into the floor plane.
+3. 1/1 - The colour is a neutral, matte grey.
+4. 1/1 - The scale is appropriate for the requested size.
+
+MOST_WRONG: The geometry is entirely smooth; you need to implement low-poly subdivision or a decimate modifier to introduce sharp, angular, faceted planes.
+VERDICT: FAIL

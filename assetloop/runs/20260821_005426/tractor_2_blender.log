@@ -1,0 +1,19 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_005426\tractor_2.py:17: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+Traceback (most recent call last):
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_005426\tractor_2.py", line 70, in <module>
+    create_wheel("Wheel_FL", 0.32, 1.1, 0.8)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_005426\tractor_2.py", line 67, in create_wheel
+    ob = create_part(name, b_wheel, m_black, (x_pos, radius, z_pos))
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_005426\tractor_2.py", line 26, in create_part
+    mesh_func(bm)
+    ~~~~~~~~~^^^^
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_005426\tractor_2.py", line 64, in b_wheel
+    rot = mathutils.Matrix.Rotation(math.radians(90), 4, 'Y')
+                                    ^^^^
+NameError: name 'math' is not defined. Did you forget to import 'math'?
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

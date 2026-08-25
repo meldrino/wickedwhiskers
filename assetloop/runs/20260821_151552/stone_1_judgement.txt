@@ -1,0 +1,7 @@
+1. **PASS**: The geometry has clear, angular faceted planes and a non-symmetrical silhouette. It avoids the "primitive sphere" trap.
+2. **FAIL**: The mesh is clearly clipping into the ground plane rather than resting on a deliberate, flat base. It looks like it's sinking into the floor rather than sitting on it.
+3. **PASS**: The color is a neutral, matte grey, which fits the "dry stone" aesthetic perfectly.
+4. **PASS**: Given the context of the ground plane, the scale is appropriate for a small, carryable object.
+
+MOST_WRONG: The mesh is clipping into the ground plane; you need to adjust the origin point or the bottom vertices to ensure a flat, stable contact patch.
+VERDICT: FAIL

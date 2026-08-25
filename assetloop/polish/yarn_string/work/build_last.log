@@ -1,0 +1,35 @@
+C:\crypto\wicked whiskers\assetloop\builders\build_asset.py:23: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+SWEEP_DEBUG rings=97 sides=24 faces=2352 failed=0
+SWEEP_DEBUG rings=97 sides=24 faces=2352 failed=0
+SWEEP_DEBUG rings=97 sides=24 faces=2352 failed=0
+SWEEP_DEBUG rings=97 sides=24 faces=2352 failed=0
+SWEEP_DEBUG rings=97 sides=24 faces=2352 failed=0
+SWEEP_DEBUG rings=49 sides=24 faces=1200 failed=0
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+14:40:50 | INFO: Starting glTF 2.0 export
+14:40:50 | INFO: Extracting primitive: EndFray
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: LooseEnd
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: TwineBall
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: WrapA
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: WrapB
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: WrapC
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: WrapD
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Extracting primitive: WrapE
+14:40:50 | INFO: Primitives created: 1
+14:40:50 | INFO: Finished glTF 2.0 export in 0.06660676002502441 s
+
+DIMS (0.2, 0.127, 0.115)
+ASSET_BUILT
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

@@ -1,0 +1,15 @@
+14:48:00 POLISH START yarn_ball spec=C:\crypto\wicked whiskers\assetloop\builders\yarn_ball.json briefLen=244 maxRounds=5
+14:48:04 GEOMETRY WARNINGS: PROBE inside ThreadBead1 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadBead2 in Ball pct=0 -> DETACHED_CANDIDATE | PROBE inside ThreadBead3 in Ball pct=0 -> DETACHED_CANDIDATE | PROBE inside ThreadBead4 in Ball pct=0 -> DETACHED_CANDIDATE | PROBE inside ThreadBead5 in Ball pct=0 -> DETACHED_CANDIDATE | PROBE inside ThreadTip in Ball pct=0 -> DETACHED_CANDIDATE
+14:48:04 round 1 built OK dims=(0.245, 0.108, 0.161)
+14:48:14 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+14:48:31 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+14:49:00 round 1: verdict=FAIL most_wrong='The "thread" is a series of floating, disconnected spheres rather than a continuous, textured surface.'
+14:49:01 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+14:49:11 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+14:49:37 GEOMETRY WARNINGS: PROBE inside ThreadBead1 in Ball pct=100 -> BURIED_SUSPECT | PROBE inside ThreadBead2 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadBead3 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadBead4 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadBead5 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadTip in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+14:49:37 round 1: revision rejected (attempt 1): patch implausibly changed overall proportions from (0.245, 0.108, 0.161) to (0.108, 0.108, 0.11). Revert unrelated changes.
+14:49:37 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+14:49:47 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+14:50:13 GEOMETRY WARNINGS: PROBE inside ThreadBead2 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadBead3 in Ball pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside ThreadBead4 in Ball pct=0 -> DETACHED_CANDIDATE | PROBE inside ThreadBead5 in Ball pct=0 -> DETACHED_CANDIDATE | PROBE inside ThreadTip in Ball pct=0 -> DETACHED_CANDIDATE
+14:50:13 round 1: revision rejected (attempt 2): patch implausibly changed overall proportions from (0.245, 0.108, 0.161) to (0.138, 0.108, 0.11). Revert unrelated changes.
+14:50:13 round 1: reviser unstable after retries

@@ -1,0 +1,7 @@
+1. **FAIL**: While it has faceted planes, the overall silhouette is a uniform, rounded blob. It lacks the sharp, directional, or asymmetrical "weight" of a real rock; it looks like a low-poly sphere that had a noise modifier applied to it.
+2. **FAIL**: The asset is floating or hovering slightly above the ground plane. There is no contact shadow or flattened base to suggest it is resting on the surface; it looks like it’s suspended in mid-air.
+3. **PASS**: The color and matte finish are acceptable for a neutral, dry stone look.
+4. **PASS**: The scale is appropriate for the requested size.
+
+MOST_WRONG: The mesh lacks a flattened base and is hovering above the ground plane, preventing it from feeling grounded in the environment.
+VERDICT: FAIL

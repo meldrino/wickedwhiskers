@@ -1,0 +1,96 @@
+import bpy
+import bmesh
+import math
+from mathutils import Matrix, Vector
+
+# Palette
+RED = (0.82, 0.18, 0.13, 1.0)
+BROWN = (0.55, 0.35, 0.17, 1.0)
+D_GREY = (0.20, 0.20, 0.22, 1.0)
+N_BLACK = (0.08, 0.08, 0.09, 1.0)
+L_GREY = (0.60, 0.60, 0.63, 1.0)
+CREAM = (0.96, 0.95, 0.90, 1.0)
+SKY = (0.66, 0.85, 0.91, 1.0)
+WARM = (1.00, 0.95, 0.80, 1.0)
+
+def create_mat(name, color, rough=0.5):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = color
+    bsdf.inputs["Roughness"].default_value = rough
+    return mat
+
+def add_part(name, mesh_data, location, material):
+    ob = bpy.data.objects.new(name, mesh_data)
+    ob.location = location
+    ob.data.materials.append(material)
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+# Materials
+mat_red = create_mat("Red", RED, 0.4)
+mat_dgrey = create_mat("DGrey", D_GREY, 0.7)
+mat_nblack = create_mat("NBlack", N_BLACK, 0.8)
+mat_lgrey = create_mat("LGrey", L_GREY, 0.35)
+mat_sky = create_mat("Sky", SKY, 0.15)
+mat_cream = create_mat("Cream", CREAM, 0.8)
+mat_warm = create_mat("Warm", WARM, 0.3)
+
+# Chassis/Body
+def create_box_mesh(size_x, size_y, size_z):
+    me = bpy.data.meshes.new("Box")
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    bmesh.ops.scale(bm, vec=(size_x, size_y, size_z), verts=bm.verts)
+    bm.to_mesh(me)
+    bm.free()
+    return me
+
+# Bonnet
+add_part("Bonnet", create_box_mesh(1.2, 0.8, 1.2), (0, 0.8, 1.0), mat_red)
+# Grille
+add_part("Grille", create_box_mesh(1.0, 0.6, 0.1), (0, 0.8, 1.65), mat_dgrey)
+# Cabin
+add_part("Cabin", create_box_mesh(1.4, 1.2, 1.0), (0, 1.2, -0.3), mat_red)
+# Roof
+add_part("Roof", create_box_mesh(1.6, 0.2, 1.2), (0, 1.9, -0.3), mat_red)
+# Windows
+add_part("WinFront", create_box_mesh(1.0, 0.8, 0.05), (0, 1.2, 0.22), mat_sky)
+# Number Plate
+add_part("Plate", create_box_mesh(0.5, 0.22, 0.05), (0, 1.1, -0.85), mat_cream)
+
+# Wheels Construction
+def create_wheel(name, radius, width, pos):
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    # Tyre
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=24, radius1=radius, radius2=radius, depth=width)
+    # Hub
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=24, radius1=radius*0.6, radius2=radius*0.6, depth=width*1.2)
+    # Rotate mesh to face X
+    bmesh.ops.rotate(bm, cent=(0,0,0), matrix=Matrix.Rotation(math.radians(90), 3, 'Y'), verts=bm.verts)
+    bm.to_mesh(me)
+    bm.free()
+    return add_part(name, me, pos, mat_nblack)
+
+# Positions: X=1.1, Y=radius, Z=front/rear
+create_wheel("Wheel_FL", 0.32, 0.3, (1.1, 0.32, 1.2))
+create_wheel("Wheel_FR", 0.32, 0.3, (-1.1, 0.32, 1.2))
+create_wheel("Wheel_RL", 0.55, 0.4, (1.1, 0.55, -0.8))
+create_wheel("Wheel_RR", 0.55, 0.4, (-1.1, 0.55, -0.8))
+
+# Exhaust
+me_ex = bpy.data.meshes.new("Exhaust")
+bm = bmesh.new()
+bmesh.ops.create_cone(bm, cap_ends=True, segments=12, radius1=0.1, radius2=0.1, depth=1.2)
+bm.to_mesh(me_ex)
+bm.free()
+ob_ex = add_part("Exhaust", me_ex, (0.6, 1.5, -0.2), mat_nblack)
+ob_ex.rotation_euler = (0.1, 0, 0)
+
+print("ASSET_BUILT")
+print("DIMS Vector((2.2, 1.9, 2.6))")
+bpy.ops.export_scene.gltf(filepath="C:\\crypto\\wicked whiskers\\assetloop\\runs\\20260821_010507\\tractor_2.glb", export_format='GLB')
+
+

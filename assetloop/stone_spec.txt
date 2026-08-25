@@ -1,0 +1,21 @@
+MODE: builder
+FAMILY: rock
+ASSET: stone (pickup)
+
+========== WHAT TO BUILD ==========
+A single natural stone the cat can pick up. It will become a mouse-trap crafting
+ingredient (alongside sticks and string), so it must read INSTANTLY as "a stone"
+at gameplay distance: an irregular grey lump with a flattened resting face.
+
+Design contract:
+- ONE rock part, radius 0.05-0.07 m, sitting exactly on the ground (auto_ground on).
+- STYLIZED FACETED look (house style): "facet": 0.5-0.8, "smooth": false, lumpiness 0.15-0.25,
+  squash around [1.0, 0.8-0.9, 0.6-0.75], flatten 0.4-0.55, any seed you like.
+- Material: use style-sheet stone palette (grey or warm-grey), roughness 0.9-0.95.
+- Do NOT add extra parts. One stone, one part.
+
+========== JUDGE CHECKLIST ==========
+1. Reads as a stylized game rock: angular faceted planes, irregular silhouette - NOT a smooth potato/egg/sphere.
+2. Has a DISTINCT flattened resting face visibly touching the ground plane.
+3. Colour is natural dry stone (grey/warm grey), matte, not saturated, not brown bark.
+4. Size believable for a cat to carry (fist-to-skull sized).

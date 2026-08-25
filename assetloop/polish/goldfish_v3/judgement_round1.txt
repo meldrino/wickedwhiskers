@@ -1,0 +1,15 @@
+22:21:05 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:21:26 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+This model is a textbook example of "primitive assembly" rather than cohesive character design. It fails the 2026-08-22 standard for integration.
+
+1. **Lack of Integration:** The model reads as a collection of disjointed shapes (a cone/teardrop body with spikes glued to it) rather than a living creature. The "cohesive cheerful fish" requirement has been completely ignored.
+2. **Tail Junction:** The tail parts (TailDown/TailUp) are barely rooted and create a messy, jagged intersection at the peduncle. It looks like broken geometry rather than a stylized fin.
+3. **Pectoral Fins:** These are essentially flat, uninspired spikes. They lack any organic flow or connection to the body, violating the "no visible separate primitives" clause.
+4. **Dorsal Ridge:** This is a sharp, unintegrated blade sitting on the back. It does not follow the contour of the body in a way that suggests a natural feature; it looks like a piece of plastic tacked onto a generic shape.
+5. **Silhouette:** The silhouette is stiff and mechanical. A "plump teardrop" should have soft, inviting curves, but this model is composed of harsh, straight-edged transitions.
+
+This asset is not ship-ready; it requires a complete rework of the mesh topology to unify the forms.
+
+MOST_WRONG: Total lack of mesh integration (visible primitive intersections).
+VERDICT: FAIL
+

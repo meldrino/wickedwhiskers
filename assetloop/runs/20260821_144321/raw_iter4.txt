@@ -1,0 +1,30 @@
+```json
+{
+  "asset": "stone",
+  "auto_ground": true,
+  "surface_noise": {
+    "frequency": 12,
+    "amplitude": 0.002,
+    "seed": 42
+  },
+  "materials": {
+    "stone_mat": {
+      "color": [0.33, 0.33, 0.36],
+      "roughness": 0.9
+    }
+  },
+  "parts": [
+    {
+      "type": "rock",
+      "name": "Stone_Main",
+      "material": "stone_mat",
+      "center": [0, 0, 0.03],
+      "radius": 0.06,
+      "seed": 88,
+      "squash": [1.2, 0.9, 0.5],
+      "lumpiness": 0.22,
+      "flatten": 0.45
+    }
+  ]
+}
+```

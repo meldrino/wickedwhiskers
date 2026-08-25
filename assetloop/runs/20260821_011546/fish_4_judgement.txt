@@ -1,0 +1,13 @@
+Listen, I don't know what kind of abstract art project you think you're running, but this is a disaster. It looks like a low-poly piece of office furniture, not a living creature. Do better.
+
+1. 0/1 - It reads as a blocky, mechanical assembly. Zero fish-like qualities.
+2. 0/1 - There are no fins, just cylinders stuck to a box.
+3. 0/1 - There are no eyes, pupils, or a nose.
+4. 0/1 - It is a literal cube. There is no taper, no torpedo shape, no organic flow.
+5. 0/1 - The colors are a dull grey and a flat, muted brick-red. Nowhere near gold-orange or cream.
+6. 0/1 - It is oriented vertically and looks like it's sitting on a surface, not swimming.
+7. 0/1 - The proportions are non-existent; it’s a geometric primitive mess.
+8. 0/1 - While the objects are touching, it is not a "coherent model"—it's a collection of unmerged primitives.
+
+MOST_WRONG: The entire geometry is a collection of un-modeled primitive cubes and cylinders that bear zero resemblance to a fish.
+VERDICT: FAIL

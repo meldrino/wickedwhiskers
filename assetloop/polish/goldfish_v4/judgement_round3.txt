@@ -1,0 +1,13 @@
+This model is an embarrassment. We are three iterations in, and you have failed to address the most fundamental instruction: the silhouette.
+
+1. **Body Silhouette:** You have completely ignored the "plump round teardrop" requirement. This is still a rigid, extruded cylinder/capsule shape. It looks like a submarine, not a goldfish.
+2. **Nose Geometry:** You have failed the "no flat truncated cap" requirement. The front of the face is a flat, circular plane. It looks like a pipe fitting.
+3. **Peduncle Geometry:** You have failed the "no flat truncated cap" requirement here as well. The tail connection is a flat, vertical face, not a tapered, organic peduncle.
+4. **Pectoral Fins:** These are still thin, flat, primitive planes. They lack any volumetric thickness or organic integration with the body.
+5. **Fin Integration:** The "jagged two-tone material boundaries" are still present. The fins look like they were glued onto the surface of a primitive rather than growing out of the mesh.
+
+You are wasting my time. This is not a "stylized" goldfish; it is a collection of primitives that fails every aesthetic and technical requirement set out in the brief.
+
+MOST_WRONG: Incorrect body silhouette (rigid cylinder vs. plump teardrop) and flat truncated nose/peduncle caps.
+VERDICT: FAIL
+

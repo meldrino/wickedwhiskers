@@ -1,0 +1,28 @@
+{
+  "asset": "stick_test2",
+  "auto_ground": true,
+  "surface_noise": { "frequency": 40, "amplitude": 0.0012, "seed": 3 },
+  "materials": {
+    "bark": { "color": [0.148, 0.068, 0.023], "roughness": 0.85 },
+    "wood": { "color": [0.59, 0.40, 0.16], "roughness": 0.7 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "Shaft", "material": "bark",
+      "waypoints": [
+        [-0.26, 0.0, 0.012], [-0.20, 0.004, -0.004], [-0.13, 0.002, 0.014],
+        [-0.06, -0.003, 0.022], [0.0, 0.0, 0.012], [0.07, 0.004, 0.0],
+        [0.14, 0.001, 0.016], [0.20, -0.002, 0.024], [0.26, 0.0, 0.018]
+      ],
+      "radii": [0.017, 0.0155, 0.014, 0.0128, 0.0118, 0.0109, 0.0101, 0.0095, 0.009],
+      "sides": 24 },
+    { "type": "cylinder", "name": "Branch1", "material": "bark", "collar": 1.7,
+      "from": [0.02, 0.005, 0.018], "to": [0.05, 0.05, 0.05], "radius": 0.006 },
+    { "type": "cylinder", "name": "ForkA", "material": "bark", "collar": 1.6,
+      "from": [-0.21, 0.0, 0.01], "to": [-0.27, 0.03, 0.05], "radius": 0.005 },
+    { "type": "cylinder", "name": "ForkB", "material": "bark", "collar": 1.6,
+      "from": [-0.21, 0.0, 0.01], "to": [-0.28, -0.02, 0.04], "radius": 0.005 },
+    { "type": "splintered_tip", "name": "FrayedTip", "material": "wood",
+      "base": [-0.255, 0.0, 0.012], "direction": [-1, 0.05, 0.1],
+      "radius": 0.016, "seed": 11, "spikes": 7 }
+  ]
+}

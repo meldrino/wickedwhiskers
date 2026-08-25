@@ -1,0 +1,35 @@
+C:\crypto\wicked whiskers\assetloop\builders\build_asset.py:23: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+SWEEP_DEBUG rings=119 sides=28 faces=3360 failed=0
+SWEEP_DEBUG rings=55 sides=20 faces=1120 failed=0
+SWEEP_DEBUG rings=55 sides=20 faces=1120 failed=0
+SWEEP_DEBUG rings=55 sides=20 faces=1120 failed=0
+SWEEP_DEBUG rings=39 sides=14 faces=560 failed=0
+SWEEP_DEBUG rings=39 sides=14 faces=560 failed=0
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+10:34:33 | INFO: Starting glTF 2.0 export
+10:34:33 | INFO: Extracting primitive: Body
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: CaudalFinDown
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: CaudalFinUp
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: DorsalFin
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: EyeL
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: EyeR
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: PectoralFinL
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Extracting primitive: PectoralFinR
+10:34:33 | INFO: Primitives created: 1
+10:34:33 | INFO: Finished glTF 2.0 export in 0.05918145179748535 s
+
+DIMS (0.742, 0.303, 0.297)
+ASSET_BUILT
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

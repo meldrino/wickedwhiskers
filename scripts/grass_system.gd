@@ -1,11 +1,9 @@
 extends Node3D
 
 const CHUNK_SIZE := 5.0
-const NEAR_RADIUS := 18.0
-const FAR_RADIUS := 40.0
-const STREAM_RADIUS := 70.0
+const FENCE_HALF := 25.0
+const STREAM_RADIUS := 92.0
 const TERRAIN_CELLS := 12
-const FAR_HSCALE := 1.0
 
 # Restored 026850c GRASS_SHADER params (bend/wind offsets are meters - the
 # blades are only ~1-2 cm, so the tutorial's unit-height values would fling
@@ -27,7 +25,6 @@ const PARAMS := {
 
 var _material: ShaderMaterial
 var _full_mesh: Mesh
-var _full_mesh_far: Mesh
 var _disc_mesh: Mesh
 var _chunks := {}
 
@@ -52,12 +49,11 @@ func _ready() -> void:
 		PARAMS["wind_noise_seed"], false, FastNoiseLite.TYPE_SIMPLEX_SMOOTH,
 		FastNoiseLite.FRACTAL_RIDGED, PARAMS["wind_noise_freq"]))
 	var chunk_script: GDScript = preload("res://scripts/grass_chunk.gd")
-	var hscale := 8.0
+	var hscale := 1.0
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--hscale="):
 			hscale = float(a.get_slice("=", 1))
 	_full_mesh = chunk_script.build_full_mesh(hscale)
-	_full_mesh_far = chunk_script.build_full_mesh(hscale * FAR_HSCALE)
 	_disc_mesh = chunk_script.build_disc_mesh()
 
 
@@ -108,9 +104,15 @@ func _update_chunks(centers: Array) -> void:
 					continue
 				if cz < -TERRAIN_CELLS or cz > TERRAIN_CELLS - 1:
 					continue
+				# No grass outside the farm: only chunks whose center is inside
+				# the 50x50 fence (kills all tier-1 discs; outside = bare terrain).
+				var chunk_cx := (cx + 0.5) * CHUNK_SIZE
+				var chunk_cz := (cz + 0.5) * CHUNK_SIZE
+				if absf(chunk_cx) > FENCE_HALF or absf(chunk_cz) > FENCE_HALF:
+					continue
 				var dist := Vector2((cx + 0.5) * CHUNK_SIZE - c.x, (cz + 0.5) * CHUNK_SIZE - c.z).length()
 				if dist <= STREAM_RADIUS + CHUNK_SIZE:
-					desired[_chunk_key(cx, cz, c)] = true
+					desired["%d,%d" % [cx, cz]] = true
 	var cam: Vector3 = centers[0] if centers.size() > 0 else Vector3.ZERO
 	var missing: Array[String] = []
 	for key in desired:
@@ -126,41 +128,31 @@ func _update_chunks(centers: Array) -> void:
 			_chunks.erase(key)
 
 
-func _chunk_key(cx: int, cz: int, _c: Vector3) -> String:
-	return "%d,%d,1" % [cx, cz]
-
-
 func _key_dist(key: String, cam: Vector3) -> float:
 	var parts := key.split(",")
 	var cx := int(parts[0])
 	var cz := int(parts[1])
-	var size := int(parts[2]) if parts.size() > 2 else 1
-	var half := size * CHUNK_SIZE * 0.5
-	return Vector2(cx * CHUNK_SIZE + half - cam.x, cz * CHUNK_SIZE + half - cam.z).length()
+	return Vector2((cx + 0.5) * CHUNK_SIZE - cam.x, (cz + 0.5) * CHUNK_SIZE - cam.z).length()
 
 
 func _spawn(key: String) -> void:
 	var parts := key.split(",")
 	var cell := Vector2i(int(parts[0]), int(parts[1]))
-	var size := int(parts[2]) if parts.size() > 2 else 1
 	var chunk: Node3D = preload("res://scripts/grass_chunk.gd").new()
 	chunk.name = "Chunk_%s" % key
 	add_child(chunk)
-	chunk.setup(cell, size, _material, _full_mesh, _full_mesh_far, _disc_mesh)
+	chunk.setup(cell, _material, _full_mesh, _disc_mesh)
 	_chunks[key] = chunk
 
 
-func _update_tiers(centers: Array) -> void:
+func _update_tiers(_centers: Array) -> void:
 	for key in _chunks:
 		var chunk: Node3D = _chunks[key]
 		var cpos := chunk.position + Vector3(CHUNK_SIZE * 0.5, 0, CHUNK_SIZE * 0.5)
-		var best := INF
-		for c in centers:
-			var d := Vector2(c.x - cpos.x, c.z - cpos.z).length()
-			best = minf(best, d)
-		var tier := 2
-		if best <= NEAR_RADIUS:
+		var tier := 1
+		if absf(cpos.x) <= FENCE_HALF and absf(cpos.z) <= FENCE_HALF:
 			tier = 0
-		elif best <= FAR_RADIUS:
-			tier = 1
 		chunk.set_tier(tier)
+
+
+

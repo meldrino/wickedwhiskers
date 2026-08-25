@@ -1,0 +1,79 @@
+10:49:19 gemini busy (gemini-flash-latest), waiting 30s (attempt 1/6)
+10:49:50 gemini busy (gemini-flash-latest), waiting 60s (attempt 2/6)
+10:50:51 gemini busy (gemini-flash-latest), waiting 90s (attempt 3/6)
+10:52:22 switching to fallback model gemini-3.1-flash-lite
+```json
+{
+  "asset": "Wooden_Stick",
+  "auto_ground": true,
+  "materials": {
+    "Bark": {"color": [0.42, 0.29, 0.17], "roughness": 0.85},
+    "InnerWood": {"color": [0.79, 0.66, 0.44], "roughness": 0.6}
+  },
+  "parts": [
+    {
+      "type": "bent_cylinder",
+      "name": "Main_Shaft",
+      "material": "Bark",
+      "waypoints": [
+        [-0.26, 0.0, 0.0],
+        [-0.13, 0.01, 0.01],
+        [0.0, -0.01, 0.0],
+        [0.13, 0.01, -0.01],
+        [0.26, 0.0, 0.0]
+      ],
+      "radius_start": 0.016,
+      "radius_end": 0.010,
+      "sides": 24
+    },
+    {
+      "type": "cylinder",
+      "name": "Side_Branch",
+      "material": "Bark",
+      "from": [-0.08, 0.0, 0.01],
+      "to": [-0.04, 0.05, 0.05],
+      "radius": 0.007
+    },
+    {
+      "type": "cylinder",
+      "name": "Fork_A",
+      "material": "Bark",
+      "from": [0.20, 0.0, 0.0],
+      "to": [0.24, 0.03, 0.03],
+      "radius": 0.006
+    },
+    {
+      "type": "cylinder",
+      "name": "Fork_B",
+      "material": "Bark",
+      "from": [0.20, 0.0, 0.0],
+      "to": [0.24, -0.03, 0.03],
+      "radius": 0.006
+    },
+    {
+      "type": "cone_tip",
+      "name": "Broken_Tip",
+      "material": "InnerWood",
+      "base": [-0.26, 0.0, 0.0],
+      "tip": [-0.32, 0.0, 0.0],
+      "radius": 0.010
+    },
+    {
+      "type": "box",
+      "name": "Bark_Ridge_1",
+      "material": "Bark",
+      "center": [-0.10, 0.012, 0.0],
+      "size": [0.05, 0.005, 0.005],
+      "rot_deg": [0, 0, 15]
+    },
+    {
+      "type": "box",
+      "name": "Bark_Ridge_2",
+      "material": "Bark",
+      "center": [0.10, -0.012, 0.0],
+      "size": [0.06, 0.005, 0.005],
+      "rot_deg": [0, 0, -10]
+    }
+  ]
+}
+```

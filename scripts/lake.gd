@@ -1,7 +1,7 @@
 extends Node3D
 
-const RIPPLE_INTERVAL := 0.5
-const RIPPLE_LIFE := 2.0
+const RIPPLE_INTERVAL := 0.9
+const RIPPLE_LIFE := 2.2
 
 var water_level := 0.0
 var _water: MeshInstance3D = null
@@ -11,7 +11,6 @@ var _swim_t := 0.0
 var _ripple_t := 0.0
 var _ripples: Array = []
 var _ripple_origin := Vector2.ZERO
-var _ripple_max_scale := 4.0
 var rng := RandomNumberGenerator.new()
 
 
@@ -25,8 +24,7 @@ func _ready() -> void:
 	_build_shore_wall()
 	_build_fish()
 	var src_dir := Vector2(0.45, -0.89).normalized()
-	_ripple_origin = c + src_dir * (_surface_r - 0.7)
-	_ripple_max_scale = (_surface_r * 1.1) / 0.6
+	_ripple_origin = src_dir * (_surface_r * 0.45)
 
 
 func _water_radius() -> float:
@@ -65,13 +63,15 @@ func _build_water() -> void:
 	nt.as_normal_map = true
 	nt.width = 256
 	nt.height = 256
-	_water_mat.normal_map = nt
+	_water_mat.normal_enabled = true
+	_water_mat.normal_texture = nt
 	_water_mat.refraction_enabled = true
 	_water_mat.refraction_texture = nt
 	_water_mat.refraction_scale = 0.07
 
 	_water = MeshInstance3D.new()
 	var wm := CylinderMesh.new()
+	wm.radial_segments = 128
 	_surface_r = _water_radius()
 	wm.top_radius = _surface_r
 	wm.bottom_radius = _surface_r
@@ -102,7 +102,8 @@ func _physics_process(delta: float) -> void:
 		var k: float = r["t"] / life
 		var ring: MeshInstance3D = r["mesh"]
 		var mat: StandardMaterial3D = r["mat"]
-		ring.scale = Vector3.ONE * lerpf(0.35, _ripple_max_scale, k)
+		var s: float = lerpf(0.35, r["max_s"], k)
+		ring.scale = Vector3(s, s * 0.22, s)
 		mat.albedo_color.a = r["start_a"] * (1.0 - k)
 		if k >= 1.0:
 			ring.queue_free()
@@ -118,23 +119,31 @@ func _make_ripple(at: Vector2, start_a: float) -> void:
 	mat.albedo_color = Color(0.9, 0.97, 1.0)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var tm := TorusMesh.new()
-	tm.inner_radius = 0.42
-	tm.outer_radius = 0.5
-	tm.rings = 8
-	tm.ring_segments = 48
+	tm.inner_radius = 0.46
+	tm.outer_radius = 0.54
+	tm.rings = 48
+	tm.ring_segments = 8
 	tm.material = mat
 	var ring := MeshInstance3D.new()
 	ring.mesh = tm
 	ring.position = Vector3(at.x, water_level + 0.015, at.y)
 	add_child(ring)
+	var allowed: float = maxf(0.6, _surface_r - at.length() - 0.35)
+	_ripples.append({
+		"mesh": ring,
+		"mat": mat,
+		"t": 0.0,
+		"life": RIPPLE_LIFE,
+		"start_a": start_a,
+		"max_s": allowed / 0.54,
+	})
 	mat.albedo_color.a = start_a
-	_ripples.append({"mesh": ring, "mat": mat, "t": 0.0, "life": RIPPLE_LIFE, "start_a": start_a})
 
 
 func splash(at: Vector3) -> void:
-	var pos := Vector2(at.x, at.z)
-	_make_ripple(pos, 0.7)
-	_make_ripple(pos, 0.6)
+	var local := Vector2(at.x, at.z) - Vector2(Terrain.lake.center.x, Terrain.lake.center.y)
+	_make_ripple(local, 0.7)
+	_make_ripple(local, 0.6)
 	_make_droplets(at)
 
 

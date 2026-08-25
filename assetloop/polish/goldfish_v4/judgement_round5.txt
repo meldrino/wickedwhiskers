@@ -1,0 +1,5 @@
+1. Starboard Eye: Material remains untextured orange body shader instead of matching the black bead material assigned to the port eye.
+
+MOST_WRONG: Mismatched eye material with untextured orange eye on starboard side
+VERDICT: FAIL
+

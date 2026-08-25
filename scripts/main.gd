@@ -2,28 +2,21 @@ extends Node3D
 
 const WORLD_SIZE := 54.0
 const HALF := WORLD_SIZE / 2.0
+const FENCE_HALF := 25.0
 
 const TREE_SCENES := [
-	preload("res://assets/tree_default.glb"),
-	preload("res://assets/tree_detailed.glb"),
-	preload("res://assets/tree_fat.glb"),
-	preload("res://assets/tree_oak.glb"),
-	preload("res://assets/tree_simple.glb"),
-	preload("res://assets/tree_tall.glb"),
-	preload("res://assets/tree_thin.glb"),
-	preload("res://assets/tree_cone.glb"),
-	preload("res://assets/tree_blocks.glb"),
+	preload("res://assets/tree_ww_round.glb"),
+	preload("res://assets/tree_ww_cone.glb"),
+	preload("res://assets/tree_ww_fat.glb"),
 ]
 const FENCE_PANEL := preload("res://assets/fence2.glb")
 const FENCE_PANEL_WIDTH := 5.89
 const FENCE_PANEL_HEIGHT := 1.1
+const TRUNK_COLLIDER_SIZE := Vector3(0.5, 1.8, 0.5)
 const ROCK_SCENES := [
-	preload("res://assets/rock_smallA.glb"),
-	preload("res://assets/rock_smallB.glb"),
-	preload("res://assets/rock_smallC.glb"),
-	preload("res://assets/rock_smallD.glb"),
-	preload("res://assets/rock_largeA.glb"),
-	preload("res://assets/rock_largeB.glb"),
+	preload("res://assets/rock_ww_a.glb"),
+	preload("res://assets/rock_ww_b.glb"),
+	preload("res://assets/rock_ww_c.glb"),
 ]
 const CROP_SCENES := [
 	preload("res://assets/crop_carrot.glb"),
@@ -86,7 +79,7 @@ func _spawn_player() -> void:
 	if pl == null:
 		return
 	if GameState.spawn_near_shed:
-		pl.global_position = Vector3(16, Terrain.height_at(16, -7.2), -7.2)
+		pl.global_position = Vector3(16, Terrain.height_at(16, -7.8), -7.8)
 		GameState.spawn_near_shed = false
 	pl.global_position.y = Terrain.height_at(pl.global_position.x, pl.global_position.z)
 
@@ -95,7 +88,7 @@ func _maybe_screenshot() -> void:
 	print("MAYBESCREEN START")
 	var args := OS.get_cmdline_user_args()
 	_log_debug("maybe_screenshot args=" + str(args))
-	if "--bare" in args:
+	if "--bare" in args and "--screenshot" in args:
 		var p0 = get_tree().get_first_node_in_group("player")
 		if p0 != null:
 			var mr := p0.get_node_or_null("MeshRoot")
@@ -104,6 +97,42 @@ func _maybe_screenshot() -> void:
 		Hud.visible = false
 	if "--smoketest" in args:
 		_run_smoke()
+		return
+	if "--pondgrid" in args:
+		var lc: Vector2 = Terrain.lake.center
+		var dry := 0
+		var dry_inner := 0
+		for gix in range(-26, 27):
+			for giz in range(-26, 27):
+				var wx := lc.x + gix * 0.2
+				var wz := lc.y + giz * 0.2
+				var hh := Terrain.height_at(wx, wz)
+				if hh > Terrain.water_level + 0.02 and Vector2(gix * 0.2, giz * 0.2).length() < Terrain.water_radius:
+					dry += 1
+					var gd := Vector2(gix * 0.2, giz * 0.2).length()
+					if gd < 4.5:
+						dry_inner += 1
+						if dry_inner <= 12:
+							print("PONDGRID (%.1f, %.1f) d=%.1f h=%.3f (+%.2f)" % [
+								wx, wz, gd, hh, hh - Terrain.water_level])
+		print("PONDRESULT dry=%d dry_inner=%d wl=%.3f wr=%.2f" % [dry, dry_inner, Terrain.water_level, Terrain.water_radius])
+		get_tree().quit()
+		return
+	if "--cutawaytest" in args:
+		_run_cutawaytest()
+		return
+	if "--camtest" in args:
+		_run_camtest()
+		return
+	if "--fishtest" in args:
+		_run_fishtest()
+		return
+	if "--pawtest" in args:
+		var vi := args.find("--pawtest")
+		var variant := "v1"
+		if vi >= 0 and vi + 1 < args.size():
+			variant = args[vi + 1]
+		_run_pawtest(variant)
 		return
 	if "--fpsbench" in args:
 		_run_fpsbench()
@@ -139,6 +168,59 @@ func _maybe_screenshot() -> void:
 		var pond_from := Vector3(Terrain.lake.center.x, 9, Terrain.lake.center.y)
 		var pond_to := Vector3(Terrain.lake.center.x + 3.5, 0, Terrain.lake.center.y + 3.5)
 		player.camera.look_at_from_position(pond_from, pond_to, Vector3.UP)
+		var pond_frames := 5
+		for a in args:
+			if a.begins_with("--pondframes="):
+				pond_frames = int(a.get_slice("=", 1))
+		for i in range(pond_frames):
+			await get_tree().process_frame
+		for a in args:
+			if a.begins_with("--pondeye="):
+				var eye_h := float(a.get_slice("=", 1))
+				var dir := Vector2(1, 1).normalized()
+				var sr := Terrain.shore_distance(dir)
+				var sp := Vector3(
+					Terrain.lake.center.x + dir.x * (sr - 0.6),
+					0,
+					Terrain.lake.center.y + dir.y * (sr - 0.6))
+				sp.y = Terrain.height_at(sp.x, sp.z) + eye_h
+				player.camera.look_at_from_position(sp,
+					Vector3(Terrain.lake.center.x, Terrain.water_level - 0.05, Terrain.lake.center.y),
+					Vector3.UP)
+				print("PONDEYE cam=(%.2f, %.3f, %.2f) shore_r=%.2f wl=%.3f wr=%.1f lake=(%.1f,%.1f) r=%.1f" % [
+					sp.x, sp.y, sp.z, sr, Terrain.water_level, Terrain.water_radius,
+					Terrain.lake.center.x, Terrain.lake.center.y, Terrain.lake.radius])
+				break
+		if "--pondcensus" in args:
+			var stack: Array[Node] = [get_tree().current_scene]
+			while stack.size() > 0:
+				var nd: Node = stack.pop_back()
+				for c in nd.get_children():
+					stack.append(c)
+				if nd is MeshInstance3D or nd is MultiMeshInstance3D:
+					var n3 := nd as Node3D
+					var gp := n3.global_position
+					var dd := Vector2(gp.x - Terrain.lake.center.x, gp.z - Terrain.lake.center.y).length()
+					if dd < 9.5:
+						var info := ""
+						if nd is MeshInstance3D:
+							var ab: AABB = (nd as MeshInstance3D).get_aabb()
+							var sc: float = maxf(n3.scale.x, maxf(n3.scale.y, n3.scale.z))
+							info = "aabb=%s xscale=%.2f vis=%s" % [ab.size, sc, n3.visible]
+						else:
+							info = "MULTIMESH vis=%s" % n3.visible
+						print("CENSUS %s/%s pos=(%.2f, %.2f, %.2f) %s" % [
+							nd.get_parent().name, nd.name, gp.x, gp.y, gp.z, info])
+		if "--pondgrid" in args:
+			var lc: Vector2 = Terrain.lake.center
+			for gix in range(-26, 27):
+				for giz in range(-26, 27):
+					var wx := lc.x + gix * 0.2
+					var wz := lc.y + giz * 0.2
+					var hh := Terrain.height_at(wx, wz)
+					if hh > Terrain.water_level + 0.02 and Vector2(gix * 0.2, giz * 0.2).length() < 5.45:
+						print("PONDGRID (%.1f, %.1f) d=%.1f h=%.3f (+%.2f)" % [
+							wx, wz, Vector2(wx - lc.x, wz - lc.y).length(), hh, hh - Terrain.water_level])
 	elif "--ground" in args and player != null:
 		player.camera_frozen = true
 		player.camera_holder.position = player.global_position + Vector3(0, 0.4, 0)
@@ -173,11 +255,17 @@ func _maybe_screenshot() -> void:
 		player.camera_holder.position = Vector3(4.2, 1.1, -12.4)
 		player.camera.position = Vector3(0, 0, 0)
 		player.camera.look_at(Vector3(4, 0.45, -14), Vector3.UP)
+	elif "--gate" in args and player != null:
+		player.camera_frozen = true
+		player.global_position = Vector3(0, 0.5, -19)
+		player.camera_holder.position = Vector3(0, 0.5, 0)
+		player.camera.position = Vector3(0, 0, 0)
+		player.camera.look_at(Vector3(0, 0.8, -25), Vector3.UP)
 	else:
 		for i in range(30):
 			await get_tree().process_frame
 	var mode := "base"
-	for flag in ["catclose", "flyover", "pond", "ground", "grass", "dumbleclaw"]:
+	for flag in ["catclose", "flyover", "pond", "ground", "grass", "dumbleclaw", "gate"]:
 		if "--%s" % flag in args:
 			mode = flag
 			break
@@ -366,24 +454,86 @@ func _build_shed(shed_pos: Vector3) -> void:
 	shed.name = "Shed"
 	add_child(shed)
 
-	var wood := Color(0.45, 0.3, 0.18)
+	var wood := Color(0.47, 0.31, 0.18)
 	var wood_dark := Color(0.36, 0.24, 0.14)
-	var roof_col := Color(0.3, 0.2, 0.12)
-	var half_w := 2.3
-	var half_d := 1.7
-	var wall_h := 3.0
+	var roof_col := Color(0.32, 0.22, 0.13)
+	var frame_col := Color(0.25, 0.17, 0.11)
+	var half_w := 1.5
+	var half_d := 1.2
+	var wall_h := 2.5
 
 	# Solid exterior box (the interior now lives in its own scene: scenes/shed.tscn)
 	_add_mesh(shed, "box", Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0), wood)
 	_add_collider(shed, Vector3(half_w * 2.0, wall_h, half_d * 2.0), Vector3(0, wall_h / 2.0, 0))
-	# Roof (overhang) + ridge cap
-	_add_mesh(shed, "box", Vector3(half_w * 2.0 + 0.5, 0.5, half_d * 2.0 + 0.5), Vector3(0, wall_h + 0.25, 0), roof_col)
-	_add_mesh(shed, "box", Vector3(half_w * 2.0 + 0.5, 0.3, 0.7), Vector3(0, wall_h + 0.65, 0), roof_col)
+	# Vertical plank seams (proud of the walls, front + back)
+	for x in range(-1, 2):
+		if x == 0:
+			continue
+		_add_mesh(shed, "box", Vector3(0.03, wall_h, 0.02), Vector3(x * 0.9, wall_h / 2.0, half_d + 0.01), wood_dark)
+		_add_mesh(shed, "box", Vector3(0.03, wall_h, 0.02), Vector3(x * 0.9, wall_h / 2.0, -half_d - 0.01), wood_dark)
+	# Horizontal plank seams on the side walls
+	for y in range(3):
+		_add_mesh(shed, "box", Vector3(0.02, 0.03, half_d * 2.0), Vector3(half_w + 0.01, 0.5 + y * 1.0, 0), wood_dark)
+		_add_mesh(shed, "box", Vector3(0.02, 0.03, half_d * 2.0), Vector3(-half_w - 0.01, 0.5 + y * 1.0, 0), wood_dark)
+	# Corner posts
+	for sx in [-1, 1]:
+		for sz in [-1, 1]:
+			_add_mesh(shed, "box", Vector3(0.22, wall_h + 0.1, 0.22),
+				Vector3(sx * (half_w - 0.1), (wall_h + 0.1) / 2.0, sz * (half_d - 0.1)), frame_col)
+	# Gabled roof (two sloped slabs) + ridge cap — derived from the box size
+	var roof_over := 0.35
+	var rise := 0.5
+	var roof_d := half_d * 2.0 + 0.8
+	var slab_len := sqrt((half_w + roof_over) * (half_w + roof_over) + rise * rise)
+	var slope_ang := atan(rise / (half_w + roof_over))
+	var slab_cx := (half_w + roof_over) / 2.0
+	_add_mesh(shed, "box", Vector3(slab_len, 0.22, roof_d), Vector3(slab_cx, wall_h + rise / 2.0, 0), roof_col)
+	shed.get_child(-1).rotation.z = -slope_ang
+	_add_mesh(shed, "box", Vector3(slab_len, 0.22, roof_d), Vector3(-slab_cx, wall_h + rise / 2.0, 0), roof_col)
+	shed.get_child(-1).rotation.z = slope_ang
+	_add_mesh(shed, "box", Vector3(0.45, 0.45, roof_d), Vector3(0, wall_h + rise - 0.02, 0), roof_col)
+	# Gable triangles filling the roof ends (triangular prisms, flat side down)
+	var gable_h := rise + 0.15
+	var gable := PrismMesh.new()
+	gable.size = Vector3(half_w * 2.0, gable_h, 0.35)
+	var gmi := MeshInstance3D.new()
+	gmi.mesh = gable
+	var gmat := StandardMaterial3D.new()
+	gmat.albedo_color = wood_dark
+	gmi.material_override = gmat
+	gmi.position = Vector3(0, wall_h + gable_h / 2.0 - 0.1, half_d + 0.05)
+	shed.add_child(gmi)
+	var gmi2 := gmi.duplicate()
+	gmi2.position.z = -half_d - 0.05
+	shed.add_child(gmi2)
+	# Small window on each side wall with a wooden frame + alpha-blended glass pane
+	for sx in [-1, 1]:
+		var wx: float = sx * (half_w - 0.04)
+		var glass := StandardMaterial3D.new()
+		glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glass.albedo_color = Color(0.72, 0.83, 0.9, 0.4)
+		glass.metallic = 0.2
+		glass.roughness = 0.1
+		var pane := _mesh("box", Vector3(0.04, 0.56, 0.56), Color(1, 1, 1))
+		pane.material_override = glass
+		pane.position = Vector3(wx - sx * 0.06, 1.6, 0)
+		shed.add_child(pane)
+		_add_mesh(shed, "box", Vector3(0.1, 0.7, 0.7), Vector3(wx, 1.6, 0), frame_col)
+		_add_mesh(shed, "box", Vector3(0.14, 0.08, 0.76), Vector3(wx, 1.2, 0), frame_col)
+		_add_mesh(shed, "box", Vector3(0.14, 0.72, 0.08), Vector3(wx, 1.6, -0.3), frame_col)
+		_add_mesh(shed, "box", Vector3(0.14, 0.72, 0.08), Vector3(wx, 1.6, 0.3), frame_col)
 	# Door frame + dark door (door mesh swings open on unlock)
-	_add_mesh(shed, "box", Vector3(1.9, 2.2, 0.15), Vector3(0, 1.1, half_d - 0.05), wood_dark)
-	var door_mesh := _mesh("box", Vector3(1.7, 2.0, 0.1), Color(0.1, 0.08, 0.06))
+	_add_mesh(shed, "box", Vector3(0.9, 2.0, 0.12), Vector3(0, 1.0, half_d - 0.05), wood_dark)
+	_add_mesh(shed, "box", Vector3(0.08, 2.0, 0.05), Vector3(-0.55, 1.0, half_d - 0.02), frame_col)
+	_add_mesh(shed, "box", Vector3(0.08, 2.0, 0.05), Vector3(0.55, 1.0, half_d - 0.02), frame_col)
+	# Planks on the door itself
+	_add_mesh(shed, "box", Vector3(0.8, 0.06, 0.05), Vector3(0, 0.6, half_d + 0.01), frame_col)
+	_add_mesh(shed, "box", Vector3(0.8, 0.06, 0.05), Vector3(0, 1.5, half_d + 0.01), frame_col)
+	var door_mesh := _mesh("box", Vector3(0.9, 2.0, 0.1), Color(0.1, 0.08, 0.06))
 	door_mesh.name = "Door"
-	door_mesh.position = Vector3(0, 1.1, half_d - 0.02)
+	door_mesh.position = Vector3(0, 1.0, half_d - 0.02)
+	if GameState.shed_unlocked:
+		door_mesh.rotation.y = 2.4
 	shed.add_child(door_mesh)
 
 	var door := _make_door("shed")
@@ -398,10 +548,10 @@ func _build_shed_portal(shed: Node3D) -> void:
 	portal.name = "ShedPortal"
 	var col := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(1.7, 2.2, 0.7)
+	box.size = Vector3(1.1, 2.1, 0.7)
 	col.shape = box
 	portal.add_child(col)
-	portal.position = Vector3(0, 1.0, 2.0)
+	portal.position = Vector3(0, 1.0, 1.5)
 	_shed_portal = portal
 	shed.add_child(portal)
 
@@ -441,6 +591,7 @@ func _run_smoke() -> void:
 
 	GameState.add_string(1)
 	GameState.add_sticks(2)
+	GameState.add_stones(2)
 	var shed_door := get_node("Shed/Door_shed")
 	shed_door._on_combo(GameState.combo)
 	print("SMOKE shed_unlocked=%s has_keys=%s string=%d" % [GameState.shed_unlocked, GameState.has_keys, GameState.string_count])
@@ -468,6 +619,7 @@ func _run_smoke() -> void:
 
 	var dc2 := get_node("Dumbleclaw")
 	dc2._on_choice(1)
+	Hud.close_dialogue()
 	print("SMOKE after_trade food=%d gold=%d" % [GameState.food_count, GameState.gold])
 
 	var farmhouse_door := get_node("Farmhouse/Door_farmhouse")
@@ -479,8 +631,344 @@ func _run_smoke() -> void:
 	farmhouse_door.interact()
 	Hud.close_dialogue()
 	print("SMOKE is_day=%s catfood_used=%s food=%d" % [GameState.is_day, GameState.catfood_used, GameState.food_count])
+
+	GameState.add_string(1)
+	GameState.add_sticks(1)
+	var player := get_tree().get_first_node_in_group("player")
+	var lake_node := get_node("Lake")
+	var school: Node = lake_node.get_node_or_null("Fish")
+	var fish_caught := false
+	if player != null and school != null:
+		GameState.cinematic_active = false
+		player.global_position = Vector3(Terrain.lake.center.x + 2.0, 0.0, Terrain.lake.center.y + 2.0)
+		player.call("_try_fish", school.get("fish"))
+		for i in range(2400):
+			await get_tree().process_frame
+			if GameState.food_count >= 3 and GameState.has_fishing_rod:
+				fish_caught = true
+				break
+	print("SMOKE fish_rod=%s caught=%s food=%d string=%d sticks=%d" % [
+		GameState.has_fishing_rod, fish_caught, GameState.food_count,
+		GameState.string_count, GameState.stick_count])
 	print("SMOKE DONE")
 	get_tree().quit()
+
+
+func _run_camtest() -> void:
+	print("CAMTEST start")
+	await get_tree().process_frame
+	GameState.day_time = 0.5
+	var pl := get_tree().get_first_node_in_group("player")
+	if pl != null:
+		pl.global_position = Vector3(-4.0, 0.5, -8.0)
+		pl.global_position.y = Terrain.height_at(-4.0, -8.0) + 0.1
+		pl.set("camera_frozen", true)
+		await get_tree().process_frame
+		var holder: Node3D = pl.get_node("CameraHolder")
+		var cam: Camera3D = pl.get_node("CameraHolder/Camera")
+		var eye: Vector3 = pl.global_position + Vector3(2.2, 1.4, 2.2)
+		holder.global_transform = Transform3D(Basis(), eye)
+		cam.position = Vector3.ZERO
+		holder.look_at(pl.global_position + Vector3(0, 0.4, 0), Vector3.UP)
+		await get_tree().create_timer(0.9).timeout
+		get_viewport().get_texture().get_image().save_png("res://screenshots/cam_cat.png")
+		var mr: Node3D = pl.get_node("MeshRoot")
+		mr.visible = false
+		await get_tree().create_timer(0.4).timeout
+		get_viewport().get_texture().get_image().save_png("res://screenshots/cam_nocat.png")
+		mr.visible = true
+		print("CAMTEST saved player=%v eye=%v" % [pl.global_position, eye])
+	get_tree().quit()
+
+
+func _run_fishtest() -> void:
+	print("FISHCUT start")
+	await get_tree().process_frame
+	GameState.add_string(1)
+	GameState.add_sticks(1)
+	var player := get_tree().get_first_node_in_group("player")
+	var lake_node := get_node("Lake")
+	var school: Node = lake_node.get_node_or_null("Fish")
+	if player != null and school != null:
+		var spawn_dir := Vector2(1, 1).normalized()
+		var sr := Terrain.shore_distance(spawn_dir)
+		var sx: float = Terrain.lake.center.x + spawn_dir.x * (sr + 1.0)
+		var sz: float = Terrain.lake.center.y + spawn_dir.y * (sr + 1.0)
+		player.global_position = Vector3(sx, Terrain.height_at(sx, sz) + 0.1, sz)
+		var dlake := Vector2(
+			Terrain.lake.center.x - player.global_position.x,
+			Terrain.lake.center.y - player.global_position.z)
+		player.set("yaw", atan2(dlake.x, dlake.y) + PI)
+		if "--nocat" in OS.get_cmdline_user_args():
+			(player.get_node("MeshRoot") as Node3D).visible = false
+		player.set("yaw", atan2(dlake.x, dlake.y) + PI)
+		print("FISHCUT pre: chase=%s panel=%s pounce=%.1f dist=%.2f" % [
+			GameState.chase_active, Hud.any_panel_open(),
+			player.get("_pounce_t"), dlake.length()])
+		player.call("_try_fish", school.get("fish"))
+		for i in range(1200):
+			await get_tree().process_frame
+			if GameState.cinematic_active:
+				break
+		print("FISHCUT wait end: cine=%s dest=%s waiting_cam=%s" % [
+			GameState.cinematic_active, player.get("has_destination"),
+			player.get("_waiting_cam")])
+		var shots := [0.15, 0.75, 1.25, 1.85, 2.35, 2.95]
+		for i in range(shots.size()):
+			if i > 0:
+				await get_tree().create_timer(shots[i] - shots[i - 1]).timeout
+			else:
+				await get_tree().create_timer(shots[i]).timeout
+			var img := get_viewport().get_texture().get_image()
+			var p := "res://screenshots/fc_%d.png" % (i + 1)
+			img.save_png(p)
+			var camw: Vector3 = player.get_node("CameraHolder").global_transform.origin
+			print("FISHCUT shot %s cam=%v player=%v" % [p, camw, player.global_position])
+		await get_tree().create_timer(1.0).timeout
+	print("FISHCUT done food=%d rod=%s string=%d sticks=%d" % [
+		GameState.food_count, GameState.has_fishing_rod, GameState.string_count, GameState.stick_count])
+	get_tree().quit()
+
+
+func _run_cutawaytest() -> void:
+	print("CUTAWAY start")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var shed_door := get_node("Shed/Door_shed")
+	shed_door._on_combo(GameState.combo)
+	var shots := [1.5, 2.3, 3.1, 3.9, 4.4, 5.2]
+	for i in range(shots.size()):
+		await get_tree().create_timer(shots[i]).timeout
+		var img := get_viewport().get_texture().get_image()
+		var p := "res://screenshots/cw_%d.png" % (i + 1)
+		img.save_png(p)
+		print("CUTAWAY shot " + p)
+	print("CUTAWAY DONE")
+	get_tree().quit()
+
+
+func _run_pawtest(_variant: String = "v1") -> void:
+	print("PAWTEST start")
+	GameState.day_time = 0.0
+	Hud.visible = false
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var shed_door := get_node("Shed/Door_shed")
+	var padlock: Node3D = shed_door.get("_padlock")
+	if padlock == null:
+		push_error("PAWTEST no padlock")
+		get_tree().quit()
+		return
+	var dials: Array[MeshInstance3D] = []
+	for c in padlock.get_children():
+		if c.name.begins_with("Dial") and c is MeshInstance3D:
+			dials.append(c)
+	if dials.is_empty():
+		push_error("PAWTEST no dials")
+		get_tree().quit()
+		return
+	var dial: Node3D = dials[0]
+	var params := {
+		"show_paw": true,
+		"path_mode": false,
+		"advance": 0.0,
+		"path_start": [0.20, -0.10, 0.02],
+		"path_end": [0.0, 0.0, 0.02],
+		"fingers": false,
+		"target_offset": [0.0, -0.02, 0.018],
+		"model_rot_x_deg": 0.0,
+		"model_rot_y_deg": 0.0,
+		"model_rot_z_deg": 0.0,
+		"hand_bend_deg": 0.0,
+		"model_scale": 0.35,
+		"model_glb": "res://assets/WW.glb",
+		"cam_offset": [0.0, 0.02, 0.42],
+		"cam_fov": 42.0,
+		"out": "pawtest_iter.png",
+	}
+	var pf := FileAccess.open("res://screenshots/pawtest_params.json", FileAccess.READ)
+	if pf != null:
+		var j: Variant = JSON.parse_string(pf.get_as_text())
+		if j is Dictionary:
+			for k in j:
+				params[k] = j[k]
+		pf.close()
+	if bool(params["show_paw"]):
+		var toff: Array = params["target_offset"]
+		var target: Vector3 = dial.global_position + Vector3(toff[0], toff[1], toff[2])
+		var glb: PackedScene = load(str(params["model_glb"]))
+		if glb == null:
+			push_error("PAWTEST failed to load model_glb=" + str(params["model_glb"]))
+			get_tree().quit()
+			return
+		var model := glb.instantiate()
+		model.scale = Vector3.ONE * float(params["model_scale"])
+		model.rotation.x = deg_to_rad(float(params["model_rot_x_deg"]))
+		model.rotation.y = deg_to_rad(float(params["model_rot_y_deg"]))
+		model.rotation.z = deg_to_rad(float(params["model_rot_z_deg"]))
+		add_child(model)
+		await get_tree().process_frame
+		var skel: Skeleton3D = null
+		for sk in model.find_children("*", "Skeleton3D", true, false):
+			skel = sk as Skeleton3D
+			break
+		var standalone: bool = skel == null
+		if standalone:
+			print("PAWTEST standalone model (no skeleton)")
+		var show_fingers: bool = bool(params["fingers"])
+		for mi in model.find_children("*", "MeshInstance3D", true, false):
+			var m := mi as MeshInstance3D
+			if standalone:
+				m.visible = true
+			elif show_fingers:
+				m.visible = (m.name == "Arm_L")
+			else:
+				m.visible = (m.name == "Paw_L" or m.name == "Arm_L")
+		if params.has("paw_debug_color"):
+			var dc: Array = params["paw_debug_color"]
+			for mi in model.find_children("*", "MeshInstance3D", true, false):
+				var mm := (mi as MeshInstance3D).mesh
+				if mm != null:
+					for s in mm.get_surface_count():
+						var smat: Material = mm.surface_get_material(s)
+						if smat is StandardMaterial3D:
+							(smat as StandardMaterial3D).albedo_color = Color(dc[0], dc[1], dc[2])
+		var hand_w: Vector3 = Vector3.ZERO
+		if skel != null:
+			var hand_i := skel.find_bone("Hand.L")
+			var bend := float(params["hand_bend_deg"])
+			if absf(bend) > 0.01:
+				var rest_q: Quaternion = skel.get_bone_rest(hand_i).basis.get_rotation_quaternion()
+				skel.set_bone_pose_rotation(hand_i, rest_q * Quaternion(Vector3.RIGHT, deg_to_rad(bend)))
+				await get_tree().process_frame
+			hand_w = skel.to_global(skel.get_bone_global_pose(hand_i).origin)
+		if bool(params["path_mode"]):
+			var paw_mi: MeshInstance3D = null
+			var paw_name := "Paw_L" if not standalone else "*"
+			for mi in model.find_children(paw_name, "MeshInstance3D", true, false):
+				paw_mi = mi as MeshInstance3D
+				break
+			var paw_center: Vector3 = Vector3.ZERO
+			if paw_mi != null and paw_mi.mesh != null:
+				paw_center = paw_mi.global_transform * paw_mi.mesh.get_aabb().get_center()
+			var ps: Array = params["path_start"]
+			var pe: Array = params["path_end"]
+			var start: Vector3 = dial.global_position + Vector3(ps[0], ps[1], ps[2])
+			var end: Vector3 = dial.global_position + Vector3(pe[0], pe[1], pe[2])
+			var desired: Vector3 = start.lerp(end, clampf(float(params["advance"]), 0.0, 1.0))
+			model.global_position += desired - paw_center
+			print("PAWTEST paw_center=" + str(paw_center) + " desired=" + str(desired) + " dial=" + str(dial.global_position))
+		else:
+			if standalone:
+				var anchor_w: Vector3 = Vector3.ZERO
+				if params.has("model_anchor"):
+					var ma: Array = params["model_anchor"]
+					anchor_w = model.global_transform * Vector3(ma[0], ma[1], ma[2])
+				else:
+					var paw_mi: MeshInstance3D = null
+					for mi in model.find_children("*", "MeshInstance3D", true, false):
+						paw_mi = mi as MeshInstance3D
+						break
+					if paw_mi != null and paw_mi.mesh != null:
+						anchor_w = paw_mi.global_transform * paw_mi.mesh.get_aabb().get_center()
+				model.global_position += target - anchor_w
+				print("PAWTEST anchor_w=" + str(anchor_w) + " target=" + str(target) + " model_pos=" + str(model.global_position))
+			else:
+				model.global_position += target - hand_w
+		if bool(params["fingers"]):
+			_pawtest_fingers(model, dial)
+		await get_tree().process_frame
+	var cam := Camera3D.new()
+	cam.current = true
+	cam.fov = float(params["cam_fov"])
+	add_child(cam)
+	if float(params.get("light_energy", 0.0)) > 0.0:
+		var key := DirectionalLight3D.new()
+		key.light_energy = float(params["light_energy"])
+		key.shadow_enabled = false
+		key.rotation_degrees = Vector3(float(params.get("light_pitch_deg", -30.0)), float(params.get("light_yaw_deg", 0.0)), 0.0)
+		add_child(key)
+		var fill := DirectionalLight3D.new()
+		fill.light_energy = float(params.get("light_fill_energy", 0.35))
+		fill.shadow_enabled = false
+		fill.rotation_degrees = Vector3(float(params.get("fill_pitch_deg", 0.0)), float(params.get("fill_yaw_deg", 180.0)), 0.0)
+		add_child(fill)
+	var co: Array = params["cam_offset"] as Array
+	cam.global_position = padlock.global_position + Vector3(co[0], co[1], co[2])
+	cam.look_at(padlock.global_position, Vector3.UP)
+	await get_tree().process_frame
+	var dn := get_node_or_null("DayNight")
+	if dn != null:
+		for c in dn.get_children():
+			if c is DirectionalLight3D:
+				c.light_energy = 0.0
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.05, 0.06, 0.09)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.65, 0.6, 0.55)
+	env.ambient_light_energy = 0.18
+	var we := get_node_or_null("WorldEnvironment")
+	if we != null:
+		we.environment = env
+	else:
+		var we2 := WorldEnvironment.new()
+		we2.environment = env
+		add_child(we2)
+	var img := get_viewport().get_texture().get_image()
+	var p := "res://screenshots/" + str(params["out"])
+	img.save_png(p)
+	print("PAWTEST saved=" + p)
+	get_tree().quit()
+
+
+func _pawtest_segment(a: Vector3, b: Vector3, r: float, mat: Material) -> void:
+	var cm := CapsuleMesh.new()
+	cm.radius = r
+	cm.height = maxf(a.distance_to(b) + r * 2.0, 0.002)
+	cm.material = mat
+	var mi := MeshInstance3D.new()
+	mi.mesh = cm
+	add_child(mi)
+	mi.look_at_from_position((a + b) * 0.5, b, Vector3.UP)
+	mi.rotate_object_local(Vector3.RIGHT, PI / 2.0)
+
+
+func _pawtest_fingers(model: Node3D, dial: Node3D) -> void:
+	var fur := StandardMaterial3D.new()
+	fur.albedo_color = Color("#f9ad59")
+	fur.roughness = 0.9
+	for mi in model.find_children("Paw_L", "MeshInstance3D", true, false):
+		var sm := (mi as MeshInstance3D).mesh
+		if sm != null and sm.get_surface_count() > 0:
+			var src := sm.surface_get_material(0)
+			if src is StandardMaterial3D:
+				fur.albedo_color = (src as StandardMaterial3D).albedo_color
+				fur.roughness = (src as StandardMaterial3D).roughness
+				break
+	var claw := StandardMaterial3D.new()
+	claw.albedo_color = Color("#f5e6d0")
+	claw.roughness = 0.5
+	var d: Vector3 = dial.global_position
+	var palm := MeshInstance3D.new()
+	var pm := SphereMesh.new()
+	pm.radius = 0.026
+	pm.height = 0.052
+	pm.material = fur
+	palm.mesh = pm
+	palm.scale = Vector3(1.25, 0.75, 0.85)
+	palm.position = d + Vector3(0.0, -0.006, 0.006)
+	add_child(palm)
+	var spread := [-0.017, -0.006, 0.006, 0.017]
+	for i in 4:
+		var base := d + Vector3(spread[i], 0.010, 0.014)
+		var knuckle := d + Vector3(spread[i] * 0.8, 0.030, 0.008)
+		var tip := d + Vector3(spread[i] * 0.55, 0.044, -0.004)
+		_pawtest_segment(base, knuckle, 0.0058, fur)
+		_pawtest_segment(knuckle, tip, 0.0045, fur)
+		var dir: Vector3 = (tip - knuckle).normalized()
+		var claw_tip: Vector3 = tip + dir * 0.012 + Vector3(0.0, -0.006, -0.004)
+		_pawtest_segment(tip, claw_tip, 0.0022, claw)
 
 
 func _build_tractor() -> void:
@@ -499,14 +987,14 @@ func _build_lake() -> void:
 
 
 func _build_bird_tree() -> void:
-	var scene: PackedScene = preload("res://assets/tree_detailed.glb")
+	var scene: PackedScene = preload("res://assets/tree_ww_round.glb")
 	var tree: Node3D = scene.instantiate()
 	tree.position = Vector3(BIRD_TREE_POS.x, Terrain.height_at(BIRD_TREE_POS.x, BIRD_TREE_POS.z), BIRD_TREE_POS.z)
 	tree.scale = Vector3.ONE * 4.0
 	add_child(tree)
 	tree.add_to_group("trees")
 	trees.append(tree)
-	_add_collider(tree, Vector3(0.9, 2.4, 0.9), Vector3(0, 1.2, 0))
+	_add_collider(tree, TRUNK_COLLIDER_SIZE / 4.0, Vector3(0, 1.2, 0))
 
 
 func _log_debug(msg: String) -> void:
@@ -517,30 +1005,22 @@ func _log_debug(msg: String) -> void:
 
 
 func _build_fence_perimeter() -> void:
-	var dist := HALF - 2.0
+	var dist := FENCE_HALF
 	var span := dist * 2.0
 	var per_edge := maxi(2, int(round(span / FENCE_PANEL_WIDTH)))
 	var spacing := span / per_edge
 	var start := -dist + spacing / 2.0
 
 	for edge in range(4):
+		if edge == 0:
+			_build_gate_edge(dist, spacing)
+			continue
 		for i in range(per_edge):
-			var on_north := edge == 0
-			var center_panel := i == per_edge / 2
-			if on_north and center_panel:
-				var gate: Node3D = preload("res://scripts/gate.gd").new()
-				gate.name = "Gate"
-				gate.position = Vector3(0, 0, -dist)
-				add_child(gate)
-				continue
 			var fence: Node3D = FENCE_PANEL.instantiate()
 			var off := start + i * spacing
 			var pos := Vector3.ZERO
 			var rot := 0.0
 			match edge:
-				0:
-					pos = Vector3(off, 0, -dist)
-					rot = 0.0
 				1:
 					pos = Vector3(dist, 0, off)
 					rot = PI / 2.0
@@ -554,6 +1034,24 @@ func _build_fence_perimeter() -> void:
 			fence.rotation = Vector3(0, rot, 0)
 			add_child(fence)
 			_add_fence_collider(fence)
+
+
+func _build_gate_edge(dist: float, spacing: float) -> void:
+	# North edge (faces the farmhouse): gate centred at x=0, panels symmetric on
+	# either side at the same spacing as the other edges.
+	var items := int(round(dist * 2.0 / spacing)) + 1
+	for i in range(items):
+		var off := -dist + i * spacing
+		if is_equal_approx(off, 0.0):
+			var gate: Node3D = preload("res://scripts/gate.gd").new()
+			gate.name = "Gate"
+			gate.position = Vector3(0, 0, -dist)
+			add_child(gate)
+			continue
+		var fence: Node3D = FENCE_PANEL.instantiate()
+		fence.position = Vector3(off, 0, -dist)
+		add_child(fence)
+		_add_fence_collider(fence)
 
 
 func _add_fence_collider(parent: Node3D) -> void:
@@ -581,7 +1079,7 @@ func _build_trees() -> void:
 		add_child(tree)
 		tree.add_to_group("trees")
 		trees.append(tree)
-		_add_collider(tree, Vector3(0.6, 2.0, 0.6), Vector3(0, 1.0, 0))
+		_add_collider(tree, TRUNK_COLLIDER_SIZE / scale, Vector3(0, 1.0, 0))
 
 
 func _build_rocks() -> void:
@@ -623,20 +1121,39 @@ func _build_logs() -> void:
 
 
 func _spawn_pickups() -> void:
-	var stick_positions := [
-		Vector3(1.5, 0.25, 8.0),
-		Vector3(2.6, 0.25, 5.2),
-		Vector3(-2.2, 0.25, 9.6),
-		Vector3(4.2, 0.25, 10.8),
-		Vector3(-3.4, 0.25, 6.0),
-		Vector3(6.0, 0.25, -3.0),
-		Vector3(0.5, 0.25, -1.0),
-	]
-	for p in stick_positions:
-		var st := preload("res://scripts/pickup.gd").new()
-		st.kind = "stick"
-		st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.25, p.z)
-		add_child(st)
+	for kind in ["stick", "stone"]:
+		var count := 7 if kind == "stick" else 6
+		for p in _scatter_positions(count):
+			var st := preload("res://scripts/pickup.gd").new()
+			st.kind = kind
+			st.position = Vector3(p.x, Terrain.height_at(p.x, p.z) + 0.04, p.z)
+			add_child(st)
+
+
+func _scatter_positions(count: int) -> Array[Vector3]:
+	var placed: Array[Vector3] = []
+	var attempts := 0
+	var min_gap := 8.0
+	while placed.size() < count and attempts < 600:
+		attempts += 1
+		if attempts == 300:
+			min_gap = 5.0
+		var p := _random_pos(3.0)
+		if _too_close_to_landmarks(p):
+			continue
+		if Terrain.water_level > -900.0 and Terrain.height_at(p.x, p.z) < Terrain.water_level + 0.1:
+			continue
+		if placed.is_empty() and Vector3(0, 0, 12).distance_to(p) > 12.0:
+			continue
+		var ok := true
+		for q in placed:
+			if p.distance_to(q) < min_gap:
+				ok = false
+				break
+		if not ok:
+			continue
+		placed.append(p)
+	return placed
 
 
 func _spawn_dumbleclaw() -> void:
@@ -708,8 +1225,8 @@ func _add_collider(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 
 
 func _random_pos(margin: float) -> Vector3:
-	var x := rng.randf_range(-HALF + margin + 2.0, HALF - margin - 2.0)
-	var z := rng.randf_range(-HALF + margin + 2.0, HALF - margin - 2.0)
+	var x := rng.randf_range(-FENCE_HALF + margin, FENCE_HALF - margin)
+	var z := rng.randf_range(-FENCE_HALF + margin, FENCE_HALF - margin)
 	return Vector3(x, 0, z)
 
 
@@ -724,7 +1241,7 @@ func _too_close_to_landmarks(pos: Vector3) -> bool:
 func _build_path() -> void:
 	var dirt := Color(0.6, 0.48, 0.32)
 	var dust := Color(0.55, 0.44, 0.3)
-	var fence_z := HALF - 2.0
+	var fence_z := FENCE_HALF
 	var path: Node3D = Node3D.new()
 	path.name = "Path"
 	add_child(path)

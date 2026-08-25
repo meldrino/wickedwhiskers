@@ -1,0 +1,13 @@
+Listen, I’ve seen better geometry in a preschool block set. This is an absolute disaster.
+
+1. **FAIL**: It looks like a stack of primitive cubes, not a tractor.
+2. **FAIL**: The wheels are white, not near-black, and they look like floating dinner plates rather than functional tyres.
+3. **FAIL**: The body is grey, not red, and there is zero indication of a cabin or sky-blue windows.
+4. **FAIL**: No mudguards or fenders exist on this model.
+5. **FAIL**: No exhaust pipe visible anywhere.
+6. **FAIL**: No number plate exists.
+7. **FAIL**: The proportions are completely abstract; it lacks any recognizable tractor silhouette.
+8. **PASS**: At least the pieces are touching, though they are arranged with zero artistic intent.
+
+MOST_WRONG: The entire mesh is a collection of untextured, incorrectly colored primitives that fail to resemble a vehicle in any capacity.
+VERDICT: FAIL

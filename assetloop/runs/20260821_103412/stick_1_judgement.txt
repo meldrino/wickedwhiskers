@@ -1,0 +1,13 @@
+This asset is a failure. You have completely ignored the "curved" family rulebook and the specific design instructions provided in the brief.
+
+1. **NON-CONTIGUOUS SHAFTS:** The rulebook explicitly states: "Sticks... contiguous is NON-NEGOTIABLE - one bent_cylinder through waypoints, never separate butt-joined cylinders." Your model is a series of straight, faceted cylinders joined at sharp, visible angles. It looks like a low-poly pipe assembly, not a natural stick.
+2. **VIOLATION OF SMOOTH PRIMITIVES:** The rulebook requires 16+ radial segments with smooth shading. Your mesh is clearly low-poly (hexagonal/octagonal), creating harsh, ugly silhouette facets that violate the "chunky, rounded, toy-like" aesthetic.
+3. **FORBIDDEN JOINERY:** The side branch and forks are "glued-on" perpendicular cylinders. The brief required them to join *into* the shaft at 30-60 degree angles. They look like they were snapped on in a CAD program, not grown from the wood.
+4. **INCORRECT BENDING:** The brief requested a "gentle organic bend." Your model has sharp, 90-degree-like zig-zag kinks at the junctions of your straight segments.
+5. **BARK RIDGES:** The brief asked for bark ridges "hugging/embedded in the shaft." Instead, you have placed what appear to be floating or poorly integrated rectangular blocks that do not follow the curvature of the shaft.
+6. **BROKEN TIP ORIENTATION:** The `Broken_Tip` cone is not integrated into the mesh flow; it looks like a separate, mismatched primitive stuck onto the end of the shaft.
+
+This model fails to meet the most basic construction requirements for the *Wicked Whiskers* style. It is not "chunky and rounded"; it is jagged and primitive.
+
+MOST_WRONG: The shaft is constructed from butt-joined straight cylinders instead of a single, smooth, bent cylinder, violating the primary construction rule for the curved family.
+VERDICT: FAIL

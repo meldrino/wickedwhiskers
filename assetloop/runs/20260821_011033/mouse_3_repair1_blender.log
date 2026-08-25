@@ -1,0 +1,43 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_011033\mouse_3.py:12: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+01:14:54 | INFO: Starting glTF 2.0 export
+01:14:54 | INFO: Extracting primitive: Body
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: EarInL
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: EarInR
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: EarL
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: EarR
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: EyeL
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: EyeR
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Head
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Leg
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Leg.001
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Leg.002
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Leg.003
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Nose
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Snout
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Extracting primitive: Tail
+01:14:54 | INFO: Primitives created: 1
+01:14:54 | INFO: Finished glTF 2.0 export in 0.04730534553527832 s
+
+ASSET_BUILT
+DIMS Vector(<Vector (0.0800, 0.1080, 0.1671)>)
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

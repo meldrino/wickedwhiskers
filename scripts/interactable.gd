@@ -5,6 +5,9 @@ extends Area3D
 @export var interaction_radius := 2.2
 @export var interaction_box := Vector3.ZERO
 @export var interaction_center := Vector3.ZERO
+@export var interaction_range := 1.8
+@export var interaction_points_extra: Array[Vector3] = []
+@export var walk_to_interact := true
 
 var _held_player: Node3D = null
 
@@ -44,3 +47,10 @@ func interact() -> void:
 
 func get_interaction_point() -> Vector3:
 	return to_global(interaction_center)
+
+
+func get_interaction_points() -> Array[Vector3]:
+	var pts: Array[Vector3] = [get_interaction_point()]
+	for extra in interaction_points_extra:
+		pts.append(to_global(extra))
+	return pts

@@ -1,0 +1,11 @@
+{
+  "asset": "stone_v2",
+  "auto_ground": true,
+  "surface_noise": { "frequency": 11, "amplitude": 0.0014, "seed": 7 },
+  "materials": { "stone_warm": { "color": [0.30, 0.27, 0.24], "roughness": 0.93 } },
+  "parts": [
+    { "type": "rock", "name": "Stone", "material": "stone_warm", "center": [0, 0, 0.045],
+      "radius": 0.052, "seed": 23, "squash": [0.95, 1.0, 0.72], "lumpiness": 0.26,
+      "flatten": 0.5, "facet": 0.75, "smooth": false }
+  ]
+}

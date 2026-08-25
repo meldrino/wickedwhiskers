@@ -1,0 +1,7 @@
+1. **PASS**: It has clear, angular faceted planes and a non-spherical silhouette.
+2. **FAIL**: The mesh is clearly floating above the ground plane; there is a visible gap between the bottom geometry and the shadow cast on the floor.
+3. **PASS**: The colour is a neutral, matte grey, fitting the dry stone requirement.
+4. **PASS**: The scale relative to the environment suggests a portable, fist-sized object.
+
+MOST_WRONG: The mesh origin/pivot is offset, causing the object to hover instead of sitting flush on the ground plane.
+VERDICT: FAIL

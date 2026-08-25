@@ -1,0 +1,22 @@
+ASSET BRIEF: SHED INTERIOR KIT for Wicked Whiskers (follows the shared style sheet above).
+
+A kit of props furnishing the inside of the farm shed. The shed interior floor is ~3.2 m (X) x 2.7 m (Z), walls ~2.4 m tall - everything must fit inside that with headroom. Origin at floor centre, y=0 = shed floor. Props arranged as if viewed from the open front (+Z): workbench against the back wall (-Z side), shelf on the left wall, tools by the right wall.
+
+Parts (~30+):
+- Workbench: chunky wooden top slab + 4 legs + lower cross-stretcher, against the back wall
+- On the bench: small wooden mallet (head + handle), a coil of wire (thin torus), a small wooden box with 3 visible compartments, a hammer (cylinder handle + dark head)
+- Left wall shelf unit: two long planks on 3 vertical brackets each; on the shelves: 3 seed packets (small flat boxes leaning), a clay flower pot (cone-ish cylinder wider at top), a rolled sack (bent cylinder) 
+- Right wall: tool rack = vertical plank + horizontal bar; hanging on it a spade (shaft + blade box + T-handle) and a rake (shaft + head bar + 4 teeth)
+- Floor cluster: 2 wooden crates (open-top boxes with visible corner posts), a metal bucket (truncated cone, handle arc of thin torus half), a folded tarpaulin (flattened irregular box) in green
+
+Colours: wood #8B5A2B = (0.55, 0.35, 0.17) roughness 0.75 with darker wood #6B4423 = (0.42, 0.27, 0.14); metal parts #7A7A82 = (0.48, 0.48, 0.51) roughness 0.45; terracotta pot #B5651D = (0.71, 0.40, 0.11); tarp green #4C9A3F = (0.30, 0.60, 0.25); seed packets cream with one red stripe each.
+
+========== JUDGE CHECKLIST ==========
+1. Reads as a furnished SHED INTERIOR corner: workbench + shelves + tools?
+2. Workbench has legs, stretcher AND items sitting ON it?
+3. At least 2 tools (spade/rake) visibly hanging or racked?
+4. Crates and bucket present on the floor?
+5. Everything fits within ~3.2 x 2.7 m footprint and ~2.2 m height?
+6. Warm wood palette with metal accents, matte and cosy?
+7. Items individually readable (not one merged lump)?
+8. Single coherent arrangement - nothing floating in mid-air?

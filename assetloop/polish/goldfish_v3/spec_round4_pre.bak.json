@@ -1,0 +1,31 @@
+{
+  "materials": {
+    "body_orange": { "color": [0.93, 0.55, 0.18], "roughness": 0.7 },
+    "fin_cream": { "color": [0.96, 0.88, 0.74], "roughness": 0.8 },
+    "eye_dark": { "color": [0.08, 0.07, 0.06], "roughness": 0.35 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "Body", "material": "body_orange",
+      "waypoints": [[0, 0, 0.30], [0, 0, 0.24], [0, 0, 0.14], [0, 0, 0.00], [0, 0, -0.13], [0, 0, -0.24], [0, 0, -0.30]],
+      "radii": [0.010, 0.048, 0.082, 0.092, 0.066, 0.030, 0.020], "sides": 20 },
+    { "type": "bent_cylinder", "name": "TailUp", "material": "fin_cream",
+      "waypoints": [[0, -0.008, -0.20], [0, -0.055, -0.38], [0, -0.105, -0.46]],
+      "radii": [0.020, 0.013, 0.004], "sides": 10 },
+    { "type": "bent_cylinder", "name": "TailDown", "material": "fin_cream",
+      "waypoints": [[0, 0.008, -0.20], [0, 0.055, -0.38], [0, 0.105, -0.46]],
+      "radii": [0.020, 0.013, 0.004], "sides": 10 },
+    { "type": "bent_cylinder", "name": "DorsalRidge", "material": "fin_cream",
+      "waypoints": [[0, 0.05, 0.12], [0, 0.10, 0.15], [0, 0.115, 0.05], [0, 0.095, -0.07]],
+      "radii": [0.010, 0.032, 0.026, 0.006], "sides": 10 },
+    { "type": "bent_cylinder", "name": "PecL", "material": "fin_cream",
+      "waypoints": [[-0.055, -0.03, 0.09], [-0.105, -0.06, 0.03], [-0.125, -0.09, -0.03]],
+      "radii": [0.013, 0.007, 0.003], "sides": 8 },
+    { "type": "bent_cylinder", "name": "PecR", "material": "fin_cream",
+      "waypoints": [[0.055, -0.03, 0.09], [0.105, -0.06, 0.03], [0.125, -0.09, -0.03]],
+      "radii": [0.013, 0.007, 0.003], "sides": 8 },
+    { "type": "sphere", "name": "EyeL", "material": "eye_dark", "center": [-0.042, 0.048, 0.185], "radius": 0.018 },
+    { "type": "sphere", "name": "EyeR", "material": "eye_dark", "center": [0.042, 0.048, 0.185], "radius": 0.018 }
+  ],
+  "auto_ground": false
+}
+

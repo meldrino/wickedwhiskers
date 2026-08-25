@@ -1,0 +1,13 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_003051\tractor_1.py:14: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+Traceback (most recent call last):
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_003051\tractor_1.py", line 77, in <module>
+    bpy.ops.wm.save_as_mainfile(filepath="tractor.blend")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Error: Cannot open file C:\Windows\System32\tractor.blend@ for writing: Permission denied
+
+Error: Cannot open file C:\Windows\System32\tractor.blend@ for writing: Permission denied
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

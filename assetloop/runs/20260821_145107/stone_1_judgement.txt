@@ -1,0 +1,8 @@
+1. **FAIL.** This is a perfect, featureless potato. It lacks the irregular, jagged silhouette of a natural stone.
+2. **FAIL.** While it sits on the plane, the base is rounded, not flattened. It looks like it’s resting on a single point of contact rather than a stable, flat base.
+3. **PASS.** The shading is smooth and free of obvious geometric faceting.
+4. **PASS.** The color is a neutral, matte grey appropriate for a stone.
+5. **PASS.** The scale is acceptable for the requested size.
+
+MOST_WRONG: The silhouette is too organic and symmetrical; you need to introduce aggressive, asymmetrical vertex displacement to break the "potato" shape and create a flat, stable base.
+VERDICT: FAIL

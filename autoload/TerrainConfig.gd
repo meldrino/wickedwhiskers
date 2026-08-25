@@ -3,7 +3,7 @@ extends RefCounted
 
 const CAT := 0.5
 
-var size := 121
+var size := 721
 var extent := 60.0
 var seed := 0
 
@@ -20,7 +20,7 @@ var hill_max := 60.0
 var edge_start := 26.8
 var edge_end := 28.0
 
-var grass_color := Color(0.35, 0.55, 0.2)
+var grass_color := Color(0.16, 0.29, 0.10)
 var dirt_color := Color(0.45, 0.33, 0.2)
 var rock_color := Color(0.52, 0.52, 0.54)
 var water_edge_color := Color(0.3, 0.43, 0.21)
@@ -47,6 +47,7 @@ static func whiskers() -> TerrainConfig:
 		{ "center": Vector2(0.0, -34.0), "radius": 16.0 },
 		{ "center": Vector2(10.0, -20.0), "radius": 9.0 },
 		{ "center": Vector2(16.0, -10.0), "radius": 8.0 },
+		{ "center": Vector2(-11.0, -16.0), "radius": 10.0 },
 	]
 	return c
 

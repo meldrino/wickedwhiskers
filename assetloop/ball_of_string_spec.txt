@@ -1,0 +1,17 @@
+ASSET BRIEF: BALL OF STRING for Wicked Whiskers (follows the shared style sheet above).
+
+A ball of twine/string for the cat to play with. Diameter ~18 cm. Origin at ground under the ball; ball centre at y=0.09.
+
+Parts (~12+): main sphere body in cream twine colour, then 6-8 thin torus rings of varying radii and orientations wrapped around it to suggest wound string layers (each torus slightly larger than needed so it sits ON the sphere surface, tilted at varied angles), plus one loose trailing strand: a thin curved series of 4-5 small cylinders or a bent tube snaking away from the ball across the ground ending in a frayed tip (tiny cone).
+
+Colours: twine cream #E8D9B0 = (0.91, 0.85, 0.69) roughness 0.8 for everything; frayed tip slightly darker #C9B888 = (0.79, 0.72, 0.53).
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a BALL OF STRING/twine (not a plain sphere)?
+2. Visible wrap lines/rings around the sphere suggesting wound string?
+3. A loose strand trails away from the ball onto the ground?
+4. Matte fibrous look - roughness high, no sheen blowout?
+5. Cream/natural twine colour?
+6. Diameter ~18 cm, resting on the ground plane?
+7. Strand is thin (a few mm) relative to the ball?
+8. Single coherent model - strand attached to ball, nothing floating?

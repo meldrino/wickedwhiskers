@@ -1,0 +1,42 @@
+{
+  "materials": {
+    "gold_orange": { "color": [0.95, 0.42, 0.10], "roughness": 0.55 },
+    "fin_white":   { "color": [0.99, 0.93, 0.82], "roughness": 0.6 },
+    "eye_black":   { "color": [0.02, 0.02, 0.02], "roughness": 0.25 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "Body", "cap_style": "round",
+      "waypoints": [[-0.25, 0, 0.11], [-0.15, 0, 0.13], [0.0, 0, 0.15], [0.15, 0, 0.13], [0.22, 0, 0.11]],
+      "radii":     [0.02, 0.08, 0.12, 0.08, 0.02],
+      "sides": 32, "material": "gold_orange" },
+
+    { "type": "bent_cylinder", "name": "CaudalFinUp",
+      "waypoints": [[0.22, 0, 0.11], [0.35, 0, 0.20], [0.45, 0, 0.28]],
+      "radii":     [0.04, 0.05, 0.01],
+      "sides": 24, "cross_section": [1.0, 0.15], "cap_style": "round", "material": "fin_white" },
+
+    { "type": "bent_cylinder", "name": "CaudalFinDown",
+      "waypoints": [[0.22, 0, 0.11], [0.35, 0, 0.02], [0.45, 0, -0.06]],
+      "radii":     [0.04, 0.05, 0.01],
+      "sides": 24, "cross_section": [1.0, 0.15], "cap_style": "round", "material": "fin_white" },
+
+    { "type": "bent_cylinder", "name": "DorsalFin",
+      "waypoints": [[-0.02, 0, 0.25], [0.08, 0, 0.28], [0.15, 0, 0.22]],
+      "radii":     [0.02, 0.06, 0.01],
+      "sides": 24, "cross_section": [1.0, 0.15], "cap_style": "round", "material": "fin_white" },
+
+    { "type": "bent_cylinder", "name": "PectoralFinL",
+      "waypoints": [[-0.12, -0.06, 0.12], [-0.20, -0.15, 0.10], [-0.28, -0.22, 0.08]],
+      "radii":     [0.04, 0.05, 0.01],
+      "sides": 16, "cross_section": [0.8, 0.25], "cap_style": "round", "material": "fin_white" },
+
+    { "type": "bent_cylinder", "name": "PectoralFinR",
+      "waypoints": [[-0.12, 0.06, 0.12], [-0.20, 0.15, 0.10], [-0.28, 0.22, 0.08]],
+      "radii":     [0.04, 0.05, 0.01],
+      "sides": 16, "cross_section": [0.8, 0.25], "cap_style": "round", "material": "fin_white" },
+
+    { "type": "sphere", "name": "EyeL", "center": [-0.22, -0.06, 0.14], "radius": 0.02, "u_segments": 24, "v_segments": 16, "material": "eye_black" },
+    { "type": "sphere", "name": "EyeR", "center": [-0.22, 0.06, 0.14], "radius": 0.02, "u_segments": 24, "v_segments": 16, "material": "eye_black" }
+  ]
+}
+

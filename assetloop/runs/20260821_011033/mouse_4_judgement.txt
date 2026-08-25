@@ -1,0 +1,13 @@
+Listen, I don't know what kind of "art" you think you're making, but this looks like a malfunctioning toaster, not a living creature. This is an embarrassment to the engine.
+
+1. 0/10 - It looks like a blocky, abstract monument. There is zero biological form here.
+2. 0/10 - Those are flat cylinders on the sides, not ears on top.
+3. 0/10 - There is no snout, no nose, and no eyes. It's a box.
+4. 0/10 - Those are just more cylinders stuck to the bottom. It doesn't look like legs; it looks like a base.
+5. 0/10 - There is no tail.
+6. 5/10 - You got the grey and pink colors right, but that's the bare minimum.
+7. 0/10 - Without a reference, this looks like a giant, scale-less architectural prop.
+8. 2/10 - It’s a single mesh, but it's a single *bad* mesh.
+
+MOST_WRONG: The entire geometry; you have built a stack of primitive blocks instead of a character—start by using a subdivided sphere for the head and body.
+VERDICT: FAIL

@@ -1,0 +1,65 @@
+
+import bpy, bmesh, math
+def clear_scene():
+    bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete()
+def new_mat(name, color, rough):
+    m = bpy.data.materials.new(name); m.use_nodes = True
+    bsdf = m.node_tree.nodes.get("Principled BSDF")
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = rough
+    return m
+def cone(loc, r1, r2, depth, rot, mat):
+    me = bmesh.new()
+    bmesh.ops.create_cone(me, segments=14, radius1=r1, radius2=r2, depth=depth, cap_ends=True)
+    o = bpy.data.objects.new("s", bpy.data.meshes.new_from_mesh(me))
+    bpy.context.collection.objects.link(o); o.location = loc; o.rotation_euler = rot
+    o.data.materials.append(mat); me.free(); return o
+def finger(loc, r1, r2, depth, rot, mat):
+    me = bmesh.new()
+    bmesh.ops.create_cone(me, segments=14, radius1=r1, radius2=r2, depth=depth, cap_ends=True)
+    o = bpy.data.objects.new("s", bpy.data.meshes.new_from_mesh(me))
+    bpy.context.collection.objects.link(o); o.location = loc; o.rotation_euler = rot
+    o.data.materials.append(mat); me.free(); return o
+def pad(loc, r):
+    me = bmesh.new()
+    bmesh.ops.create_circle(me, segments=14, radius=r)
+    o = bpy.data.objects.new("s", bpy.data.meshes.new_from_mesh(me))
+    bpy.context.collection.objects.link(o); o.location = loc
+    o.rotation_euler = (0, 0, 0)
+    o.data.materials.append(pad_mat); me.free(); return o
+clear_scene()
+fur = new_mat("Fur", (0.976,0.678,0.349), 0.9)
+claw = new_mat("Claw", (0.961,0.902,0.816), 0.6)
+pad_mat = new_mat("Pad", (0.788,0.553,0.490), 0.7)
+# Palm
+palm = cone((0, 0.0, 0.006), 0.028, 0.028, 0.021, (0, 0, 0), fur)
+palm.scale = (1.25, 0.75, 0.9)
+# Fingers
+finger1 = finger((-0.016, 0.036, 0.016), 0.008, 0.006, 0.032, (0, 0, 0, 1), claw)
+finger2 = finger((0.0, 0.036, 0.016), 0.008, 0.006, 0.032, (0, 0, 0, 1), claw)
+finger3 = finger((0.016, 0.036, 0.016), 0.008, 0.006, 0.032, (0, 0, 0, 1), claw)
+# Thumb
+thumb = finger((0.026, 0.036, 0.016), 0.008, 0.006, 0.032, (0, 0, 0, 1), claw)
+thumb.rotation_euler = (0, math.radians(-10), 0)
+# Claws
+claw1 = cone((-0.016, 0.036, 0.016), 0.003, 0.003, 0.009, (0, 0, 0, 1), claw)
+claw2 = cone((0.0, 0.036, 0.016), 0.003, 0.003, 0.009, (0, 0, 0, 1), claw)
+claw3 = cone((0.016, 0.036, 0.016), 0.003, 0.003, 0.009, (0, 0, 0, 1), claw)
+claw4 = cone((0.026, 0.036, 0.016), 0.003, 0.003, 0.009, (0, 0, 0, 1), claw)
+# Arm
+arm = cone((0, 0.0, 0.006), 0.016, 0.010, 0.17, (0, 0, 0, 1), claw)
+arm.rotation_euler = (0, 0, math.radians(90))
+# Pads
+pad1 = pad((-0.016, 0.036, 0.007), 0.007)
+pad2 = pad((0.0, 0.036, 0.007), 0.007)
+pad3 = pad((0.016, 0.036, 0.007), 0.007)
+pad4 = pad((0.026, 0.036, 0.007), 0.007)
+# Join and export
+bpy.ops.object.select_all(action='DESELECT')
+for o in bpy.data.objects:
+    if o.type == 'MESH': o.select_set(True)
+bpy.ops.object.join(); bpy.context.active_object.name = "Paw"
+bpy.ops.export_scene.gltf(filepath=r"C:\crypto\wicked whiskers\assets\paw_quenn_v1.glb", export_format='GLB')
+print("PAW_GLB_EXPORTED")
+
+

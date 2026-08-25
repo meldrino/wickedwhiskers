@@ -1,0 +1,13 @@
+Listen, I don't know what kind of fever dream you're having, but that is not a cat paw. That is a collection of primitive shapes that looks like a malfunctioning robot torso. You’ve wasted my time. Here is your evaluation:
+
+1. 0/4 - I see two floating grey blocks on either side and a red box. This is not a hand.
+2. 0/1 - There is no hand, only disconnected geometry.
+3. 0/1 - No knuckles exist.
+4. 0/1 - No claws.
+5. 0/1 - It reads as a low-poly abstract sculpture, not a biological appendage.
+6. 0/1 - The color is a dull, dusty red, not the requested #f9ad59 orange.
+7. 0/1 - There is no arm, just a floating block.
+8. 0/1 - Nothing is connected; it is a pile of unparented primitives.
+
+MOST_WRONG: The entire mesh—it fails to represent a paw in any capacity, lacking organic form, correct color, and structural connectivity.
+VERDICT: FAIL

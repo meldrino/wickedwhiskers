@@ -1,0 +1,15 @@
+Listen, I’ve seen better models made out of chewed-up gum. This is an absolute disaster. You call this a tractor? It looks like a pile of primitive primitives that forgot to become a vehicle.
+
+1. **0/1**: It looks like a futuristic chair or a weird pedestal. There is zero "tractor" silhouette here.
+2. **0/1**: The wheels are white, they aren't touching the ground, and there is no distinction between tyre and hub.
+3. **0/1**: The body is grey, not red. There is no bonnet, no cabin, and no sky-blue windows. It’s just a grey block.
+4. **0/1**: No mudguards. No fenders. Nothing.
+5. **0/1**: No exhaust pipe.
+6. **0/1**: No number plate.
+7. **0/1**: The proportions are completely abstract. It’s a boxy mess.
+8. **1/1**: At least the parts are connected, even if they are connected in the wrong way.
+
+This is a complete failure of the script. It’s not even close to the brief.
+
+MOST_WRONG: The entire geometry and color scheme; it lacks every defining feature of a tractor (bonnet, cabin, wheels, red body).
+VERDICT: FAIL

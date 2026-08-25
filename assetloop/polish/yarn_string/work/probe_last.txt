@@ -1,0 +1,45 @@
+14:40:52 | INFO: Data are loaded, start creating Blender stuff
+14:40:52 | INFO: Blender create Mesh node EndFray
+14:40:52 | INFO: Blender create Mesh node LooseEnd
+14:40:52 | INFO: Blender create Mesh node TwineBall
+14:40:52 | INFO: Blender create Mesh node WrapA
+14:40:52 | INFO: Blender create Mesh node WrapB
+14:40:52 | INFO: Blender create Mesh node WrapC
+14:40:52 | INFO: Blender create Mesh node WrapD
+14:40:52 | INFO: Blender create Mesh node WrapE
+14:40:52 | INFO: glTF import finished in 0.04s
+PROBE parts=8 bbox=(0.200,0.127,0.115)
+PROBE pair EndFray|LooseEnd overlap=(0.004,0.003,0.004)
+PROBE pair LooseEnd|TwineBall overlap=(0.033,0.042,0.023)
+PROBE pair LooseEnd|WrapB overlap=(0.030,0.042,0.010)
+PROBE pair LooseEnd|WrapC overlap=(0.027,0.040,0.003)
+PROBE pair LooseEnd|WrapD overlap=(0.030,0.042,0.006)
+PROBE pair LooseEnd|WrapE overlap=(0.027,0.010,0.016)
+PROBE pair TwineBall|WrapA overlap=(0.115,0.116,0.034)
+PROBE pair TwineBall|WrapB overlap=(0.110,0.115,0.043)
+PROBE pair TwineBall|WrapC overlap=(0.090,0.109,0.061)
+PROBE pair TwineBall|WrapD overlap=(0.109,0.116,0.055)
+PROBE pair TwineBall|WrapE overlap=(0.110,0.070,0.080)
+PROBE pair WrapA|WrapB overlap=(0.110,0.115,0.026)
+PROBE pair WrapA|WrapC overlap=(0.090,0.109,0.034)
+PROBE pair WrapA|WrapD overlap=(0.109,0.117,0.034)
+PROBE pair WrapA|WrapE overlap=(0.111,0.070,0.034)
+PROBE pair WrapB|WrapC overlap=(0.090,0.109,0.036)
+PROBE pair WrapB|WrapD overlap=(0.109,0.115,0.039)
+PROBE pair WrapB|WrapE overlap=(0.107,0.070,0.043)
+PROBE pair WrapC|WrapD overlap=(0.090,0.109,0.052)
+PROBE pair WrapC|WrapE overlap=(0.090,0.070,0.061)
+PROBE pair WrapD|WrapE overlap=(0.106,0.070,0.055)
+PROBE inside EndFray in TwineBall pct=0 -> CHAIN_ROOTED via LooseEnd -> EndFray
+PROBE inside LooseEnd in TwineBall pct=9 -> ROOTED_VISIBLE (mean root depth 0.012m)
+PROBE inside WrapA in TwineBall pct=54 -> ROOTED_VISIBLE (mean root depth 0.004m)
+PROBE inside WrapB in TwineBall pct=74 -> ROOTED_VISIBLE (mean root depth 0.006m)
+PROBE inside WrapC in TwineBall pct=51 -> ROOTED_VISIBLE (mean root depth 0.006m)
+PROBE inside WrapD in TwineBall pct=46 -> ROOTED_VISIBLE (mean root depth 0.005m)
+PROBE inside WrapE in TwineBall pct=76 -> ROOTED_VISIBLE (mean root depth 0.005m)
+PROBE enclosed WrapB by TwineBall -> check inside% above
+PROBE enclosed WrapC by TwineBall -> check inside% above
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

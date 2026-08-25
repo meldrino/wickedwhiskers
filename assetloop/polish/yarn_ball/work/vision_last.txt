@@ -1,0 +1,37 @@
+```json
+{
+	"asset": "yarn_ball",
+	"materials": {
+		"wool": { "color": [0.75, 0.18, 0.22], "roughness": 0.88 }
+	},
+	"parts": [
+		{ "type": "rock", "name": "Ball", "material": "wool", "center": [0, 0.055, 0],
+			"radius": 0.055, "seed": 27, "squash": [1.0, 0.95, 1.0], "lumpiness": 0.14,
+			"flatten": 0, "facet": 0.15, "smooth": true },
+		{ "type": "sphere", "name": "ThreadBead1",
+			"center": [0.03, 0.024, 0.035], "radius": 0.0038,
+			"u_segments": 12, "v_segments": 8,
+			"material": "wool", "smooth": true },
+		{ "type": "sphere", "name": "ThreadBead2",
+			"center": [0.045, 0.02, 0.04], "radius": 0.0034,
+			"u_segments": 12, "v_segments": 8,
+			"material": "wool", "smooth": true },
+		{ "type": "sphere", "name": "ThreadBead3",
+			"center": [0.055, 0.006, 0.04], "radius": 0.003,
+			"u_segments": 12, "v_segments": 8,
+			"material": "wool", "smooth": true },
+		{ "type": "sphere", "name": "ThreadBead4",
+			"center": [0.065, 0.01, 0.045], "radius": 0.0027,
+			"u_segments": 12, "v_segments": 8,
+			"material": "wool", "smooth": true },
+		{ "type": "sphere", "name": "ThreadBead5",
+			"center": [0.075, 0.006, 0.05], "radius": 0.0024,
+			"u_segments": 12, "v_segments": 8,
+			"material": "wool", "smooth": true },
+		{ "type": "sphere", "name": "ThreadTip",
+			"center": [0.085, 0.008, 0.055], "radius": 0.002,
+			"u_segments": 12, "v_segments": 8,
+			"material": "wool", "smooth": true }
+	]
+}
+```

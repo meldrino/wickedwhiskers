@@ -1,0 +1,7 @@
+1. 1 (The faceting is present and it avoids being a perfect sphere, though it leans slightly toward a "pebble" shape).
+2. 0 (The mesh is clearly floating above the ground plane; there is no contact shadow or flattened base meeting the floor).
+3. 1 (The colour is a neutral, matte grey, which fits the dry stone requirement).
+4. 1 (The scale, relative to the ground plane, appears to be within the fist-to-skull range).
+
+MOST_WRONG: The mesh is floating above the ground plane instead of having a flattened base that sits flush with the floor.
+VERDICT: FAIL

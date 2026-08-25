@@ -1,0 +1,8 @@
+1. 0 (This is a perfect, smooth, mathematical ellipsoid. It lacks any natural geological character, lumps, or irregular silhouette.)
+2. 0 (It is a floating, rounded shape with no clear flat base to suggest it is resting on a surface.)
+3. 0 (The silhouette is clearly faceted. You haven't applied smooth shading or sufficient subdivision to the mesh, resulting in an ugly low-poly "diamond" edge.)
+4. 1 (The colour is acceptable as a neutral grey, but it looks like a plastic toy because it lacks texture or surface variation.)
+5. 1 (The scale is appropriate for the object type.)
+
+MOST_WRONG: The mesh is a primitive, low-poly ellipsoid with no surface detail or flat base; you need to add displacement/sculpting for shape and apply smooth shading to the normals.
+VERDICT: FAIL

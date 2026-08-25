@@ -1,0 +1,13 @@
+Listen, I’ve seen better modeling from a toddler playing with blocks. This is an absolute disaster. Here is your evaluation:
+
+1. 0/1 - This looks like a geometric abstract sculpture, not a tractor.
+2. 0/1 - The wheels are floating, they are all the same size, and they are grey instead of near-black.
+3. 0/1 - There is no bonnet, no cabin, no windows, and no roof. It’s just a stack of grey and red primitives.
+4. 0/1 - No mudguards or fenders exist on this model.
+5. 0/1 - Where is the exhaust? It’s completely missing.
+6. 0/1 - No number plate, cream or otherwise.
+7. 0/1 - The proportions are nonsensical; it’s a vertical tower of boxes.
+8. 0/1 - The wheels are literally hovering in the air, disconnected from the chassis.
+
+MOST_WRONG: The entire geometry is a failure; delete the script and start over by defining a chassis, cabin, and wheel hierarchy instead of stacking random cubes.
+VERDICT: FAIL

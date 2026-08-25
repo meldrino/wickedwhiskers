@@ -1,0 +1,100 @@
+import bpy
+import bmesh
+import math
+from mathutils import Matrix, Vector
+
+def clear_scene():
+    # Remove all objects
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete()
+    # Clean up data blocks
+    for m in bpy.data.meshes: bpy.data.meshes.remove(m)
+    for mat in bpy.data.materials: bpy.data.materials.remove(mat)
+
+def create_material(name, color, roughness=0.5):
+    mat = bpy.data.materials.new(name=name)
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    bsdf = nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+        bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+def create_mesh_obj(name, bmesh_data, location=(0,0,0)):
+    me = bpy.data.meshes.new(name)
+    bmesh_data.to_mesh(me)
+    bmesh_data.free()
+    obj = bpy.data.objects.new(name, me)
+    # Link to the active collection
+    bpy.context.collection.objects.link(obj)
+    obj.location = location
+    return obj
+
+def build_cylinder(radius, height, segments=24):
+    bm = bmesh.new()
+    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=segments, diameter1=radius*2, diameter2=radius*2, depth=height)
+    mat = Matrix.Rotation(math.radians(90), 4, 'Y')
+    bmesh.ops.transform(bm, matrix=mat, verts=bm.verts)
+    return bm
+
+# 1. Clear scene first
+clear_scene()
+
+# 2. Setup Materials after clearing
+mats = {
+    "red": create_material("Red", (0.82, 0.18, 0.13), 0.45),
+    "tyre": create_material("Tyre", (0.08, 0.08, 0.09), 0.4),
+    "hub": create_material("Hub", (0.6, 0.6, 0.63), 0.5),
+    "plate": create_material("Plate", (0.96, 0.95, 0.9), 0.35)
+}
+
+# Bonnet
+bm = bmesh.new()
+bmesh.ops.create_cube(bm, size=1.0)
+bmesh.ops.transform(bm, matrix=Matrix.Scale(1.2, 4, (1,0,0)) @ Matrix.Scale(0.8, 4, (0,1,0)) @ Matrix.Scale(1.5, 4, (0,0,1)), verts=bm.verts)
+bonnet = create_mesh_obj("Bonnet", bm, (0, 0.8, 0.8))
+bonnet.data.materials.append(mats["red"])
+
+# Cabin
+bm = bmesh.new()
+bmesh.ops.create_cube(bm, size=1.0)
+bmesh.ops.transform(bm, matrix=Matrix.Scale(1.4, 4, (1,0,0)) @ Matrix.Scale(1.2, 4, (0,1,0)) @ Matrix.Scale(1.0, 4, (0,0,1)), verts=bm.verts)
+cabin = create_mesh_obj("Cabin", bm, (0, 1.0, -0.6))
+cabin.data.materials.append(mats["red"])
+
+# Wheels
+wheel_data = [("Wheel_FL", 0.32, 0.3, (-1.1, 0.32, 0.8)), ("Wheel_FR", 0.32, 0.3, (1.1, 0.32, 0.8)),
+              ("Wheel_RL", 0.55, 0.4, (-1.1, 0.55, -0.8)), ("Wheel_RR", 0.55, 0.4, (1.1, 0.55, -0.8))]
+
+for name, r, w, loc in wheel_data:
+    bm = build_cylinder(r, w)
+    obj = create_mesh_obj(name, bm, loc)
+    obj.data.materials.append(mats["tyre"])
+    bm_h = build_cylinder(r*0.6, w*1.1)
+    hub = create_mesh_obj(name+"_hub", bm_h, loc)
+    hub.data.materials.append(mats["hub"])
+    hub.parent = obj
+
+# Plate
+bm = bmesh.new()
+bmesh.ops.create_cube(bm, size=1.0)
+bmesh.ops.transform(bm, matrix=Matrix.Scale(0.5, 4, (1,0,0)) @ Matrix.Scale(0.22, 4, (0,1,0)) @ Matrix.Scale(0.05, 4, (0,0,1)), verts=bm.verts)
+plate = create_mesh_obj("Plate", bm, (0, 1.1, -1.3))
+plate.data.materials.append(mats["plate"])
+
+# Export
+bpy.ops.wm.save_as_mainfile(filepath="tractor.blend")
+
+# Dims
+min_v = Vector((999, 999, 999))
+max_v = Vector((-999, -999, -999))
+for obj in bpy.data.objects:
+    for v in obj.bound_box:
+        world_v = obj.matrix_world @ Vector(v)
+        min_v.x = min(min_v.x, world_v.x); min_v.y = min(min_v.y, world_v.y); min_v.z = min(min_v.z, world_v.z)
+        max_v.x = max(max_v.x, world_v.x); max_v.y = max(max_v.y, world_v.y); max_v.z = max(max_v.z, world_v.z)
+print("TRACTOR_BUILT")
+print(f"DIMS X:{max_v.x-min_v.x:.2f} Y:{max_v.y-min_v.y:.2f} Z:{max_v.z-min_v.z:.2f}")
+
+

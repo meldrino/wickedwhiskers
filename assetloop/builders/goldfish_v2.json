@@ -1,0 +1,41 @@
+{
+	"asset": "goldfish_v2",
+	"materials": {
+		"body": { "color": [0.95, 0.93, 0.88], "roughness": 0.45 },
+		"patch": { "color": [0.92, 0.38, 0.14], "roughness": 0.5 },
+		"fin": { "color": [0.98, 0.96, 0.92], "roughness": 0.6 },
+		"eye": { "color": [0.05, 0.05, 0.06], "roughness": 0.3 }
+	},
+	"parts": [
+		{ "type": "rock", "name": "Body", "material": "body", "center": [0, 0.02, 0],
+			"radius": 0.2, "seed": 11, "squash": [0.72, 1.12, 0.82], "lumpiness": 0.06,
+			"flatten": 0, "facet": 0, "smooth": true },
+		{ "type": "rock", "name": "HeadPatch", "material": "patch", "center": [0, 0.14, 0.09],
+			"radius": 0.085, "seed": 3, "squash": [1.0, 1.0, 0.55], "lumpiness": 0.1,
+			"flatten": 0.3, "facet": 0, "smooth": true },
+		{ "type": "rock", "name": "MidPatch", "material": "patch", "center": [0.05, -0.06, 0.11],
+			"radius": 0.07, "seed": 9, "squash": [0.9, 0.95, 0.5], "lumpiness": 0.12,
+			"flatten": 0.35, "facet": 0, "smooth": true },
+		{ "type": "box", "name": "TailUp",
+			"size": [0.02, 0.15, 0.18], "center": [0, -0.37, 0.08],
+			"rot_deg": [20, 0, 0], "material": "fin", "smooth": false },
+		{ "type": "box", "name": "TailDown",
+			"size": [0.02, 0.15, 0.18], "center": [0, -0.37, -0.08],
+			"rot_deg": [-20, 0, 0], "material": "fin", "smooth": false },
+		{ "type": "box", "name": "TailBridge",
+			"size": [0.018, 0.16, 0.06], "center": [0, -0.22, 0],
+			"rot_deg": [0, 0, 0], "material": "fin", "smooth": false },
+		{ "type": "box", "name": "DorsalFin",
+			"size": [0.02, 0.15, 0.13], "center": [0, 0.03, 0.19],
+			"rot_deg": [-15, 0, 0], "material": "fin", "smooth": false },
+		{ "type": "sphere", "name": "EyeL",
+			"center": [-0.115, 0.155, 0.06], "radius": 0.023,
+			"u_segments": 12, "v_segments": 8,
+			"material": "eye", "smooth": true },
+		{ "type": "sphere", "name": "EyeR",
+			"center": [0.115, 0.155, 0.06], "radius": 0.023,
+			"u_segments": 12, "v_segments": 8,
+			"material": "eye", "smooth": true }
+	],
+	"auto_ground": true
+}

@@ -1,0 +1,13 @@
+Listen, I don't know what you call this, but it’s certainly not a tractor. It looks like a pile of primitive geometry that gave up halfway through the build process. Here is your assessment:
+
+1. 0/1 - This reads as a pile of boxes, not a tractor.
+2. 0/1 - The wheels are white/grey, not near-black, and they look like floating plates rather than functional tyres.
+3. 0/1 - No bonnet, no cabin, no sky-blue windows, no roof. Just a red block on a grey block.
+4. 0/1 - No mudguards/fenders exist.
+5. 0/1 - No exhaust pipe.
+6. 0/1 - No number plate.
+7. 0/1 - The proportions are completely abstract; it looks like a toy stool, not a vehicle.
+8. 0/1 - It is a disaster of a mesh.
+
+MOST_WRONG: The entire model is missing 90% of the required structural features (cabin, bonnet, exhaust, fenders) and uses incorrect colors for the wheels.
+VERDICT: FAIL

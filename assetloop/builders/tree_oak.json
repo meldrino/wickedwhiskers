@@ -1,0 +1,16 @@
+{
+  "materials": {
+    "bark": { "color": [0.36, 0.26, 0.18], "roughness": 0.95 },
+    "leaf_main": { "color": [0.35, 0.62, 0.27], "roughness": 0.85 },
+    "leaf_light": { "color": [0.48, 0.72, 0.32], "roughness": 0.85 }
+  },
+  "parts": [
+    { "type": "cylinder", "name": "Trunk", "material": "bark", "from": [0.0, 0.0, 0.0], "to": [0.01, 0.0, 0.78], "radius_start": 0.075, "radius_end": 0.048, "sides": 14 },
+    { "type": "bent_cylinder", "name": "BranchL", "material": "bark", "waypoints": [[-0.02, 0.0, 0.6], [-0.16, 0.02, 0.74], [-0.3, 0.03, 0.86]], "radii": [0.042, 0.03, 0.02], "sides": 10, "collar": 1.5 },
+    { "type": "bent_cylinder", "name": "BranchR", "material": "bark", "waypoints": [[0.03, 0.0, 0.66], [0.17, -0.03, 0.8], [0.31, -0.04, 0.92]], "radii": [0.038, 0.028, 0.018], "sides": 10, "collar": 1.5 },
+    { "type": "sphere", "name": "CanopyCore", "material": "leaf_main", "center": [0.0, 0.0, 1.12], "radius": 0.38, "u_segments": 20, "v_segments": 14 },
+    { "type": "sphere", "name": "CanopyL", "material": "leaf_light", "center": [-0.3, 0.05, 1.0], "radius": 0.24, "u_segments": 18, "v_segments": 12 },
+    { "type": "sphere", "name": "CanopyR", "material": "leaf_light", "center": [0.32, -0.06, 1.06], "radius": 0.22, "u_segments": 18, "v_segments": 12 },
+    { "type": "sphere", "name": "CanopyTop", "material": "leaf_main", "center": [0.02, 0.0, 1.42], "radius": 0.2, "u_segments": 16, "v_segments": 12 }
+  ]
+}

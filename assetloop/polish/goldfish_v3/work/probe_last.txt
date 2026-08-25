@@ -1,0 +1,34 @@
+22:33:32 | INFO: Data are loaded, start creating Blender stuff
+22:33:32 | INFO: Blender create Mesh node Body
+22:33:32 | INFO: Blender create Mesh node DorsalRidge
+22:33:32 | INFO: Blender create Mesh node EyeL
+22:33:32 | INFO: Blender create Mesh node EyeR
+22:33:32 | INFO: Blender create Mesh node PecL
+22:33:32 | INFO: Blender create Mesh node PecR
+22:33:32 | INFO: Blender create Mesh node TailDown
+22:33:32 | INFO: Blender create Mesh node TailUp
+22:33:32 | INFO: glTF import finished in 0.02s
+PROBE parts=8 bbox=(0.256,0.250,0.762)
+PROBE pair Body|DorsalRidge overlap=(0.061,0.048,0.253)
+PROBE pair Body|EyeL overlap=(0.024,0.024,0.024)
+PROBE pair Body|EyeR overlap=(0.024,0.024,0.024)
+PROBE pair Body|PecL overlap=(0.047,0.073,0.131)
+PROBE pair Body|PecR overlap=(0.047,0.073,0.131)
+PROBE pair Body|TailDown overlap=(0.038,0.103,0.105)
+PROBE pair Body|TailUp overlap=(0.038,0.103,0.105)
+PROBE pair DorsalRidge|EyeL overlap=(0.007,0.024,0.008)
+PROBE pair DorsalRidge|EyeR overlap=(0.007,0.024,0.008)
+PROBE pair TailDown|TailUp overlap=(0.038,0.023,0.267)
+PROBE inside DorsalRidge in Body pct=21 -> ROOTED_VISIBLE (mean root depth 0.018m)
+PROBE inside EyeL in Body pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+PROBE inside EyeR in Body pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+PROBE inside PecL in Body pct=23 -> ROOTED_VISIBLE (mean root depth 0.014m)
+PROBE inside PecR in Body pct=23 -> ROOTED_VISIBLE (mean root depth 0.014m)
+PROBE inside TailDown in Body pct=20 -> ROOTED_VISIBLE (mean root depth 0.016m)
+PROBE inside TailUp in Body pct=20 -> ROOTED_VISIBLE (mean root depth 0.016m)
+PROBE enclosed EyeL by Body -> check inside% above
+PROBE enclosed EyeR by Body -> check inside% above
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

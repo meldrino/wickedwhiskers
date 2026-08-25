@@ -1,0 +1,10 @@
+15:20:16 | INFO: Data are loaded, start creating Blender stuff
+15:20:16 | INFO: Blender create Mesh node stone_main
+15:20:16 | INFO: glTF import finished in 0.00s
+OBJ stone_main polys 80 smooth 4
+BUCKETS >90:0 45-90:0 25-45:0 15-25:0 4-15:0
+CREASES_OVER_4DEG 0
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

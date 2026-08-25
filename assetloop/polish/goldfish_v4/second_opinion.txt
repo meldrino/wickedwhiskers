@@ -1,0 +1,23 @@
+10:36:31 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+This asset is nowhere near production-ready. It looks like an unfinished beginner blockout rather than an intentional stylized low-poly model.
+
+Here are the critical issues:
+
+* **Main Body (Topology & Shading):** 
+  * Inconsistent normal smoothing across an extremely low-density mesh creates ugly, muddy lighting bands across the midsection.
+  * The silhouette is lumpy and segmented like a deformed cylinder.
+  * The posterior end narrows into an awkward, conical point before abruptly meeting the tail fin.
+* **Head & Eyes:** 
+  * The eyes are just two high-poly black spheres haphazardly intersecting the mesh with no sockets, eyelids, or stylistic integration.
+  * The snout lacks any character, mouth definition, or stylized anatomical features.
+* **Dorsal Fin:** 
+  * Poly-density clash: The curved dorsal fin has a much denser vertex distribution than the chunky, faceted body it intersects.
+  * It is simply clipped into the body with zero transition or modeling at the base.
+* **Pectoral Fins:** 
+  * Paper-thin, sharp wedges angled awkwardly out of the bottom sides without proper root geometry.
+* **Caudal Fin (Tail):** 
+  * The geometry is faceted and unevenly extruded, completely clashing with the smooth curve of the dorsal fin.
+  * The connection point to the body is jarring and lacks natural flow.
+
+VERDICT: FAIL
+

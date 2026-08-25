@@ -1,0 +1,60 @@
+22:20:46 POLISH START goldfish_v3 spec=C:\crypto\wicked whiskers\assetloop\builders\goldfish_v3.json briefLen=315 maxRounds=8
+22:20:50 GEOMETRY WARNINGS: PROBE inside TailDown in Body pct=7 -> BARELY_ROOTED (warn) | PROBE inside TailUp in Body pct=6 -> BARELY_ROOTED (warn)
+22:20:50 round 1 built OK dims=(0.256, 0.25, 0.762)
+22:21:05 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:21:26 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:21:55 round 1: verdict=FAIL most_wrong='Total lack of mesh integration (visible primitive intersections).'
+22:21:55 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:22:05 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:22:32 geometry probe clean (8 lines)
+22:22:32 round 1: patch accepted, dims=(0.256, 0.25, 0.762)
+22:22:43 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:22:59 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:23:30 round 2: verdict=FAIL most_wrong='Complete lack of organic form/blending (primitive-heavy silhouette).'
+22:23:30 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:23:40 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:24:07 geometry probe clean (8 lines)
+22:24:07 round 2: patch accepted, dims=(0.256, 0.25, 0.762)
+22:24:17 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:24:34 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:25:03 round 3: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:25:03 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:25:13 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:25:41 geometry probe clean (8 lines)
+22:25:41 round 3: patch accepted, dims=(0.256, 0.25, 0.762)
+22:25:51 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:26:09 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:26:38 round 4: verdict=FAIL most_wrong='Complete lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:26:38 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:26:48 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:27:15 GEOMETRY WARNINGS: PROBE inside EyeL in Body pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside EyeR in Body pct=1 -> BARELY_ROOTED (warn)
+22:27:15 round 4: patch accepted, dims=(0.256, 0.25, 0.762)
+22:27:25 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:27:42 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:28:11 round 5: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:28:12 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:28:22 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:28:49 geometry probe clean (8 lines)
+22:28:49 round 5: patch accepted, dims=(0.256, 0.25, 0.762)
+22:28:59 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:29:16 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:29:45 round 6: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:29:45 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:29:55 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:30:22 geometry probe clean (8 lines)
+22:30:22 round 6: patch accepted, dims=(0.256, 0.25, 0.762)
+22:30:33 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:30:49 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:31:21 round 7: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:31:21 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:31:31 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:31:58 geometry probe clean (8 lines)
+22:31:58 round 7: patch accepted, dims=(0.256, 0.25, 0.762)
+22:32:08 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:32:25 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:32:54 round 8: verdict=FAIL most_wrong='Total lack of organic blending; the model remains a collection of disjointed, un-integrated primitives.'
+22:32:54 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+22:33:05 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+22:33:32 GEOMETRY WARNINGS: PROBE inside EyeL in Body pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside EyeR in Body pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+22:33:32 round 8: patch accepted, dims=(0.256, 0.25, 0.762)
+22:33:32 ROUND CAP reached without approval - staging last views for human review

@@ -83,6 +83,11 @@ static func generate_colors(heights: PackedFloat32Array, cfg: TerrainConfig) -> 
 			for lake in cfg.lakes:
 				var ld: float = Vector2(x, z).distance_to(lake.center)
 				c = c.lerp(cfg.water_edge_color, 1.0 - smoothstep(0.0, lake.radius * 0.45, ld))
+				# Shore tint by HEIGHT, not just distance: every vertex at/below
+				# the waterline (plus a 0.3 m bank) gets water_edge_color so the
+				# bed seen through the translucent water never reads as grass.
+				var wl: float = height_at(heights, cfg, lake.center.x, lake.center.y) + lake.depth - 1.4 * TerrainConfig.CAT
+				c = c.lerp(cfg.water_edge_color, 1.0 - smoothstep(wl - 0.05, wl + 0.3, h))
 			colors[idx] = c
 	return colors
 

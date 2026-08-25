@@ -1,0 +1,8 @@
+1. 0 (This is a perfect, featureless egg/potato. Zero natural variation or lumpy silhouette.)
+2. 0 (It is floating/hovering above the ground plane; there is no contact shadow or flattened base.)
+3. 0 (The silhouette is heavily faceted/low-poly. It looks like a primitive mesh straight out of a viewport, not a smooth-shaded game asset.)
+4. 1 (The color is a neutral grey, which is acceptable, but the lack of texture or material variation makes it look like a placeholder.)
+5. 1 (The scale is fine, but it’s irrelevant when the geometry is this poor.)
+
+MOST_WRONG: The mesh is a low-poly primitive with no smoothing applied and no flattened base, resulting in a floating, faceted egg.
+VERDICT: FAIL

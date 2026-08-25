@@ -1,0 +1,13 @@
+C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_1.py:28: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+Traceback (most recent call last):
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_1.py", line 216, in <module>
+    wheel_FL = create_wheel("Wheel_FL", (-hub_x_front, R_front, z_front), R_front, W_front, R_front * 0.55)
+  File "C:\crypto\wicked whiskers\assetloop\runs\20260821_004250\tractor_1.py", line 173, in create_wheel
+    for f in res_tyre['faces']:
+             ~~~~~~~~^^^^^^^^^
+KeyError: 'faces'
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

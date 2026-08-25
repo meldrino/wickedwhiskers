@@ -1,0 +1,14 @@
+This asset is a failure. It looks like a generic wooden dowel or a toy baton, not a natural stick. You ignored almost every instruction in the brief regarding shape and character.
+
+**Discrepancies:**
+
+1. **Perfectly Straight Shaft:** The brief explicitly demanded 4-5 segments to create a "gentle bend." The model is a single, perfectly straight, uniform cylinder. It looks manufactured, not natural.
+2. **Missing Forked End:** The brief required a forked mini-branch at one end. The model just ends in a smooth, rounded cap.
+3. **Missing Bark Ridges:** The brief required 2-3 thin boxes to act as bark ridges. The surface is entirely smooth, lacking any visual interest or "chunky" detail.
+4. **Incorrect Frayed Tip:** The brief asked for a frayed/broken tip (tiny cone). The model has a rounded, bulbous end that looks like a bead or a toy part, not a broken piece of wood.
+5. **Lack of Silhouette Variation:** The silhouette is identical from all four angles. A stick should have character and asymmetry; this model is mathematically symmetrical and boring.
+6. **Proportions:** The side branch is a perfect, uniform cylinder. It lacks the "stubby" organic feel requested and looks like it was glued on as an afterthought.
+
+MOST_WRONG: The shaft is a single straight cylinder instead of the required multi-segment bent structure, which completely ruins the organic silhouette requested for the asset.
+
+VERDICT: FAIL

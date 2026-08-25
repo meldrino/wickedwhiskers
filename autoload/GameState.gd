@@ -5,14 +5,19 @@ const DAY_SECONDS := 7200.0
 
 const TRAP_STRING_COST := 1
 const TRAP_STICK_COST := 2
+const TRAP_STONE_COST := 2
 const LADDER_STRING_COST := 1
 const LADDER_STICK_COST := 2
+const ROD_STRING_COST := 1
+const ROD_STICK_COST := 1
 
 const TRADE_GOLD := 10
 const TOWN_GOLD_TARGET := 30
 
 var string_count := 0
 var stick_count := 0
+var stone_count := 0
+var has_fishing_rod := false
 var food_count := 0
 var gold := 0
 var lives := MAX_LIVES
@@ -35,6 +40,7 @@ var spawn_near_shed := false
 var quest := "meet"
 var first_dawn := false
 var chase_active := false
+var cinematic_active := false
 
 var day_index := 1
 var day_time := 0.0
@@ -52,6 +58,12 @@ func _ready() -> void:
 func new_game() -> void:
 	string_count = 0
 	stick_count = 0
+	# TEMP TEST KIT (Andy, 2026-08-24): boot with rod materials so the
+	# fishing cutaway can be tested without gathering. Revert to 0/0.
+	string_count = 1
+	stick_count = 1
+	stone_count = 0
+	has_fishing_rod = false
 	food_count = 0
 	gold = 0
 	lives = MAX_LIVES
@@ -69,6 +81,7 @@ func new_game() -> void:
 	quest = "meet"
 	first_dawn = false
 	chase_active = false
+	cinematic_active = false
 	day_index = 1
 	day_time = 0.0
 	is_day = false
@@ -93,12 +106,16 @@ func add_sticks(n: int) -> void:
 	stick_count += n
 
 
+func add_stones(n: int) -> void:
+	stone_count += n
+
+
 func add_food(n: int) -> void:
 	food_count += n
 
 
 func can_afford_trap() -> bool:
-	return string_count >= TRAP_STRING_COST and stick_count >= TRAP_STICK_COST
+	return string_count >= TRAP_STRING_COST and stick_count >= TRAP_STICK_COST and stone_count >= TRAP_STONE_COST
 
 
 func can_afford_ladder() -> bool:
@@ -108,11 +125,22 @@ func can_afford_ladder() -> bool:
 func spend_trap() -> void:
 	string_count -= TRAP_STRING_COST
 	stick_count -= TRAP_STICK_COST
+	stone_count -= TRAP_STONE_COST
 
 
 func spend_ladder() -> void:
 	string_count -= LADDER_STRING_COST
 	stick_count -= LADDER_STICK_COST
+
+
+func can_afford_rod() -> bool:
+	return string_count >= ROD_STRING_COST and stick_count >= ROD_STICK_COST
+
+
+func spend_rod() -> void:
+	string_count -= ROD_STRING_COST
+	stick_count -= ROD_STICK_COST
+	has_fishing_rod = true
 
 
 func materials_status() -> String:
@@ -121,6 +149,17 @@ func materials_status() -> String:
 	if not has_string and not has_sticks:
 		return "none"
 	if has_string and has_sticks:
+		return "full"
+	return "half"
+
+
+func trap_materials_status() -> String:
+	var has_string := string_count >= TRAP_STRING_COST
+	var has_sticks := stick_count >= TRAP_STICK_COST
+	var has_stones := stone_count >= TRAP_STONE_COST
+	if not has_string and not has_sticks and not has_stones:
+		return "none"
+	if has_string and has_sticks and has_stones:
 		return "full"
 	return "half"
 

@@ -1,0 +1,48 @@
+ASSET BRIEF: CARTOON FARM TRACTOR for Wicked Whiskers (follows the shared style sheet above).
+
+The previous version was rejected by the game's owner for being "about 8 blocks" - a boring cluster of boxes. The minimum to look right is ~25 separate parts. Build AT LEAST these:
+
+BODY/ENGINE (front faces +Z):
+- Bonnet/hood: rounded chunky box over the engine, red
+- Grille at the very front: dark grey box with 2-3 thin horizontal slats
+- Headlights: two small spheres/cylinders flanking the grille, warm light colour
+- Front axle: dark grey cylinder across the X axis connecting the front wheels
+- Engine block hint visible under/beside the bonnet: darker red or dark grey box
+
+CABIN:
+- Cabin body: red box set toward the rear
+- Windows: sky-blue panels on the front and sides, slightly inset into the cabin
+- Roof: red flat box on top, slightly wider than the cabin
+- Roof support posts: 4 thin dark-grey cylinders/boxes
+- Seat inside: dark grey box with a backrest
+- Steering wheel: torus (primitive_torus_add) tilted toward the seat on a short column, dark grey
+
+REAR:
+- Big rear wheels with mudguards/fenders: arches over them (torus halves or short curved segments)
+- Exhaust pipe: vertical near-black cylinder beside the cabin, slight forward tilt, small rain-cap disc on top
+- Tow hitch at the very back: small dark frame/plate
+
+WHEELS (critical - read carefully):
+- 2 small FRONT wheels + 2 large REAR wheels
+- Each wheel = near-black tyre (cylinder, 24+ segments) + light-grey hub cap (shorter cylinder of larger radius than the tyre centre, so hubs read clearly)
+- Tread hint: one slightly-larger very-short near-black ring around each tyre middle
+- EACH of the four wheels must be its OWN mesh object named EXACTLY: "Wheel_FL", "Wheel_FR", "Wheel_RL", "Wheel_RR" (FL=front left etc.)
+- Build each wheel directly along the X axis (axle direction): create the bmesh cylinder then rotate the MESH DATA (me.transform) so the OBJECT transform stays identity and local X is the axle. The game spins each wheel around its LOCAL X axis.
+- Wheel object origins sit at the hub centre.
+
+NUMBER PLATE (gameplay object):
+- Cream rectangular plate (0.5 x 0.22 x 0.05) mounted on the REAR (-Z side), about 1.1 m up, named EXACTLY "Plate"
+
+SIZE (must fit the game's existing collider):
+- Width (X) ~2.2 m to the outer wheel edges; length (Z) ~2.6 m; height (Y) ~1.9 m including roof and exhaust
+- Rear wheel radius ~0.55 m; front wheel radius ~0.32 m; tyres touch the ground at y=0
+
+========== JUDGE CHECKLIST ==========
+1. Reads unmistakably as a chunky cartoon FARM TRACTOR (not a truck, not a pile of boxes)?
+2. Four wheels visible: two small front + two large rear, all touching the ground, tyres near-black with lighter hubs?
+3. Red body with a distinct bonnet at the front (+Z) and a cabin with sky-blue windows and a roof toward the rear?
+4. Mudguards/fenders arch over the rear wheels?
+5. Exhaust pipe visible beside the cabin with a cap on top?
+6. Cream number plate mounted on the REAR (-Z) face?
+7. Proportions sane for the size contract (~2.2 wide, ~2.6 long, ~1.9 tall) - nothing absurdly huge or tiny?
+8. Single coherent model - no parts floating disconnected in mid-air?

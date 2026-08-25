@@ -16,12 +16,55 @@ project:
     Pipe output to a log file first (piping live to Select-String made Godot error). Do NOT pass
     args through Play Wicked Whiskers.bat. Windowed (NOT --headless) when screenshots are wanted.
   vision_tooling: Qwen Vision WORKS for reviewing screenshots (qwen2.5vl:7b in Ollama, needs
-    ~11.8 GiB!). Helper: C:\Users\Andy\AppData\Local\Temp\opencode\vision_expert.ps1
-    -ImagePath <png/jpg> -Prompt "...". REQUIRES free RAM (~12 GiB: killed Chrome/Brave/
+    ~11.8 GiB!). Helper: C:\crypto\bigpickle\vision_expert.ps1
+    -Prompt "<text>" -Image <png>[,<png>...] (invoke with & not pwsh -File - array params don't
+    bind under -File; keep to 1-2 downscaled 640x360 images per call - full-res times out at
+    the script's 300s HTTP cap). REQUIRES free RAM (~12 GiB: killed Chrome/Brave/
     Omen/GooglePlayGamesServices/MuseHub/AvastUI/NVIDIA overlay), num_ctx=1024, and a shell
     timeout >= 5-6 min (the call can exceed 240 s even after returning its answer).
     NEVER kill opencode, pwsh (PowerShell 7), or Windows' "Secure System" process.
     STOP the model after use: ollama stop qwen2.5vl:7b (it nearly crashed the machine once).
+    TRUSTED VISION REVIEWER (2026-08-13): gemini-flash via C:\crypto\bigpickle\gemini-vision.ps1
+    (-Prompt "..." -Image @('a.png',...); GEMINI_API_KEY set; 180s HTTP cap; auto-appends to
+    inbox). Use gemini for verdicts; quenn only if gemini unavailable (it is too lenient on
+    procedural paws).
+    ASSET LOOP PROTOCOL (2026-08-21, HARD RULE after days of quenn-guided drift):
+    1. build/modify asset in Blender bpy -> export GLB
+    2. render in Godot isolated studio scene -> screenshot
+    3. EVERY iteration judged by gemini-vision.ps1 with a STRUCTURED prompt (numbered checks:
+       anatomy counts, orientation vs spec, proportions, artifacts; verdict PASS/FAIL + the
+       single most-wrong thing). NEVER quenn. No exceptions while gemini API is up.
+    4. fix from gemini's specifics -> re-render -> re-judge
+    5. only a gemini PASS goes to the user; ANDY is the FINAL judge (gemini =
+       iteration-only helper while he is away - Andy, 2026-08-24).
+    ENFORCEMENT (2026-08-22, after an overnight batch shipped 6 UNJUDGED assets in
+    violation of this exact rule): assetloop\polish_asset.ps1 IS steps 2-4 mechanised -
+    `pwsh -File assetloop\polish_asset.ps1 -Name <n> -SpecPath <builders\x.json>
+    -Brief "<what it must be>"`: build -> 4-view render -> gemini-vision judge -> on FAIL
+    gemini rewrites the builder JSON -> rebuild -> re-judge, max 4 rounds. Verdict tiers
+    PASS / PASS-WITH-NOTES / FAIL. Flip-flop guard auto-approves if the judge re-raises
+    an issue it retired >=2 rounds ago; round cap exits 2 and stages renders under
+    assetloop\polish\<n>\needs_human for Andy. EVERY asset (hand-spec OR gemini-script)
+    runs through it BEFORE being shown to Andy. Exit 0 = show approved\ renders.
+    Re-verified post-reboot 2026-08-20: GEMINI_API_KEY intact, smoke test PASS (see worklog).
+    GOLDFISH STATUS (2026-08-23 morning, nightshift recovery): goldfish_v4 built on an
+    UPGRADED builder - cross_section [n,b] keys make organic elliptical fin sweeps,
+    cap_style:"round" replaces flat end-caps with rounded poles, optional top-level fuse
+    does join+exact-boolean-union+subsurf (fuse now OFF for the fish: union sliced
+    two-tone material boundaries into jagged seams). polish_asset.ps1 reviser fallback
+    model is now a param (-FallbackModel): NEVER let long-JSON generation fall to
+    gemini-3.1-flash-lite (degenerate 300-char skeletons -> exit 4).
+    Run history today: calibrated judge PASS-WITH-NOTES once, but the MANDATORY
+    independent second-opinion gate FAILed it (flat nose/peduncle caps - since fixed at
+    builder level via cap_style; saw-tooth material boundaries - fixed by disabling fuse;
+    fat wedge pectorals - slimmed + deep-rooted). Then quota wall: 3.6-flash daily and
+    3.7-flash buckets both exhausted ~08:30, loop degraded to lite judging AND lite
+    revising -> coarse patches ballooned the body. STOPPED CLEANLY at ~8 judged rounds
+    of Andy's max-10. Latest views staged: assetloop\polish\goldfish_v4\needs_human\.
+    NEXT SESSION (quota resets midnight PT / ~09:00 local next day): re-run loop with
+    -JudgeModel gemini-3.6-flash -FallbackModel gemini-flash-latest, same enriched brief
+    (it carries the art-director KNOWN DEFECTS list); then the second-opinion gate must
+    PASS before showing Andy.
   project_dir: "C:\\crypto\\wicked whiskers"
   docs_site: https://meldrino.com/forai/ww.html
   design_doc: "C:\\crypto\\wicked whiskers.docx"
@@ -74,7 +117,10 @@ design_rules:
   catching_birds: perch on a tree. Catch = ladder (crafted) lean + climb, OR drive the tractor
     into the tree to knock the bird out.
   catching_fish: pond + one fish. Catch = rod ONLY (crafted from string + sticks). Paw attempt
-    always fails ("that's oFISHial" toast).
+    always fails ("that's oFISHial" toast). Clicking the fish walks WW to a bank spot OUTSIDE
+    the ShoreWall ring (r+0.55) and plays the real-world fishing cutaway (scripts/cutaway_fish.gd,
+    commit e20b3f1): side-on profile camera, rod lashed to Hand.R bone, cast/line/ripples, goldfish
+    bezier leap into his arms; +1 food + dialogue on finish.
   materials:
     string: found in the shed (padlocked)
     sticks: found on the ground (7 pickups)
@@ -125,20 +171,30 @@ build_status:
   scene1_layout:
     player start: (0,0,12), yaw 0.6, ground 60x60 + WorldBoundaryShape collision
     farmhouse: (0,0,-24), box build, gable roof, porch, door/windows on +Z, night-locked
-    shed: (16,0,-10), EXTERIOR ONLY (solid box + overhang roof, door frame, dark door that
-      swings open on unlock, padlock). Entry portal (ShedPortal, area in the doorway) switches
-      to the shed's own scene (S1.5) once unlocked, with a 0.7s beat so the door swing reads.
-      Return spawns the player near the shed door at (16,0,-7.2).
+    shed: (16,0,-10), EXTERIOR ONLY, PERSON-SCALE (2026-08-13: walls 2.5m, 0.9x2.0m door,
+      3.0x2.4m footprint, ridge 3.2m; measured AABB 3.76x3.2x3.21m incl roof). Box build +
+      overhang roof derived from box, door frame + 0.8m plank door, alpha-blend glass windows,
+      dark door that swings open on unlock, padlock. Entry portal (ShedPortal, area in the
+      doorway) switches to the shed's own scene (S1.5) once unlocked, with a 0.7s beat so the
+      door swing reads. Return spawns the player near the shed door at (16,0,-7.8).
     shed_interior: scenes/shed.tscn = own scene (S1.5). Interior walls (doorway gap on +Z),
       floor, overhang roof, warm OmniLight, props: loot crates, boot-with-sprout, hay pile,
-      sprung mousetrap, glowing lantern, rake, rope coil. Player spawns inside at (0,0,0.6)
-      facing the door. Loot = string + spare tractor keys on the crates (one-time, tracked via
+      sprung mousetrap, glowing lantern, rake, rope coil. Player spawns inside at (0,0,0.2)
+      facing the door (was 0.6; moved back so the exit portal at z 1.1 doesn't overlap his
+      collision body at spawn - the old portal at z 1.55 cleared it). Loot = string + spare
+      tractor keys on the crates (one-time, tracked via
       shed_string_taken/shed_key_taken so re-entering can't farm them). Exit portal
       (ShedExitPortal) returns to the farm. DayNight runs here too so hunger/tiredness continue.
     tractor: (10,0,-20), red box build + 4 wheels + number plate
-    pond: (-11,0,-16), sunken lake (S1 garden): deep dark bed + muddy shallows shelf for
-      depth, metallic water with animated noise-normal ripples + sky reflections, torus bank
-      ring half-buried, reeds + grass shoreline, orbiting glint + expanding ripple rings,
+    pond: (-11,0,-16), sunken lake (S1 garden): heightfield-carved bowl (TerrainGenerator
+      smoothstep carve, flat pad radius 10 under the bowl so the waterline is an exact
+      circle r~4.49m at wl=-0.7; grid 721 = 0.167m cells since commit e8a2ea1 - Andy
+      APPROVED the shoreline 2026-08-24 "good enough"; NO bank lip mesh: a TorusMesh mud
+      ring was tried and rejected by Andy same day), deep dark bed + muddy shallows shelf
+      for depth, metallic water (128-seg rim) with animated noise-normal ripples + sky
+      reflections, reeds + grass shoreline, orbiting glint + expanding ripple rings
+      (per-ring containment cap keeps them inside the disc; rings=48 flattened y*0.22;
+      double-offset bug fixed 2026-08-24: ripples are LOCAL to Lake node now),
       one swimming fish under the surface; --pond screenshot camera
     bird tree: (20,0,-4), perched bird
     dumbleclaw: (4,0,-14), wizard cat (barrel body, robe, beard, glasses, pointy hat)
@@ -163,6 +219,73 @@ build_status:
     door.gd: shed combo-prompt unlock (tween door swing, padlock vanishes; loot now lives in
       the shed scene) / farmhouse night-locked then once-day catfood + scene-2 tease; box
       interaction volume
+    cutaway.gd (2026-08-18, RP5 = SUBVIEWPORT APPROACH, v7): in-game cinematic padlock unlock
+      played by door.gd._on_combo. SubViewport with own_world_3d=true renders an isolated
+      3D scene (padlock + paw + camera + environment) displayed via CanvasLayer (layer 100)
+      + TextureRect fullscreen. Zero game-world bleed. Scene building copied from
+      cutaway_anim.gd (the approved standalone renderer). Dynamic digits: player's actual
+      entered digits revealed progressively as paw slides across 3 dials.
+      Timeline: 4s animation. Hold "000" 0.5s, paw enters bottom 1s, dial 1 at 1.5s,
+      dial 2 at 2.3s, dial 3 at 3.1s, hold to 4.5s, then shackle pop (correct) or toast
+      (wrong). Smooth-step easing. Audio: click1.wav per dial, click2.wav for shackle pop.
+      Paw config (RP3 locked): rot_x=5, rot_y=180, scale=0.35, anchor=[0.0,0.3525,-0.03],
+      hand_bend=-15, fur=#f9ad59 roughness=0.5. Camera: overhead (0.05,0,0.55), look_at
+      (0,0.02,0.08), fov=38. Environment: shed wall brown bg Color(0.47,0.31,0.18).
+      Player state saved/restored: yaw, pitch, camera_holder rotation, cat_facing, mesh_rot_y.
+      shed_unlocked set in _finish_unlock (NOT _on_combo) to prevent shed portal activating
+      during cutaway. free() used instead of queue_free() for immediate SubViewport teardown.
+      Status: FUNCTIONAL in-game. Known issue: SubViewport+own_world_3d causes persistent VRAM
+      pressure (grass LOD downgrades). Attempted v8 direct-tree revert (hiding game nodes,
+      removing game WorldEnvironments) — worked technically but reverted by user (visual quality
+      rejected, not the approach's fault). See forai/ww.html for full architecture record.
+      Branch: cutaway-finger-anatomy. HEAD: bf1dde3 (revert to RP5).
+    pawtest HARNESS (scripts/main.gd --pawtest, 2026-08-13, NEW PLAN): after WW.glb dump showed
+      the real cat has Paw_L/Paw_R MESHES (4,906 tris) but NO front-paw finger/toe bones (NOT
+      prehensile), plan re-thought per gemini consult: use the REAL paw mesh + SWAT motion
+      (cats rake/bat dials down, cannot pinch), POV insert-shot, arm cropped at frame edge
+      ("Muppet rule"). --pawtest instances WW.glb, shows ONLY Paw_L (arm hidden - it read as a
+      blocking cylinder), hand placed on a dial, close camera, params from
+      screenshots/pawtest_params.json (target_offset, model_rot_x/y_deg, hand_bend_deg,
+      model_scale, cam_offset, cam_fov, out).
+      STATUS: 9 pose-iterations PLATEAUED at 3-4/10 (gemini): the real paw mesh is a
+      FEATURELESS BLOB - pose/camera/scale tuning cannot add toe definition. Sequence frames
+      frame1..5 built (Muppet rule: arm end always cropped below frame via z-flip + vertical
+      path); user: "roughly right size/place but still a round blob". Procedural fingers (palm
+      + 4 fingers + claws, blob hidden) tried - USER: "it is just shit". CONCLUSION (02:25):
+      everything built blind reads as bad - STOP blind-procedural. DECISION NEEDED (user is
+      the aesthetic gatekeeper, fresh in the morning): (a) user hand-places/designs the paw,
+      (b) proper paw asset, (c) stylized silhouette, (d) wide swat shot where detail is moot.
+      Overnight driver C:\crypto\bigpickle\paw-iter.ps1 (render->gemini grade->correct; quenn
+      auto-fallback; plateau jitter; logs + all frames archived in screenshots/) ran 60 iters,
+      results committed at 4847d11.
+    paw_pipeline BROWSER-AI (2026-08-14, CURRENT): quenn + paw_gen.py procedural variants ALL
+      rejected ("never going to be usable"). WINNING PIPELINE: user prompts a browser AI
+      (ChatGPT first, Claude/Gemini/others to try - prompt file is model-agnostic) -> user
+      pastes the returned bpy script back -> AGENT RUNS IT VERBATIM headless in Blender 5.2
+      (nothing is altered: the standalone render loads the exact exported GLB) -> user judges
+      the shape. Scripts: blender/paw_ai_v1/v2/v3.py + chatgpt-paw-prompt.txt + render_glb.py.
+      v1 first-try PAW_BUILT (4 fingers+thumb - wrong, digits sat ON the hand). v2
+      3 fingers+chunky thumb+soft joints+pads = "closest yet". v3 thicker fingers/buried
+      knuckles/webbing/sharp claws - REJECTED. ChatGPT feedback to apply next: cartoon = 3
+      fingers + 1 thumb; digits attach INTO the hand (thumb had open spaces); knuckles too high
+      -> sink into hand + align; claws missing/not sharp; fingers have air gaps -> use more
+      polygons. COLOUR reads white/cream in renders (should be orange #f9ad59) - deferred.
+       quenn vision (Ollama /v1/chat/completions, image_url data URI) works for describing
+       renders but is TOO LENIENT a judge - user eyes are the gate. Scripts + prompt + renderer
+       hosted at meldrino.com/forai/ww-paw/ (links from ww.html). RUN DIRECTLY:
+       "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python paw.py.
+       Godot: after re-exporting the GLB, run --import so .import cache refreshes.
+       Audio: assets/sounds/click1.wav + click2.wav (CC0 qubodup, OpenGameArt).
+    paw_v4 PARAMETRIC (2026-08-16, CURRENT): blender/paw_ai_v4.py -> assets/paw_ai_v4.glb.
+       TRELLIS lump root-caused via experts (gemini + copilot): single-image generators collapse
+       thin features into blobs; retry needs an EXAGGERATED 3D RENDER reference. v4 = v3 anatomy
+       scaled x2.6, chunky arm+wrist+elbow, back-protruding knuckle row, body voxel-remeshed
+       (claws re-added after), rotated to paw_hv convention (back=+Y, arm=-Z, fingers=+Z) so the
+       known-good studio pose works. VERIFIED (analyze_silhouette_v4.py): back digit row = 4 peaks
+       (thumb + 3 fingers), range 0.085 vs TRELLIS 0.016. quenn: "clearly a cat paw, 4 digits,
+       knuckles protruding". Renders: paw_v4_back/top.png, paw_compare.png (vs TRELLIS).
+       trellis_retry/ = regeneration kit (reference.png = v4 back render + prompt.txt) for if the
+       user rejects v4. USER EYES ARE THE GATE - judge paw_v4_back.png + paw_compare.png.
     shed.gd: Scene 1.5 root - builds the shed interior (floor/walls/roof/light/props),
       spawns one-time loot (string + keys on the crates), ShedExitPortal back to the farm,
       plus a --smoketest check (loot counts + portal present)
@@ -175,6 +298,12 @@ build_status:
       center bed + lighter muddy shallows shelf (no see-through edges); torus bank ring;
       reeds + grass tufts shoreline; orbiting glint + expanding/fading ripple rings.
       Rod crafted from the choice panel; catch adds food + advances quest
+      ORIENTATION FACT (2026-08-24, measured via GLB vertex-slab probe): goldfish_v3.glb
+      natively faces -Z (thin tall slab = fan tail at +Z, chunky head at -Z); child
+      rotation_degrees.y MUST be 180 so the nose rides rig +Z - swim/jump math aims rig
+      +Z along velocity (yaw atan2(heading.x,z), pitch -atan2(vy,h)), so any other child
+      yaw reads as broadside/sideways leaps. Ballistic jumps (ee3cc48): momentum along
+      swim heading, gravity arc, nose pitches with vy. taunt() = _start_jump().
     mouse.gd: wander/flee + chase comedy (never catches), choice Chase/trap/leave, trap
       places trap scene + lures mouse to it (to_trap state), trap catch adds food; box volume
     bird.gd: perched bird, choices Climb(fails)/ladder/craft tractor(drive)/leave
@@ -244,33 +373,6 @@ build_status:
 # GRASS RENDERING - OPTION B REBUILD: FULL-GEOMETRY <=2CM LAWN (2026-08-11)
 # =============================================================================
 grass_rendering:
-  current_state_2026_08_12:  # NIGHT SHIFT - SUPERSEDES the 08-11-afternoon block below
-    chunks: ALL 5x5 AGAIN (user decision: "put all the chunks back to 5x5"). _chunk_key() always
-      emits "cx,cz,1"; MACRO_SIZE deleted. Tiers stay distance-based: 0 adaptive <=18m, 1 grid
-      @0.2 <=40m, 2 grid @0.32 >40m (TUFT_SPACING_FAR 0.32 + STREAM_RADIUS 70 kept).
-      Perf note: 5x5 far chunks = ~4x more far draw calls vs 10x10 macro (fpsbench re-check pending).
-    disappearing_on_turn: user saw grass vanish when WW turns. Root cause hypothesis = _rebuild()
-      sets _mm.visible=false until the MultiMesh array is fully placed (BUILD_PER_FRAME 6000);
-      fast turns sweep the Mouse point -> wave of invisible-while-building spawns + tier-flip
-      rebuilds. Fix candidates: keep visible during rebuild / raise budget / drop mouse-keyed streaming.
-    status: NOT yet re-verified after revert (smoke + screenshots pending this shift).
-  current_state_2026_08_11_afternoon:  # SUPERSEDED by current_state_2026_08_12
-    look: far field now renders the SAME full-geometry tufts as near (impostor/small-tufts
-      approach is DEAD). Dark far band gone; grass reads as grass to the horizon.
-    stream: STREAM_RADIUS 70 (terrain caps at +-60 so 70 == full coverage; 100 dropped the
-      grazing bench to 26.2 and was reverted). Near adaptive tier 4x density (8af0dde).
-    field: WORLD_SIZE 54 -> fence HALF-2 = 25 -> field exactly 50x50 = 10 whole 5m chunks.
-      Lake (-11,-16 r6.8) / tractor (10,-20) / bird tree (20,-4) all still inside the fence.
-    macro_far_chunks: beyond FAR_RADIUS 40m chunks are true 10x10m (MACRO_SIZE 2 = 4 cells in
-      ONE real chunk, key "x,z,size"), tufts at TUFT_SPACING_FAR 0.32 vs 0.2 near. Tiers:
-      0 adaptive <=18m, 1 grid @0.2 <=40m, 2 macro @0.32 >40m. Fewer draw calls + ~4x less far
-      fill. (User's "bigger chunks far away" idea - implemented + benchmarked.)
-    fpsbench: grazing view avg 41.1 / p95 55.0 / min 1.0 (first-frame build hitch), exit 0.
-      Effective flat vs the old reach-92 baseline 43.7 but WITH real far tufts.
-    GOTCHA: Godot user args need `--` : --path <proj> -- --fpsbench (without it the flag never
-      reaches the game and it idles forever - cost ~10 min diagnosing a false "hang").
-    next: USER EYES - does the 0.32m far meadow + 10m chunk seams read OK at the horizon?
-      Then optionally tune TUFT_SPACING_FAR / FAR_RADIUS.
   history:
     - 2026-08-08 in-game (pre-port, 026850c): VegetationGenerator + shaders/grass.gdshader
       + sward discs, ~335.4k tufts, full 120x120 -> 05_game_catclose.png USER-APPROVED.
@@ -285,15 +387,16 @@ grass_rendering:
     (cx/cz -12..11 = full +-60 m; env has NO fog so partial coverage would show the
     lighter bare terrain as the old "far lighter" ring). Each tuft = flat sward disc
     (UV.x=2 shader marker, radius 0.11, dark = base*0.6) + 10 outer + 5 inner ribbon
-    blades, placed on a jittered 0.198 m grid (676/chunk). Tier 0 = full tufts within
-    NEAR_RADIUS 10 m of camera/mouse; tier 1 = sward-disc-only beyond. ONE shared
-    shader/lighting -> no light split. cast_shadow off everywhere.
+      blades, placed on a jittered 0.198 m grid (676/chunk). Tier 0 = full tufts INSIDE
+      the 50x50 fenced area (FENCE_HALF 25), tier 1 = sward-disc-only outside, regardless
+      of distance. ONE shared
+      shader/lighting -> no light split. cast_shadow off everywhere.
     2CM CAP MATH: local blade tip = base_off 0.008 + max_h 0.008 = 0.016 m, x shader
     size_large 1.25 = 0.020 m EXACTLY; disc top 0.75 cm; instance scale pinned to 1.0.
   files:
     scripts/grass_system.gd: owns the ONE ShaderMaterial + prebuilt meshes; streams all
       terrain chunks (STREAM_RADIUS 92), spawns sorted by distance to camera + Mouse;
-      set_tier 0/1 by NEAR_RADIUS 10.
+      set_tier 0/1 by position inside/outside fence (FENCE_HALF 25).
     scripts/grass_chunk.gd: static build_full_mesh()/build_disc_mesh() (SurfaceTool tuft
       geometry, seed 4242); budgeted per-frame placement (BUILD_PER_FRAME 6000,
       _mm.visible=false until built); MultiMesh via set_instance_transform (the
@@ -340,16 +443,19 @@ grass_rendering:
       reads as grass blades. Height sweep: 6.4cm=carpet, 7.4cm=borderline, 8.4cm=PASS
       ("a dense green grassy field, blades visible, strands clearly discernible").
     kept_improvements: denser+wider+tapered blades, darker disc gradient (tips pop),
-      3-scale noise (6m patch + 1.4m + 0.3m mottle + per-pixel turf grain), NEAR_RADIUS 18.
+      3-scale noise (6m patch + 1.4m + 0.3m mottle + per-pixel turf grain), tiers keyed
+      to fence (tier 0 inside 50x50, tier 1 outside) not camera radius.
       fpsbench unchanged (151.9 avg full game at hscale=8) - blade height is free.
     shots: small grass/11_bare_field_h8.png, 12_bare_grazing_h8.png, 13_game_catclose_h8.png.
     open_decision: game cap <=2cm = the carpet read. Approved 05 look was 3.5-6.5cm.
       Options: relax cap to ~8cm (reads as grass, zero perf cost) OR keep 2cm + much denser
       geometry (expensive, far field still hard). USER MUST DECIDE.
-  next_when_resumed:  # live state = current_state_2026_08_12 (night shift)
-    1) Re-verify after the 5x5 chunk revert: headless --smoketest + --fpsbench + --noon screenshots.
-    2) Then tackle disappearing-on-turn (visible-during-rebuild / mouse-keyed streaming, see above).
-    3) USER EYES in-game for the far meadow + seams once back.
+  next_when_resumed:
+    1) USER EYES on small grass/11 + 12 + 13 and the height/cap decision.
+    2) On approval: commit + push (new shader, rewritten grass_system/grass_chunk,
+       --bare/--hscale rig, deleted impostor files, worklog, PROJECT_STATE).
+    3) Re-check --pond grass near the shore with the new system.
+    4) After each change re-capture --noon screenshots into `small grass\`.
 
 # =============================================================================
 # GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs
@@ -403,6 +509,34 @@ backup_2026_08_09:
     - Re-capture --noon screenshots into small grass\.
 
 # =============================================================================
+# BOOK PROJECT
+# =============================================================================
+book:
+  title: "Wicked Whiskers — The Book"
+  status: "3 chapters written, 12-chapter outline v3 complete (first draft)"
+  web_pages:
+    book: https://meldrino.com/ww-book.html  # chapters 1-3 live
+    plan: https://meldrino.com/bookideas.html  # full 12-chapter outline v3
+    game: https://meldrino.com/ww.html  # game page with "Read Book So Far" + "Book Plan" buttons
+  files:
+    chapter1: "Ch1 is on the book page (user-written, not in git as separate file)"
+    chapter2: "chapter2.md (user-written, deployed to book page)"
+    chapter3: "chapter3.md (MoE-iterated, deployed to book page)"
+    outline: "book_plot_outline.md (v3 — 12 chapters, backstory, clues, Muminpur lore)"
+    worklog: "worklog.md"
+  plot:
+    arc: "petty thief → criminal mastermind (never becomes good, gets good at being bad)"
+    macguffin: "Pied Piper's Pipe of Muminpur — attracts rats, in City Museum"
+    crew: [Scraps, Seagull, Margaret, Pigeon]
+    backstory: "WW was a pedigree cat (Muminpur Opaline) owned by a billionaire, escaped from private jet, got amnesia"
+    clues: 4  # newspaper, mansion, pedigree, microchip
+    ending: "heist + mansion revenge + WW2 rescue"
+    sequel_hook: "rumour of second Muminpur relic"
+    gearheads: "moved to Ideas/Back Pocket — rival cat crew, not in current story"
+  git: "chapter3.md + book_plot_outline.md committed. Web pages live on Pi only."
+  moe_iterations: 5  # on chapter 3
+
+# =============================================================================
 # TODO / NEXT STEPS
 # =============================================================================
 todo:
@@ -446,16 +580,22 @@ todo:
     far impostor, 05_game_catclose.png approved). See grass_rendering.
   - [NEXT -> ISLE OF WIGHT] Fix 06_game_pond.png: water missing from the --pond frame
     + near-pond grass too sparse. Goal = everything matches 05_game_catclose.png.
-  - [NIGHT SHIFT 2026-08-12 - user asleep, authorized autonomy] priority list:
-      1. grass chunks in lake (user-reported) - investigate why tufts appear in/on the water
-         despite GrassExclusion (h < water_level + lake radius + slope + RECTS checks)
-      2. Dumbleclaw's beard (currently 2 tiny box/cylinder placeholders - make it a proper
-         procedural wizard beard)
-      3. animations: walk is a procedural sine; idle is breathing/sway/tail. Try a nicer trot +
-         head-bob without breaking the approved look
-      4. placeholder beautification (trees/rocks/fence/padlock/tractor) as time allows
-      Rules: verify each change (smoke + --noon screenshots), commit+push each task, update this
-      YAML + worklog as I go.
+  - [DONE] Night-shift to-do list (08-13, see worklog): ground darkened + bright detail
+    texture wired (texture * vertex = 0.135,0.247,0.08); tree collision trunk-only
+    (TRUNK_COLLIDER_SIZE 0.5x1.8x0.5, scale-compensated); fence north edge rebuilt via
+    _build_gate_edge (gate at x=0, panels +-6.25..+-25) + gate latch/swing fixed; grass
+    culled to FENCE_HALF so all tier-1 discs are gone (outside = bare textured terrain);
+    sky = runtime cloud cover + improved stars + shooting stars. Smoke PASS, --noon
+    screenshots captured. Git tag save5. SEE WORKLOG for the north-corner fence overhang
+    (panels at +-25 stick ~3m past the east/west fence lines) - needs user eyes.
+  - [USER REVIEW] 08-13 screenshots: flyover/catclose/pond/ground/dumbleclaw (noon) +
+    base (night) - verify darker ground, cloud sky, fence enclosure, trunk-only collision.
+  - [NEXT] Fence corners: fence_corner.glb + fence_bend.glb exist and are unused - add
+    proper 90-degree corner pieces to close the fence enclosure (fixes the +-25 overhang).
+  - [NEXT] WW.glb is 37MB - gemini audit suspects embedded uncompressed textures or dense
+    keyframes; check in Blender (resize to 1024, prune keyframes) before shipping.
+  - [NEXT] Asset sweep per gemini audit: delete fence_planks/fence_simple/stump_square;
+    keep crops/sign/tree_oak_fall for future use.
 
 # =============================================================================
 # KNOWN ISSUES

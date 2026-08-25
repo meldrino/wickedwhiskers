@@ -1,0 +1,22 @@
+{
+  "asset": "stick_b_stout",
+  "auto_ground": true,
+  "surface_noise": { "frequency": 11, "amplitude": 0.0017, "seed": 33 },
+  "materials": {
+    "bark": { "color": [0.148, 0.068, 0.023], "roughness": 0.85 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "Shaft", "material": "bark",
+      "waypoints": [
+        [-0.26, 0.0, 0.031], [-0.17, 0.002, 0.023], [-0.08, 0.003, 0.014],
+        [0.01, 0.003, 0.009], [0.10, 0.002, 0.010], [0.18, 0.001, 0.016],
+        [0.26, 0.0, 0.024]
+      ],
+      "radii": [0.0190, 0.0166, 0.0144, 0.0128, 0.0114, 0.0105, 0.0099],
+      "sides": 24 },
+    { "type": "cylinder", "name": "ForkA", "material": "bark", "collar": 1.6,
+      "from": [-0.15, 0.0, 0.0205], "to": [-0.19, 0.04, 0.055], "radius": 0.0055 },
+    { "type": "cylinder", "name": "ForkB", "material": "bark", "collar": 1.6,
+      "from": [-0.13, 0.0, 0.019], "to": [-0.09, -0.045, 0.05], "radius": 0.005 }
+  ]
+}

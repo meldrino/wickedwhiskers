@@ -19,13 +19,17 @@ func _ready() -> void:
 
 func _build_tractor() -> void:
 	var red := StandardMaterial3D.new()
-	red.albedo_color = Color(0.78, 0.16, 0.12)
+	red.albedo_color = Color(0.82, 0.18, 0.13)
+	red.roughness = 0.45
 	var dark := StandardMaterial3D.new()
 	dark.albedo_color = Color(0.2, 0.2, 0.22)
+	dark.roughness = 0.5
 	var black := StandardMaterial3D.new()
 	black.albedo_color = Color(0.08, 0.08, 0.09)
+	black.roughness = 0.4
 	plate_mat = StandardMaterial3D.new()
 	plate_mat.albedo_color = Color(0.96, 0.95, 0.9)
+	plate_mat.roughness = 0.35
 
 	_mesh("box", Vector3(2.4, 0.55, 1.5), red, Vector3(0, 0.55, 0.2))
 	_mesh("box", Vector3(1.5, 0.85, 1.1), red, Vector3(0, 1.15, -0.35))
@@ -54,6 +58,7 @@ func _wheel(radius: float, width: float) -> MeshInstance3D:
 	cm.radial_segments = 16
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(0.12, 0.12, 0.14)
+	mat.roughness = 0.5
 	cm.material = mat
 	var mi := MeshInstance3D.new()
 	mi.mesh = cm

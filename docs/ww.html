@@ -32,16 +32,17 @@
 <div class="note"><strong>Source:</strong> converted from the design document <code>wicked whiskers.docx</code>. Includes the canonical additions: the wise old cat is <strong>Dumbleclaw</strong>, and all catching is craft-only (no manual catches).</div>
 
 <h2>Live Build Status (Aug 2026)</h2>
-<div class="note"><strong>Project:</strong> <code>C:\crypto\wicked whiskers</code> — Godot 4.7.1, GDScript, source on GitHub (meldrino/wickedwhiskers).</div>
+<div class="note"><strong>Project:</strong> <code>C:\crypto\wicked whiskers</code> — Godot 4.7.1, GDScript, source on GitHub (meldrino/wickedwhiskers). Branch: <code>cutaway-finger-anatomy</code>.</div>
 <ul>
-<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, random each game), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle.</li>
-<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys).</li>
+<li><strong>S1 farm garden</strong> — built. Padlocked shed (combo = last 3 digits of the tractor's number plate, randomised each game via <code>GameState.combo = randi_range(100, 999)</code>), pond, bird tree, Dumbleclaw, mouse, tractor, string + sticks, day/night cycle.</li>
+<li><strong>Padlock cutaway</strong> — FUNCTIONAL but visually rejected (RP5, SubViewport approach). Correct combo plays a 4-second cinematic: overhead shot of padlock on brown shed wall, paw enters from bottom, slides across 3 dials revealing the player's entered digits, shackle pops, padlock drops, door swings open. Wrong combo shows toast "The padlock stays shut." The paw is paw.glb (TRELLIS.2 asset, ~178K verts, orange #f9ad59). The user is not satisfied with the visual quality — this is the open problem. See "Cutaway paw — the saga" below.</li>
+<li><strong>S1.5 shed interior</strong> — built as its own scene; walk through the doorway portal, one-time loot (string + spare tractor keys). Shed is PERSON-SCALE (2026-08-13): 0.9x2.0 m door, 2.5 m walls, ~3.0x2.4 m footprint, ridge ~3.2 m. Door stays open on return (rotation.y = 2.4) if <code>GameState.shed_unlocked</code>.</li>
 <li><strong>S2 farmhouse</strong> — teased only (door locked at night, once-daily catfood at first light); interior not built yet.</li>
 <li><strong>S3 town</strong> — planned (Dick Whittington city, golden fish tease, 30-gold town gates).</li>
 <li><strong>All three catches are craft-only:</strong> convoluted mouse trap / ladder (bird) / fishing rod (fish). No manual catches.</li>
 <li><strong>Dumbleclaw</strong> — quest giver + trader (surplus food → gold), time-of-day aware hints.</li>
 <li><strong>Lake reworked:</strong> sunken pond with a raised bank, reeds + grass shoreline, dark deep bed, and animated rippling water with sky reflections.</li>
-<li><strong>Vegetation:</strong> ~300k real 3D grass tufts across the world, terrain-aware placement (never on water/buildings). A baked-texture "grass plane" experiment (one 1×1 texture on a deformable sheet) was <strong>rejected Aug 2026</strong> — blades rendered as flat blobs; the full 3D-tuft lawn is the working approach.</li>
+<li><strong>Vegetation (Aug 2026):</strong> calibrated 1/10-size grass system — chunked near/mid tiers (5 m chunks streamed around the cat; 1M blades/chunk detailed near + 250k/chunk simple mid, built multi-frame via <code>set_instance_transform</code>) plus a terrain-draped far impostor plane so the LOD seam is never visible. The old flat unlit tufts and the rejected baked-texture "grass plane" are both gone.</li>
 <li>Economy: day = 2 real hours, hunger + tiredness, 9 lives, catchables never respawn.</li>
 <li>Verified by headless smoke tests + screenshots (reviewed by an image-capable model).</li>
 </ul>
@@ -182,8 +183,262 @@
 <li>S1 + S1.5 playable: gather string/sticks, craft, catch mouse/bird/fish, Dumbleclaw quests + trading, day/night + food/tiredness, 9 lives, restart with a fresh combo.</li>
 <li>Control scheme reworked (Aug 2026): always-on mouse-look + WASD + click-to-walk/interact with proximity gating; camera follows behind the cat.</li>
 <li>Lake reworked (Aug 2026): sunken pond, bank + reeds, animated rippling water with sky reflections.</li>
-<li>Grass plane experiment rejected (Aug 2026): baked 1×1 texture sheet looked like blobs in-game; reverted to the ~300k 3D-tuft lawn. Revert path: <code>VegetationGenerator.regen()</code> → <code>_build_species(VEG_GRASS)</code>.</li>
-<li>Next: farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button.</li>
+<li>Grass plane experiment rejected (Aug 2026): baked 1×1 texture sheet looked like blobs in-game; the full 3D-tuft lawn is the working approach. Replaced Aug 2026 by the calibrated 1/10-size chunked grass system (near/mid tiers + far impostor) ported from the hexaquo tutorial; cat-close screenshot approved, pond view still under investigation.</li>
+<li>Gate click fix (Aug 2026): interaction point moved to the panel centre so the gate opens/closes from the hinge end, far end, or panel centre (covers the full 2.9 m width), still only within ~1 m; clicks on the gate beat clicks on fish, so the cat no longer pounces into the lake from beside the gate. Verified headless (far no-op, both ends toggle).</li>
+<li>Console-error cleanup (Aug 2026): water normal map (Godot 4 API), wet-cat surface_get_material, shooting-star look_at ordering, grass debug spam removed.</li>
+<li>Shed person-scale (Aug 2026): 0.9x2.0 m door, 2.5 m walls, 3.2 m ridge; portal + camera clamp re-tuned to the smaller interior.</li>
+<li>Padlock unlock cutaway (Aug 2026): combo success plays a cinematic unlock — letterbox bars, camera push-in on the padlock, player cat parked away from frame, the cutaway paw turns the dials with clicks, shackle springs open, padlock drops, door swings. GameState.cinematic_active locks player input during it. The paw itself is the open problem — see the "Cutaway paw — the saga" section below. The one SHIPPED decision from the earlier cutaway work: fur colour is SAMPLED at runtime from the cat's own WW.glb material so a recolor auto-updates.</li>
+<li>Vision reviewer switch (Aug 2026): quenn (qwen2.5vl:7b) proved too lenient on procedural paws. Trusted screenshot reviewer is now gemini-flash via C:\crypto\bigpickle\gemini-vision.ps1 (GEMINI_API_KEY set; -Image arrays; auto-appends to the inbox).</li>
+<li>Next: approve/iterate the cutaway paws (user is the final judge), farmhouse interior (S2), town (S3), placeholder-asset beautification, player settings button, fix the pond view in the new grass system.</li>
+</ul>
+
+<h2>Grass — how we finally got it right (the nightmare)</h2>
+<p>Grass took DAYS and several rejected approaches. This is the full history plus the
+working recipe so nobody ever re-lives it. Final system = <strong>chunked full-geometry
+tufts, one shared shader, no impostor, no baked texture</strong>. This is what ships.</p>
+<ul>
+<li><strong>DEAD END 1 — baked texture sheet (07/08, REJECTED "blades are just blobs"):</strong>
+cover a 1x1 tile with dense tufts, bake a top-down ortho render to one 1024x1024 texture,
+use it on a deformable plane. FAILED because a top-down ortho bake flattens 3D blades into
+pure vertical projections — at 1 texel/m they crush under the sward discs and read as flat
+green blobs. Do not go back to this.</li>
+<li><strong>DEAD END 2 — impostor far plane (09-10/08, THE ROT):</strong> chunked near/mid blades
++ a terrain-draped far impostor plane with its own shader. The impostor caught full sun while
+real blades self-shadowed, so the far field read LIGHTER (even after distance-darkening
+hacks). Ground was "unacceptable". DELETED.</li>
+<li><strong>THE WIN — one shared full-geometry shader (11/08 onwards):</strong> restored the
+USER-APPROVED tuft look (hexaquo.at tutorial, Karl Bittner, CC-BY-SA, parts 2+3 = the same
+architecture we already had) INSIDE the chunked streamer, engine-native tiers, every chunk
+renders real tufts.</li>
+<li><strong>Per-tuft anatomy (grass_chunk.gd VEG):</strong> flat sward disc (UV.x=2 shader
+marker, radius 0.125, dark = base*0.6, radial vertex shading) + 16 outer + 8 inner thin
+RIBBON blades (4 vertex rings = 6 tris, half the old box) with UV.y = 1 at base / 0 at tip so
+the shader's bottom_to_top gradient works. Tapered tips (half-width * (1 - 0.6*t)).</li>
+<li><strong>The 2 cm cap math:</strong> local blade tip = base_off 0.008 + max_h 0.008 =
+0.016 m, x shader size_large 1.15 = 0.018 m ≈ 2 cm (mowed lawn). disc_off 0.006. If you ever
+raise it, hscale sweeps already proved ~8 cm reads as "a field of grass" and costs nothing.</li>
+<li><strong>Shader (grass.gdshader):</strong> cull_disabled with the
+<code>if (!FRONT_FACING) NORMAL = -NORMAL</code> fix; vertex() sizes by seamless world-space
+patch_noise (clumps), bends tips by <code>blade_bend * pow(bottom_to_top, 2.0)</code>, gusts
+via scrolling wind_noise with direction rotated world→instance by inverse(MODEL_MATRIX);
+fragment() AO = bottom_to_top - wind*affect (tips bright/base dark), 3-scale noise for
+mottle (6 m patch + 1.4 m + 0.3 m + per-pixel turf grain at world_vertex.xz/0.05), BACKLIGHT
+translucency. <strong>Unit trap:</strong> tutorial bend/wind values assume UNIT-height blades;
+ours are metre-scaled, so blade_bend 0.02 and wind_strength 0.01 (not 0.35/0.12).</li>
+<li><strong>Chunked streamer (grass_system.gd):</strong> 5x5 m chunks (CHUNK_SIZE 5.0,
+STREAM_RADIUS 92, FENCE_HALF 25 — grass ONLY inside the 50x50 fence, outside is bare terrain).
+Macro 10x10 far chunks were TRIED and REVERTED (caused grass to disappear on fast turns) —
+stay 5x5 everywhere. Two stream centers: camera + Mouse.</li>
+<li><strong>Placement:</strong> MultiMesh via <code>set_instance_transform</code> — the
+.buffer array path SILENTLY FAILED ("painted grass" bug), never go back. Budget
+BUILD_PER_FRAME 6000, _mm.visible=false until the array is placed (this causes a
+disappearing-on-fast-turn artifact; raise the budget or keep _mm.visible=true if it returns).
+Adaptive probe placement near (PROBE_STEP 0.035, COVER_RADIUS 0.02) + jittered grid far
+(TUFT_SPACING 0.12). Reject terrain above rock_start+0.3, GrassExclusion rects, water.</li>
+<li><strong>Vision loop lesson:</strong> qwen2.5vl:3b "field of grass" read is driven by BLADE
+SIZE IN FRAME. 2 cm = "green carpet"; ~8 cm = "visible blades". Calibrate against a real
+photo before trusting the model. qwen2.5vl:3b is unreliable at describing scenes — pixel/
+probe stats are the primary signal, vision is corroboration only.</li>
+<li><strong>Godot gotchas hit:</strong> FastNoiseLite has no <code>seamless</code> property
+(only NoiseTexture2D); fragment built-in is <code>COLOR</code> not <code>VERTEX_COLOR</code>;
+no <code>return</code> in Godot 4 fragment shaders; SurfaceTool has no
+get_vertex_count() in 4.7.1; user args need the <code>--</code> separator
+(<code>--path X -- --fpsbench</code>).</li>
+<li><strong>Backup rule (user):</strong> every approved look = a committed + pushed
+screenshot (<code>&lt;seq&gt;_&lt;mode&gt;_&lt;camera&gt;_&lt;state&gt;.png</code>, commit
+message = same tag) so any look is fetchable from git history as a revert map.</li>
+</ul>
+
+<h2>Character pipeline — how WW (the cat) was made in Blender</h2>
+<p>WW is built <strong>procedurally in Blender via Python</strong>, not hand-modelled and not
+AI-generated (Meshy/Tripo were evaluated and rejected: no API, user cannot view AI images,
+no licence/consistency control). The generator is fully re-runnable and deterministic. This
+is the path to reuse for Dumbleclaw's rework and any future NPC.</p>
+<ul>
+<li><strong>Files:</strong> <code>tools/blender/gen_ww.py</code> (the cat, v0.3) and
+<code>tools/blender/ww_style.py</code> (SHARED style spec — palette + roughness/metallic +
+primitive helpers: sphere, capsule, tapered_tube, subdiv, glTF export). Trees =
+gen_trees.py, rocks = gen_rocks.py, all built on ww_style.py so everything matches. Unit
+convention: generators build in "cat units" (~2 m tall cat); main.gd scales at placement.</li>
+<li><strong>Run it:</strong> <code>"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
+--background --python gen_ww.py</code> → outputs <code>assets/WW.glb</code> (rigged,
++Y up, forward -Z). <strong>After re-running, reimport in the Godot editor</strong>
+(delete <code>.godot/imported</code> to force a full reimport) — stale zombie Godot
+processes hold the old import; the launcher kills them.</li>
+<li><strong>WW.blend is saved OUTSIDE the project</strong>
+(<code>C:\crypto\wicked-whiskers-blender-out\WW.blend</code>): a .blend inside res:// breaks
+Godot's importer without a configured Blender path.</li>
+<li><strong>How it builds (gen_ww.py):</strong> (1) geometry = one UNIONED fur body (boolean
+EXACT solver on spheres/capsules/tapered tubes: body, head, ears+inner cups, legs, tail
+curve, muzzle, belly) + SEPARATE feature meshes (nose, almond flattened eyes with pupils +
+glints, satchel box + strap, 3 whisker strands per cheek) + SEPARATE arm meshes (tapered
+tubes sunk into the chest, held outside the body so auto-weights pin them to the arm bones);
+(2) armature with stable bone names (Root/Pelvis/Spine/Chest/Neck/Head + L/R UpperArm/
+Forearm/Hand/Thigh/Shin/Foot/Toe/Ear + Tail01-03); (3) parent_set ARMATURE_AUTO (automatic
+weights); (4) subdiv 3 on the body, 2 on arms, shade_smooth; (5) paint_cream_faces assigns
+the CREAM material to faces near ref points (muzzle/belly/toes) AFTER subdiv; (6) glTF export.</li>
+<li><strong>Tail technique (5 spheres → 1 tapered tube):</strong> the tail was originally 5
+spheres stacked on top of each other and looked wrong. It is now ONE tapered_tube following a
+curved 3D path (9 path points, per-point radius shrinking 0.14 → 0.028, from pelvis up over
+the back). Same primitive = the arms (each arm = one tapered tube + a paw sphere, smooth
+surface instead of stacked capsules/spheres) and the whiskers (thin tapered strands). This
+"single tapered tube along a path, radii per point, cap_tip" is THE trick for smooth
+organic limbs — use it for Dumbleclaw's limbs too.</li>
+<li><strong>KNOWN BUG (fix next cat pass):</strong> build_armature() bone positions for the
+arms are still at the OLD coords (0.48-0.52) — the arm MESHES moved to 0.68-0.76. Bones and
+meshes must match or auto-weights drift. The 3b4edf9 commit rebuilt arms as smooth tapered
+tubes at the shoulder (were floating capsules).</li>
+<li><strong>WW.glb is 37 MB</strong> — suspected embedded uncompressed textures or dense
+keyframes; check in Blender (resize to 1024, prune keyframes) before shipping.</li>
+<li><strong>Rigging facts (player.gd):</strong> set_bone_pose_rotation(IDENTITY) aligns a
+bone with its PARENT frame, NOT the rest pose — pass get_bone_rest(idx).basis to return to
+rest. Walk is a procedural sine trot (LF+RH diagonal, knees fold on the swing leg, body
+sinks to keep paws planted) — a keyframed Blender walk cycle is the future upgrade.</li>
+<li><strong>Style consistency rule (user):</strong> new props must come from the Kenney
+Nature Kit (C:\crypto\world\kenneys nature kit) — never mix packs. Character/NPC upgrades
+(like Dumbleclaw's beard) are code-built primitives in dumbleclaw.gd today; the Blender
+pipeline above is the upgrade path for a proper Dumbleclaw model + future NPCs.</li>
+<li><strong>Fallback:</strong> docs/cat_prompts.md keeps the Meshy/Tripo prompts as a
+fallback if AI variants are ever wanted (free tier = CC BY 4.0 + attribution).</li>
+</ul>
+
+<h2>Cutaway paw — the saga (the closest we've got so far)</h2>
+<p>The padlock cutaway needs a single cartoon paw that turns the dials. This consumed hours.
+The pipeline that finally made progress: <strong>the USER chats with a browser AI (ChatGPT
+first, then others), pastes the returned Blender (bpy) script back, and the agent runs it
+headless</strong>. Agent-built procedural paws were all rejected by the user's eyes.</p>
+<ul>
+<li><strong>quenn (qwen2.5vl:7b) attempt — FAILED.</strong> quenn wrote a buggy bpy paw script
+(2nd try, needed a rewritten generator anyway) and later its vision grading proved
+UNRELIABLE — it called visibly-broken paws "no visible problems". quenn was already demoted as
+vision reviewer (too lenient).</li>
+<li><strong>Procedural generator (blender/paw_gen.py) — FAILED.</strong> 6 variants (quenn,
+chunky, sleek, kawaii, sharp, stubby), 3 fingers + 1 thumb each, top-down renders
+(paw_variants_sheet.png). User: "still so bad it is never going to be usable". Rejected.</li>
+<li><strong>Browser-AI → bpy → Blender → GLB → Godot (WORKING PROGRESS).</strong> User prompts
+ChatGPT with blender/chatgpt-paw-prompt.txt (self-contained, Blender 5.2 API rules, WW
+colours, exports to assets/paw_ai_v1.glb), pastes the script back, agent runs it headless
+(<code>blender --background --python</code>), renders it STANDALONE with blender/render_glb.py
+(screenshots/paw_ai_vN_standalone.png), and the user judges the shape alone. The script is the
+asset; the render just points a camera at the exact exported GLB.</li>
+<li><strong>Iterations so far (2026-08-14).</strong> v1: 4 fingers + thumb, digits sat ON the
+hand, thumb had open spaces. v2: 3 fingers + chunky thumb, soft joints + pads — "closest yet".
+v3: thicker fingers, buried knuckles, webbing, sharp claws — feedback to ChatGPT: cartoon
+paws are 3 fingers + 1 thumb; digits must attach INTO the hand; knuckles too high (sink them
+in, aligned); claws missing/not sharp; fingers still have air gaps — "use more polygons to
+fill the air gaps". Colour reads white/cream in renders (should be orange #f9ad59) — deferred.
+User also wants to try other models with the same prompt.</li>
+<li><strong>Scripts kept here</strong> so any machine can grab the latest:
+<code>/forai/ww-paw/</code> — <a href="ww-paw/paw_ai_v1.py">paw_ai_v1.py</a>,
+<a href="ww-paw/paw_ai_v2.py">paw_ai_v2.py</a>,
+<a href="ww-paw/paw_ai_v3.py">paw_ai_v3.py</a> (current),
+<a href="ww-paw/chatgpt-paw-prompt.txt">chatgpt-paw-prompt.txt</a>,
+<a href="ww-paw/render_glb.py">render_glb.py</a>.</li>
+<li><strong>User runs scripts directly in Blender:</strong>
+<code>"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python paw.py</code>
+— nothing is altered between the script and the render.</li>
+</ul>
+
+<h2>Padlock cutaway — implementation (2026-08-14 to 2026-08-18)</h2>
+<p>The paw saga above covers getting a paw MODEL. This section covers making it PLAY IN-GAME
+as a cinematic. The result (RP5) is functional but visually rejected by the user — the paw
+still does not look right turning dials.</p>
+
+<h3>What the cutaway does (current RP5, cutaway.gd SubViewport v7)</h3>
+<ol>
+<li>Player clicks the padlocked shed door → <code>door.gd._on_combo()</code> fires.</li>
+<li>A new <code>cutaway.gd</code> Node3D is created and added to <code>get_tree().root</code>.</li>
+<li>It builds an isolated 3D scene inside a <strong>SubViewport (own_world_3d = true)</strong>:
+   padlock (3 dials, shackle, keyhole, body, jamb staple), camera, lights, paw model, environment
+   (brown shed wall <code>Color(0.47, 0.31, 0.18)</code>), audio players.</li>
+<li>The SubViewport is displayed via a CanvasLayer (layer 100) + TextureRect (fullscreen).
+   This isolates the cutaway from the game world — no hiding of game nodes needed.</li>
+<li>Animation: 4 seconds, paw enters from bottom (0.5-1.5s), slides across 3 dials revealing
+   the player's ACTUAL entered digits (not hardcoded "2"), holds. Smooth-step easing.</li>
+<li>On correct combo: shackle pops (tween), padlock drops, <code>_finish_unlock()</code> sets
+   <code>GameState.shed_unlocked = true</code>, tweens door open, frees padlock.</li>
+<li>On wrong combo: toast "The padlock stays shut."</li>
+<li>SubViewport render mode set to UPDATE_DISABLED on finish. CanvasLayer + SubViewport freed
+   with <code>free()</code> (not queue_free) for immediate GPU resource release.</li>
+<li>Player state (position, yaw, pitch, camera_holder rotation, cat_facing, mesh rotation)
+   saved before and restored after.</li>
+</ol>
+
+<h3>Paw config (locked at RP3, 2026-08-17)</h3>
+<table>
+<tr><th>Param</th><th>Value</th><th>Why</th></tr>
+<tr><td>model</td><td><code>res://assets/paw.glb</code> (TRELLIS.2)</td><td>~178K verts, single mesh, fur color #f9ad59</td></tr>
+<tr><td>rot_x / rot_y</td><td>5 / 180</td><td>Back of hand faces camera, arm hangs below frame (Muppet rule)</td></tr>
+<tr><td>scale</td><td>0.35</td><td>Reads as "paw on padlock" not "giant cat hand"</td></tr>
+<tr><td>anchor</td><td>(0, 0.3525, -0.03)</td><td>Tip of paw pads = the contact point on dial centre</td></tr>
+<tr><td>hand_bend</td><td>-15 deg</td><td>Hand.L bone bent so fingers curl slightly over the dial</td></tr>
+<tr><td>roughness / color</td><td>0.5 / #f9ad59</td><td>Matches WW.glb fur, no metallic</td></tr>
+</table>
+
+<h3>Architecture decisions and gotchas</h3>
+<ul>
+<li><strong>SubViewport own_world_3d = true</strong> (RP5): Isolates the cutaway completely from
+the game world. No hiding of game nodes needed. BUT: creates a second rendering pipeline.
+Godot does NOT cleanly release GPU resources on free(), causing persistent VRAM pressure —
+grass LOD downgrades to fake grass after the cutaway plays. This is the known cost of RP5.</li>
+<li><strong>Direct-tree approach (attempted v8, reverted):</strong> Building the 3D scene directly
+in the game tree, hiding game Node3D/CanvasLayer children, removing game WorldEnvironments
+temporarily. Tested successfully with --cutawaytest (all 6 screenshots confirmed as padlock
+scenes). REVERTED by user (visual quality rejected — not the approach's fault, the paw itself).</li>
+<li><strong>daynight.gd patched</strong>: <code>get_node("WorldEnvironment")</code> changed to
+<code>get_node_or_null("WorldEnvironment")</code> at lines 35 and 87. Required for both
+approaches — the cutaway removes game WorldEnvironments temporarily.</li>
+<li><strong>Portal timing fix (2026-08-18):</strong> <code>GameState.shed_unlocked = true</code>
+was moved from <code>_on_combo()</code> to <code>_finish_unlock()</code> in door.gd. Previously,
+the shed portal detected the player overlap DURING the cutaway and teleported them into the
+shed while the cutaway was still playing.</li>
+<li><strong>Door stays open on return:</strong> <code>_build_shed()</code> in main.gd checks
+<code>GameState.shed_unlocked</code> and sets <code>door_mesh.rotation.y = 2.4</code> so the
+door is visually open when the player returns from the shed interior.</li>
+<li><strong>free() not queue_free():</strong> queue_free() defers to end of frame, leaving the
+SubViewport + World3D alive during the transition. free() releases immediately.</li>
+<li><strong>Headless mode:</strong> <code>--cutawaytest</code> does NOT work with <code>--headless</code>
+— SubViewport get_texture() returns null. Must run windowed.</li>
+<li><strong>Godot -- separator:</strong> <code>OS.get_cmdline_user_args()</code> only returns args
+after <code>--</code>. Without it, user flags like --cutawaytest are invisible to GDScript
+(e.g. <code>Godot.exe --path "..." -- --cutawaytest</code>).</li>
+<li><strong>Scene change kills coroutines:</strong> <code>change_scene_to_file()</code> frees the
+current scene's nodes. Any <code>await</code> in a coroutine on a freed node silently dies.
+Workaround for testing: schedule quit via SceneTreeTimer (survives scene changes) or set a
+global flag in GameState checked by the new scene's _ready().</li>
+</ul>
+
+<h3>Git history (cutaway branch)</h3>
+<p>Branch: <code>cutaway-finger-anatomy</code>. Key commits:</p>
+<table>
+<tr><th>Commit</th><th>What</th></tr>
+<tr><td>b62942a</td><td>cutaway v6: add to root, hide all root children except self</td></tr>
+<tr><td>79176f7</td><td>fix: only hide Node3D on root (autoloads have no visible property, crashed)</td></tr>
+<tr><td>ba71af0</td><td>fix: remove game WorldEnvironments during cutaway</td></tr>
+<tr><td>f3065c9</td><td>fix: daynight null guard for WorldEnvironment</td></tr>
+<tr><td>f920497</td><td>cutaway v7: SubViewport with own_world_3d for complete isolation</td></tr>
+<tr><td>26ec181</td><td>shed brown bg, save/restore full player state</td></tr>
+<tr><td>45da069</td><td>door: move shed_unlocked to _finish_unlock</td></tr>
+<tr><td>3930a47</td><td>free() instead of queue_free(); door stays open on return</td></tr>
+<tr><td>beea777</td><td>RP5 snapshot: SubViewport working, all screenshots backed up</td></tr>
+<tr><td>a812a58</td><td>v8 direct-tree attempt (REVERTED by bf1dde3)</td></tr>
+<tr><td>bf1dde3</td><td>Revert to RP5 SubViewport (current HEAD)</td></tr>
+</table>
+
+<h2>Lessons (recurring mistakes to never repeat)</h2>
+<ul>
+<li><strong>This page is for AI, not the public.</strong> <code>/forai/ww.html</code> is the AI reference; <code>/ww.html</code> is the public marketing page. On 2026-08-13 the public page was found copied over this reference page (same title, public styling, no noindex) — a full overwrite that lost the design/canon/build-status content. Recovery: a .bak saved 60 ms before the overwrite (<code>ww.html.bak.202608111715</code>). Rule: never copy the public page over the forai page; keep .bak before any deploy; the forai page stays dark-styled, noindex, and titled "wicked whiskers reference".</li>
+<li><strong>This page is the durable memory.</strong> big-pickle session context can be lost or compacted and the YAMLs get trimmed. Durable decisions, canon, and build facts live HERE. If this page is ever lost, recovery source = the newest .bak in <code>/var/www/html/forai/</code> and the working copy <code>/home/andy/ww.html</code>.</li>
+<li><strong>Interaction range is not interaction point.</strong> Proximity is measured against specific points (hinge / far end / panel centre), not the whole object. A 2.9 m-wide gate needs all three points or the middle becomes a dead zone. Fix range bugs by checking the pick math, not by assuming the object is one point.</li>
+<li><strong>Godot 4 API is not Godot 3.</strong> <code>normal_map</code> on SpatialMaterial is now <code>normal_enabled</code> + <code>normal_texture</code>; <code>MeshInstance3D.surface_get_material()</code> is on <code>mesh</code>; <code>look_at</code> needs the node added to the tree first. Watch the console, fix each warning — they are real API drifts.</li>
+<li><strong>Click priority: interactables beat animals.</strong> If a fish sits near the gate, a gate click must win or the cat pounces into the lake. Interactable pick runs before fish pick in <code>_handle_click_at</code>.</li>
+<li><strong>No image input, no visual claims (2026-08-13).</strong> An agent that cannot see images must NEVER ship procedural visual work as "done". Render frames, run a vision-capable reviewer (gemini-flash via <code>C:\crypto\bigpickle\gemini-vision.ps1</code>), and let the USER judge aesthetics before claiming a result. The cutaway consumed hours because unverified procedural geometry was built blind and only reviewed by an over-lenient model.</li>
+<li><strong>Paws need finger anatomy, not claws (2026-08-13).</strong> A paw "manipulating" a padlock reads as <em>waving a paw around the lock</em> when the digits are claw-toes hooking up from below, or when the paw and dial move independently. The fix that reads correctly: 3 fingers + 1 thumb wrapping the dial's top edge, and the dial + paw rotate RIGIDLY together around the dial axis so the paw visibly drives the turn (grip-turn).</li>
+<li><strong>Git history two-line save (2026-08-13).</strong> The cutaway work lived on a detached HEAD while origin/master had diverged grass work. Save before a compact = commit + push as a NAMED BRANCH (no force-push needed): <code>cutaway-finger-anatomy</code>. Origin/master was left untouched; reconciling the two lines is still an open user decision. Also: pushing a branch full of committed screenshots packs ~160 MB — allow minutes, don't kill it (each kill restarts the pack).</li>
+<li><strong>SubViewport own_world_3d = true leaks VRAM (2026-08-18).</strong> The SubViewport approach for the cutaway isolates rendering cleanly BUT creates a second World3D + rendering pipeline. Godot does not release the GPU resources on free() — persistent VRAM pressure causes grass LOD to downgrade to fake grass after the cutaway plays. The direct-tree approach (hiding game nodes, removing game WorldEnvironments) is the alternative but has its own complexity (must not hide autoloads, must patch daynight.gd, game WorldEnvironment overrides cutaway's). Neither approach is fully clean.</li>
+<li><strong>Coroutines die on scene change (2026-08-18).</strong> <code>change_scene_to_file()</code> frees the current scene tree. Any <code>await</code> in a function that belongs to a node in that tree silently stops executing — no error, no crash, just dead code. For test automation that needs to survive a scene change: schedule the quit before triggering the change via a SceneTreeTimer (which lives on the SceneTree, not any node), or set a global flag in GameState that the new scene's _ready() checks.</li>
+<li><strong>The user is the only visual judge (2026-08-18, reinforced).</strong> Gemini-vision confirmed the SubViewport cutaway renders correctly (padlock + brown bg). The direct-tree approach also rendered correctly (6/6 screenshots confirmed). The user rejected it anyway — not because the TECHNIQUE was wrong, but because the paw ITSELF still doesn't look right. The rendering approach is solved; the paw geometry is the actual blocker.</li>
+<li><strong>Steps forward vs. back (2026-08-18, user).</strong> The session went: SubViewport v7 (working, VRAM lag) → attempted direct-tree v8 (working, user rejected visuals) → reverted to v7. The technical progress was real (two approaches both work) but the user's experience was "two steps forward, three steps back" because the core problem (paw visual quality) was not addressed by either approach change. Focus effort on the actual blocker.</li>
 </ul>
 
 <hr>

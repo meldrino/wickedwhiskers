@@ -1,0 +1,11 @@
+{
+  "asset": "stone_v3",
+  "auto_ground": true,
+  "surface_noise": { "frequency": 13, "amplitude": 0.0016, "seed": 19 },
+  "materials": { "stone_dark": { "color": [0.22, 0.22, 0.235], "roughness": 0.95 } },
+  "parts": [
+    { "type": "rock", "name": "Stone", "material": "stone_dark", "center": [0, 0, 0.055],
+      "radius": 0.066, "seed": 57, "squash": [1.08, 0.82, 0.6], "lumpiness": 0.19,
+      "flatten": 0.55, "facet": 0.65, "smooth": false }
+  ]
+}

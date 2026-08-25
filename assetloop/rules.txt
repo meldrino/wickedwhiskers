@@ -1,0 +1,36 @@
+# EVOLVING RULEBOOK for the Wicked Whiskers asset loop.
+# Scope tags keep rules from conflicting: a rule only applies to assets whose
+# spec declares its FAMILY. New lessons get appended under the right scope;
+# recurring rules get promoted into builders\build_asset.py and retired here.
+
+[UNIVERSAL]
+- BUILD SPACE: ground plane is XY, up is +Z, front faces -Y. "Lying flat" means long axis HORIZONTAL (X or Y), never along Z. The exporter handles game-space conversion - never pre-rotate.
+- Round parts are built by the library with 16+ sides and smooth shading; never request fewer sides to "save polygons".
+- cone_tip: base sits ON the body, sharp end points OUTWARD away from it. The library enforces orientation; just give base/tip in the right order.
+- Origin at ground under asset centre. auto_ground drops the model onto the ground plane - keep bottom near z=0 anyway.
+- Palette: use the style-sheet colours via named materials; roughness matte 0.6-0.95, painted/plastic 0.35-0.5.
+- Every part gets a descriptive name (Shaft, Branch1, Wheel_FL...). Gameplay-named parts must match the brief exactly.
+
+[FAMILY:curved]
+- OWNER RULING (overrides any advisor): curves are SWEEPING and hose-like - smooth continuous bends are the Wicked Whiskers house style. Never tighten them into angular elbows or straight-runs-with-kinks.
+- Sticks, tails, vines, branches: contiguous is NON-NEGOTIABLE - one bent_cylinder through waypoints, never separate butt-joined cylinders.
+- Taper naturally (thicker at the body end); thickness believable for the object - erring slender reads better than club-thick.
+- Side branches/forks join INTO the shaft (start point inside it), angled 30-60 degrees, never perpendicular glued-on look.
+- Wood grain detail must run LONGITUDE-wise along the part (directional grooves), not random noise.
+
+[FAMILY:angular]
+- Crisp 90-degree corners are CORRECT for houses, sheds, fences, crates - do not round them.
+- Separate boxes for walls/roof/door are fine; align them so joints read cleanly (edges flush or clearly overlapping).
+- Roofs: slabs tilted symmetrically meeting at a ridge ABOVE the walls, overhanging slightly.
+
+[FAMILY:rock]
+- OWNER-APPROVED STYLE: Wicked Whiskers rocks are STYLIZED FACETED chunks (flat-shaded angular planes, like classic cartoon-game boulders) - NOT realistic smooth cobbles. Use facet 0.5-0.8 and smooth:false on rock parts.
+- Every stone has a DISTINCT flattened resting face (flatten 0.4-0.55) touching the ground - no floating, no rolling potatoes.
+- Irregular massing: vary seed/squash/lumpiness per stone so silhouettes differ; avoid symmetric egg shapes.
+- Matte and dry: roughness 0.9-0.95. Colours from the style-sheet stone palette; subtle variation between stones, never saturated.
+- Size discipline: pickups are fist-to-skull sized (radius 0.04-0.09 m). Bigger boulders are decoration, not pickups.
+
+[STICK]
+- Lies FLAT on the ground: long axis along X (~55 cm), height ~= thickness. Gentle vertical wobble lives in Z, never along Z.
+- OWNER RULING: NO sprouts/splinter spikes on the ends - ends are plain rounded shaft ends. The splintered_tip part is banned for sticks.
+- Forked mini-branch near one end is fine; keep it small.

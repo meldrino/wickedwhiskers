@@ -16,3 +16,7 @@ assets/pending/
 # Redundant script.doc copies (script.txt is the tracked source)
 script.docx
 wicked_whiskers_script.txt
+
+# Build outputs (too large for GitHub)
+build/*.exe
+build/*.exe.*

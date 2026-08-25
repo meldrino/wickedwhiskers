@@ -1,0 +1,13 @@
+Listen, I don't know what you call this, but it’s certainly not a tractor. It looks like a minimalist paperweight designed by someone who has never seen a vehicle in their life. This is a total embarrassment to the art department.
+
+1. **FAIL:** This looks like a stack of primitive shapes, not a tractor.
+2. **FAIL:** The wheels are white, not near-black, and they look like floating plates rather than functional tyres.
+3. **FAIL:** The body is primarily grey, the "bonnet" is just a red slab, and there are absolutely no windows or cabin details.
+4. **FAIL:** There are no mudguards or fenders whatsoever.
+5. **FAIL:** There is no exhaust pipe.
+6. **FAIL:** There is no number plate.
+7. **FAIL:** The proportions are completely abstract and lack the silhouette of a tractor.
+8. **PASS:** At least the geometry is welded, even if it's the wrong geometry.
+
+MOST_WRONG: The entire model lacks the basic silhouette, color scheme, and essential components (windows, exhaust, fenders) of a tractor; delete the script and start from a proper reference.
+VERDICT: FAIL

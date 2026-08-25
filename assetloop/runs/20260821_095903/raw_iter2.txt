@@ -1,0 +1,88 @@
+```python
+import bpy
+import bmesh
+import math
+from mathutils import Matrix, Vector
+
+def create_material(name, color, roughness):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    return mat
+
+# Palette
+bark_brown = (0.42, 0.29, 0.17)
+inner_wood = (0.79, 0.66, 0.44)
+
+mat_bark = create_material("Bark", bark_brown, 0.85)
+mat_inner = create_material("InnerWood", inner_wood, 0.6)
+
+def create_stick():
+    # Create main mesh
+    me = bpy.data.meshes.new("WoodenStick")
+    bm = bmesh.new()
+
+    # Create 5 segments for a gentle bend along Z
+    # Length 0.55m, radius ~0.015m
+    seg_len = 0.11
+    for i in range(5):
+        # Bend by rotating slightly
+        angle = math.radians(i * 3)
+        cyl = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=12, radius1=0.015, radius2=0.015, depth=seg_len)
+        
+        # Position segments
+        z_pos = -0.275 + (i * seg_len) + (seg_len/2)
+        x_pos = math.sin(angle) * 0.05
+        
+        for v in cyl['verts']:
+            v.co.z += z_pos
+            v.co.x += x_pos
+            v.co.y += 0.015 # Ensure it sits on ground (y=0)
+
+    # Stubby side branch
+    branch = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=8, radius1=0.008, radius2=0.008, depth=0.05)
+    bmesh.ops.rotate(bm, cent=Vector((0,0,0)), matrix=Matrix.Rotation(math.radians(45), 3, 'Z') @ Matrix.Rotation(math.radians(90), 3, 'X'), verts=branch['verts'])
+    for v in branch['verts']:
+        v.co += Vector((0.03, 0.03, 0))
+
+    # Frayed tip (cone at -Z end)
+    tip = bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=10, radius1=0.015, radius2=0.002, depth=0.04)
+    for v in tip['verts']:
+        v.co.z -= 0.295
+        v.co.y += 0.015
+
+    bm.to_mesh(me)
+    bm.free()
+
+    ob = bpy.data.objects.new("WoodenStick", me)
+    bpy.context.collection.objects.link(ob)
+    ob.data.materials.append(mat_bark)
+    
+    # Apply inner wood material to the tip (last 10 vertices)
+    for poly in me.polygons:
+        # Simple heuristic: polygons at the negative Z end
+        if me.vertices[poly.vertices[0]].co.z < -0.27:
+            poly.material_index = 1
+    
+    me.materials.append(mat_inner)
+    
+    return ob
+
+# Execute
+stick = create_stick()
+
+# Export
+bpy.ops.export_scene.gltf(filepath="__GLB_OUT__", export_format='GLB')
+
+# Output metrics
+bbox = [stick.matrix_world @ Vector(corner) for corner in stick.bound_box]
+dims = Vector((
+    max(v.x for v in bbox) - min(v.x for v in bbox),
+    max(v.y for v in bbox) - min(v.y for v in bbox),
+    max(v.z for v in bbox) - min(v.z for v in bbox)
+))
+print("ASSET_BUILT")
+print(f"DIMS {dims}")
+```
