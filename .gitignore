@@ -20,3 +20,7 @@ wicked_whiskers_script.txt
 # Build outputs (too large for GitHub)
 build/*.exe
 build/*.exe.*
+
+# Debug output from console exe
+game_errors.txt
+game_output.txt
