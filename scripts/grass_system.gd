@@ -49,7 +49,7 @@ func _ready() -> void:
 		PARAMS["wind_noise_seed"], false, FastNoiseLite.TYPE_SIMPLEX_SMOOTH,
 		FastNoiseLite.FRACTAL_RIDGED, PARAMS["wind_noise_freq"]))
 	var chunk_script: GDScript = preload("res://scripts/grass_chunk.gd")
-	var hscale := 8.0
+	var hscale := 1.0
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--hscale="):
 			hscale = float(a.get_slice("=", 1))
