@@ -141,7 +141,7 @@ func _spawn(key: String) -> void:
 	var chunk: Node3D = preload("res://scripts/grass_chunk.gd").new()
 	chunk.name = "Chunk_%s" % key
 	add_child(chunk)
-	chunk.setup(cell, CHUNK_SIZE, _material, _full_mesh, _full_mesh, _disc_mesh)
+	chunk.setup(cell, _material, _full_mesh, _disc_mesh)
 	_chunks[key] = chunk
 
 
