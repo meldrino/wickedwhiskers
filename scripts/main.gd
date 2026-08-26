@@ -276,6 +276,15 @@ func _maybe_screenshot() -> void:
 				break
 	if "--grassprobe" in args and not mode.begins_with("grass"):
 		_probe_grass(player, args)
+	for a in args:
+		if a.begins_with("--wait="):
+			var secs := int(a.get_slice("=", 1))
+			print("WAIT %d seconds for grass to build..." % secs)
+			var t := 0.0
+			while t < float(secs):
+				await get_tree().create_timer(1.0).timeout
+				t += 1.0
+			print("WAIT done")
 	DirAccess.make_dir_recursive_absolute("res://screenshots")
 	var img := get_viewport().get_texture().get_image()
 	img.save_png("res://screenshots/screenshot_%s.png" % mode)
