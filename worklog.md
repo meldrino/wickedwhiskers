@@ -1355,3 +1355,13 @@ recovered from git log + worklog, zero loss):
 - Game runs on Mac but interactions (click fish, click Dumbleclaw) don't work — likely
   Wine/CrossOver input mapping issues or Mac Godot export needed.
 - Mark thinned grass in his local copy to cope with Mac GPU.
+
+## 2026-08-26
+
+### Overnight session (big-pickle autonomous)
+- **Grass dead tier code cleanup**: Removed `_update_tiers()`, `set_tier()`, `TUFT_SPACING_FAR`, `_full_mesh_far`, `_tier`, `_per_axis`, `_cursor`, `_place_grid()` from grass_chunk.gd and grass_system.gd. Tier system was dead because `_update_chunks()` already filters out-of-fence chunks. `setup()` now takes 5 args (was 6), calls `_rebuild()` directly. Net: ~40 lines removed, simpler code path.
+- **House roof fix**: Swapped rotation signs in `_build_farmhouse()` (main.gd:423-424). Front slab now rotates +0.326, back slab -0.326. Was creating V-shape (inverted), now creates Λ (peak) as intended. Known issue documented in house_spec.txt is now resolved.
+- **Ball of string asset**: Copied approved `yarn_string.glb` from `assetloop/polish/yarn_string/approved/` to `assets/misc/string.glb`. Updated pickup.gd to load GLB instead of flat cylinder placeholder.
+- **Tractor keys asset**: Created `builders/tractor_keys.json` (8 parts: keyring, split link, bow, shaft, 3 teeth). Ran through polish pipeline — 4 rounds, didn't get full approval (gemini wants eyelet threading through bow, hard with primitives). GLB staged in `assets/misc/tractor_keys.glb` — better than gold cylinder placeholder. Updated pickup.gd to load GLB.
+- **Shed interior overhaul**: Rewrote `_build_props()` in shed.gd. Added workbench with mallet/wire/hammer, left-wall shelf with seed packets/flower pot/sack, right-wall tool rack with spade+rake (4 teeth), metal bucket, folded tarpaulin. Fixed flat roof to gabled. Kept all existing loot/boot/hay/mousetrap/lantern/rope.
+- **GitHub setup for Mark**: Added scuba-hacker as collaborator with push access. Created branch ruleset `protect-master` requiring PR + 1 approval to merge into master. You bypass as admin. `mark` branch pushed to same commit as master. Mark can push to `mark` freely but needs PR for master.

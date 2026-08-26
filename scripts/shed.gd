@@ -15,9 +15,46 @@ func _ready() -> void:
 
 
 func _build_floor() -> void:
-	var wood := Color(0.45, 0.3, 0.18)
-	_add_mesh("box", Vector3(3.0, 0.2, 2.4), Vector3(0, -0.1, 0), wood)
-	_add_collider(Vector3(3.0, 0.2, 2.4), Vector3(0, -0.1, 0))
+	# Flush wooden planks with procedural wood grain + dark seam lines
+	var plank_w := 0.25
+	var plank_d := 2.4
+	var plank_h := 0.04
+	var plank_count := 12
+	var floor_y := 0.05
+	var start_x := -(plank_count * plank_w) / 2.0 + plank_w / 2.0
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 77
+	# Base slab underneath (no gaps for grass to show through)
+	_add_mesh("box", Vector3(3.0, 0.05, plank_d), Vector3(0, floor_y - 0.06, 0), Color(0.2, 0.14, 0.08))
+	_add_collider(Vector3(3.0, 0.25, plank_d), Vector3(0, floor_y - 0.08, 0))
+	for i in range(plank_count):
+		var t := rng.randf()
+		# 8 distinct wood colours, randomly assigned
+		var palette := [
+			Color(0.75, 0.58, 0.35),  # pale pine
+			Color(0.65, 0.48, 0.28),  # light oak
+			Color(0.55, 0.38, 0.20),  # warm oak
+			Color(0.48, 0.30, 0.15),  # mid brown
+			Color(0.40, 0.25, 0.12),  # dark walnut
+			Color(0.35, 0.22, 0.10),  # aged teak
+			Color(0.60, 0.42, 0.22),  # honey
+			Color(0.30, 0.18, 0.08),  # very dark
+		]
+		var c: Color = palette[int(t * palette.size()) % palette.size()]
+		var x := start_x + i * plank_w
+		var mi := _add_mesh("box", Vector3(plank_w, plank_h, plank_d), Vector3(x, floor_y, 0), c)
+		# Material with wood grain
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = c
+		mat.roughness = 0.75 + t * 0.15
+		mi.set_surface_override_material(0, mat)
+		# Dark seam strip on each side of plank (visual gap without actual gap)
+		var seam := Color(0.15, 0.10, 0.05)
+		var seam_w := 0.008
+		if i > 0:
+			_add_mesh("box", Vector3(seam_w, plank_h + 0.001, plank_d), Vector3(x - plank_w / 2.0, floor_y + 0.001, 0), seam)
+		if i == plank_count - 1:
+			_add_mesh("box", Vector3(seam_w, plank_h + 0.001, plank_d), Vector3(x + plank_w / 2.0, floor_y + 0.001, 0), seam)
 
 
 func _build_walls() -> void:
@@ -54,8 +91,17 @@ func _build_walls() -> void:
 
 func _build_roof() -> void:
 	var roof_col := Color(0.3, 0.2, 0.12)
-	_add_mesh("box", Vector3(3.4, 0.45, 2.9), Vector3(0, 2.72, 0), roof_col)
-	_add_mesh("box", Vector3(3.4, 0.3, 0.6), Vector3(0, 2.95, 0), roof_col)
+	var half_w := 1.5
+	var rise := 0.4
+	var roof_d := 2.6
+	var slab_len := sqrt(half_w * half_w + rise * rise)
+	var slope_ang := atan(rise / half_w)
+	var slab_cx := half_w / 2.0
+	_add_mesh("box", Vector3(slab_len, 0.15, roof_d), Vector3(slab_cx, 2.5 + rise / 2.0, 0), roof_col)
+	get_child(-1).rotation.z = -slope_ang
+	_add_mesh("box", Vector3(slab_len, 0.15, roof_d), Vector3(-slab_cx, 2.5 + rise / 2.0, 0), roof_col)
+	get_child(-1).rotation.z = slope_ang
+	_add_mesh("box", Vector3(0.3, 0.3, roof_d), Vector3(0, 2.5 + rise - 0.02, 0), roof_col)
 
 
 func _build_light() -> void:
@@ -74,6 +120,10 @@ func _build_props() -> void:
 	var brown := Color(0.42, 0.28, 0.17)
 	var green := Color(0.3, 0.55, 0.25)
 	var straw := Color(0.75, 0.65, 0.45)
+	var metal := Color(0.48, 0.48, 0.51)
+	var terracotta := Color(0.71, 0.40, 0.11)
+	var cream := Color(0.92, 0.89, 0.80)
+	var red_stripe := Color(0.65, 0.025, 0.012)
 
 	# Loot crates (string + keys spawn on top of these once the shed is unlocked)
 	_add_mesh("box", Vector3(0.6, 0.6, 0.6), Vector3(-1.05, 0.3, -0.9), wood)
@@ -81,6 +131,57 @@ func _build_props() -> void:
 	_add_mesh("box", Vector3(0.4, 0.4, 0.4), Vector3(-1.05, 0.85, -0.9), wood_dark)
 	_add_mesh("box", Vector3(0.6, 0.6, 0.6), Vector3(1.05, 0.3, -0.9), wood)
 	_add_collider(Vector3(0.6, 0.6, 0.6), Vector3(1.05, 0.3, -0.9))
+
+	# Workbench against back wall (-Z side)
+	var bench_w := 1.2
+	var bench_d := 0.5
+	var bench_h := 0.85
+	var bench_z := -0.95
+	_add_mesh("box", Vector3(bench_w, 0.06, bench_d), Vector3(0, bench_h, bench_z), wood)
+	# Legs
+	for lx in [-0.5, 0.5]:
+		_add_mesh("box", Vector3(0.06, bench_h, 0.06), Vector3(lx, bench_h / 2.0, bench_z - 0.18), wood_dark)
+		_add_mesh("box", Vector3(0.06, bench_h, 0.06), Vector3(lx, bench_h / 2.0, bench_z + 0.18), wood_dark)
+	# Cross-stretcher
+	_add_mesh("box", Vector3(1.0, 0.04, 0.04), Vector3(0, 0.25, bench_z), wood_dark)
+	# Items on bench: wooden mallet
+	_add_mesh("box", Vector3(0.08, 0.06, 0.12), Vector3(-0.35, bench_h + 0.08, bench_z + 0.1), wood)
+	_add_mesh("cylinder", Vector3(0.018, 0.22, 0.018), Vector3(-0.35, bench_h + 0.1, bench_z - 0.05), wood_dark)
+	# Coil of wire on bench
+	_add_mesh("cylinder", Vector3(0.06, 0.03, 0.06), Vector3(0.15, bench_h + 0.05, bench_z), metal)
+	# Small hammer on bench
+	_add_mesh("box", Vector3(0.1, 0.05, 0.06), Vector3(0.4, bench_h + 0.07, bench_z + 0.05), metal)
+	_add_mesh("cylinder", Vector3(0.012, 0.18, 0.012), Vector3(0.4, bench_h + 0.09, bench_z - 0.04), wood_dark)
+
+	# Left wall shelf unit (-X side)
+	var shelf_y := 1.2
+	_add_mesh("box", Vector3(0.35, 0.04, 0.6), Vector3(-1.3, shelf_y, 0), wood)
+	_add_mesh("box", Vector3(0.35, 0.04, 0.6), Vector3(-1.3, shelf_y + 0.45, 0), wood)
+	# Brackets
+	for bz in [-0.22, 0.0, 0.22]:
+		_add_mesh("box", Vector3(0.04, 0.12, 0.04), Vector3(-1.3, shelf_y - 0.06, bz), wood_dark)
+		_add_mesh("box", Vector3(0.04, 0.12, 0.04), Vector3(-1.3, shelf_y + 0.45 - 0.06, bz), wood_dark)
+	# Seed packets on lower shelf
+	for i in range(3):
+		_add_mesh("box", Vector3(0.008, 0.1, 0.07), Vector3(-1.22, shelf_y + 0.09, -0.15 + i * 0.15), cream)
+		_add_mesh("box", Vector3(0.01, 0.03, 0.07), Vector3(-1.21, shelf_y + 0.09, -0.15 + i * 0.15), red_stripe)
+	# Flower pot on upper shelf
+	_add_mesh("cylinder", Vector3(0.06, 0.1, 0.07), Vector3(-1.2, shelf_y + 0.45 + 0.07, 0.15), terracotta)
+	# Rolled sack on upper shelf
+	_add_mesh("cylinder", Vector3(0.04, 0.2, 0.04), Vector3(-1.2, shelf_y + 0.45 + 0.05, -0.15), straw)
+
+	# Right wall tool rack (+X side)
+	_add_mesh("box", Vector3(0.04, 1.2, 0.04), Vector3(1.3, 1.6, 0), wood_dark)
+	_add_mesh("box", Vector3(0.04, 0.04, 0.8), Vector3(1.3, 2.0, 0), wood_dark)
+	# Spade hanging on rack
+	_add_mesh("cylinder", Vector3(0.018, 0.7, 0.018), Vector3(1.28, 1.6, -0.15), wood, Vector3(0.1, 0, 0))
+	_add_mesh("box", Vector3(0.15, 0.12, 0.02), Vector3(1.26, 1.2, -0.15), metal)
+	_add_mesh("box", Vector3(0.18, 0.04, 0.04), Vector3(1.28, 2.05, -0.15), wood)
+	# Rake hanging on rack
+	_add_mesh("cylinder", Vector3(0.018, 0.8, 0.018), Vector3(1.28, 1.6, 0.2), wood, Vector3(0.1, 0, 0))
+	_add_mesh("box", Vector3(0.25, 0.04, 0.08), Vector3(1.26, 1.15, 0.2), wood_dark)
+	for t in range(4):
+		_add_mesh("box", Vector3(0.015, 0.1, 0.015), Vector3(1.22, 1.1, 0.12 + t * 0.04), metal)
 
 	# An old boot with a sprout growing out of it
 	_add_mesh("box", Vector3(0.3, 0.34, 0.58), Vector3(-1.2, 0.17, 0.9), brown, Vector3(0.15, 0, 0.3))
@@ -93,10 +194,17 @@ func _build_props() -> void:
 	_add_mesh("box", Vector3(0.5, 0.3, 0.5), Vector3(0.95, 0.42, 0.9), hay, Vector3(0, -0.2, 0))
 	_add_mesh("box", Vector3(0.45, 0.28, 0.45), Vector3(1.1, 0.72, 0.95), hay, Vector3(0, 0.35, 0))
 
-	# Sprung mousetrap on the floor — the last mouse won
+	# Metal bucket on the floor
+	_add_mesh("cylinder", Vector3(0.1, 0.2, 0.11), Vector3(0.5, 0.1, 0.8), metal)
+	_add_mesh("cylinder", Vector3(0.008, 0.2, 0.008), Vector3(0.5, 0.25, 0.8), metal, Vector3(0, 0, 0.5))
+
+	# Sprung mousetrap on the floor
 	_add_mesh("box", Vector3(0.26, 0.03, 0.12), Vector3(0.3, 0.015, 0.5), wood)
 	_add_mesh("cylinder", Vector3(0.012, 0.14, 0.012), Vector3(0.37, 0.1, 0.5), Color(0.7, 0.7, 0.72))
 	_add_mesh("box", Vector3(0.09, 0.025, 0.09), Vector3(0.21, 0.03, 0.5), Color(0.95, 0.8, 0.3))
+
+	# Folded tarpaulin on the floor
+	_add_mesh("box", Vector3(0.5, 0.06, 0.4), Vector3(-0.5, 0.03, 0.6), green, Vector3(0, 0.15, 0))
 
 	# Lantern hanging on the back wall (glows)
 	var lantern := MeshInstance3D.new()
@@ -115,10 +223,6 @@ func _build_props() -> void:
 	add_child(lantern)
 	_add_mesh("box", Vector3(0.3, 0.05, 0.05), Vector3(0.5, 1.75, -1.05), wood_dark)
 	_add_mesh("box", Vector3(0.06, 0.3, 0.06), Vector3(0.5, 0.95, -1.05), wood_dark)
-
-	# Rake leaning against the wall
-	_add_mesh("cylinder", Vector3(0.03, 1.4, 0.03), Vector3(-0.6, 0.7, -1.05), wood, Vector3(0.2, 0, 0.6))
-	_add_mesh("box", Vector3(0.2, 0.05, 0.55), Vector3(-0.66, 0.2, -0.95), wood, Vector3(0, 0, 0.12))
 
 	# Coil of rope on a peg
 	_add_mesh("cylinder", Vector3(0.2, 0.07, 0.2), Vector3(1.25, 1.15, -1.05), straw)

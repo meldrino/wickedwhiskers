@@ -76,7 +76,6 @@ func _noise_texture(seed_n: int, seamless: bool, type_i: int, fractal: int, freq
 func _process(_delta: float) -> void:
 	var centers := _centers()
 	_update_chunks(centers)
-	_update_tiers(centers)
 
 
 func _centers() -> Array:
@@ -141,18 +140,8 @@ func _spawn(key: String) -> void:
 	var chunk: Node3D = preload("res://scripts/grass_chunk.gd").new()
 	chunk.name = "Chunk_%s" % key
 	add_child(chunk)
-	chunk.setup(cell, CHUNK_SIZE, _material, _full_mesh, _full_mesh, _disc_mesh)
+	chunk.setup(cell, CHUNK_SIZE, _material, _full_mesh, _disc_mesh)
 	_chunks[key] = chunk
-
-
-func _update_tiers(_centers: Array) -> void:
-	for key in _chunks:
-		var chunk: Node3D = _chunks[key]
-		var cpos := chunk.position + Vector3(CHUNK_SIZE * 0.5, 0, CHUNK_SIZE * 0.5)
-		var tier := 1
-		if absf(cpos.x) <= FENCE_HALF and absf(cpos.z) <= FENCE_HALF:
-			tier = 0
-		chunk.set_tier(tier)
 
 
 

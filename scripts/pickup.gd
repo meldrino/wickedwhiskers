@@ -67,12 +67,12 @@ func _build_mesh() -> void:
 	var mesh: Mesh
 	match kind:
 		"string":
-			var cm := CylinderMesh.new()
-			cm.top_radius = 0.2
-			cm.bottom_radius = 0.2
-			cm.height = 0.07
-			mesh = cm
-			mat.albedo_color = Color(0.95, 0.9, 0.75)
+			var scene: PackedScene = preload("res://assets/misc/string.glb")
+			var inst: Node3D = scene.instantiate()
+			inst.rotation = Vector3(0.0, randf() * TAU, 0.0)
+			inst.scale = Vector3.ONE * 1.8
+			add_child(inst)
+			return
 		"stick":
 			var scene: PackedScene = STICK_SCENES[randi() % STICK_SCENES.size()]
 			var inst: Node3D = scene.instantiate()
@@ -94,15 +94,12 @@ func _build_mesh() -> void:
 			mesh = sm
 			mat.albedo_color = Color(0.95, 0.55, 0.25)
 		"key":
-			var cm := CylinderMesh.new()
-			cm.top_radius = 0.05
-			cm.bottom_radius = 0.05
-			cm.height = 0.22
-			mesh = cm
-			mat.albedo_color = Color(0.95, 0.75, 0.15)
-			mat.metallic = 0.6
-			mat.roughness = 0.3
-			mi.rotation = Vector3(0, 0, 1.1)
+			var scene: PackedScene = preload("res://assets/misc/tractor_keys.glb")
+			var inst: Node3D = scene.instantiate()
+			inst.rotation = Vector3(0.0, randf() * TAU, 0.0)
+			inst.scale = Vector3.ONE * 2.5
+			add_child(inst)
+			return
 	mi.mesh = mesh
 	mesh.material = mat
 	mi.position = Vector3(0, 0.25, 0)
