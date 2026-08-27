@@ -1,14 +1,14 @@
 extends Node3D
 
 func _ready() -> void:
-	var scene: PackedScene = preload("res://assets/misc/tractor_keys.glb")
+	var scene: PackedScene = preload("res://assets/misc/string.glb")
 	var inst: Node3D = scene.instantiate()
 	inst.position = Vector3(0, 0.15, 0)
 	inst.scale = Vector3.ONE * 2.5
 	add_child(inst)
 
 	var cam := Camera3D.new()
-	cam.position = Vector3(0, 0.2, 0.35)
+	cam.position = Vector3(0, 0.25, 0.4)
 	cam.rotation = Vector3(-0.35, 0, 0)
 	cam.fov = 30
 	add_child(cam)
@@ -49,5 +49,5 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
-	get_viewport().get_texture().get_image().save_png("res://screenshots/keys_asset.png")
+	get_viewport().get_texture().get_image().save_png("res://screenshots/string_preview.png")
 	get_tree().quit()

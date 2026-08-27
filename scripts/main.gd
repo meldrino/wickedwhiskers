@@ -285,11 +285,12 @@ func _maybe_screenshot() -> void:
 				await get_tree().create_timer(1.0).timeout
 				t += 1.0
 			print("WAIT done")
-	DirAccess.make_dir_recursive_absolute("res://screenshots")
-	var img := get_viewport().get_texture().get_image()
-	img.save_png("res://screenshots/screenshot_%s.png" % mode)
-	print("SCREENSHOT SAVED: res://screenshots/screenshot_%s.png" % mode)
-	get_tree().quit()
+	if "--screenshot" in args:
+		DirAccess.make_dir_recursive_absolute("res://screenshots")
+		var img := get_viewport().get_texture().get_image()
+		img.save_png("res://screenshots/screenshot_%s.png" % mode)
+		print("SCREENSHOT SAVED: res://screenshots/screenshot_%s.png" % mode)
+		get_tree().quit()
 
 
 func _probe_grass(player: Node3D, args: Array) -> void:

@@ -1,0 +1,25 @@
+02:23:33 POLISH START tractor_keys spec=C:\crypto\wicked whiskers\assetloop\builders\tractor_keys.json briefLen=72 maxRounds=4
+02:23:36 initial BUILD FAILED
+02:25:32 POLISH START tractor_keys spec=C:\crypto\wicked whiskers\assetloop\builders\tractor_keys.json briefLen=72 maxRounds=4
+02:25:37 GEOMETRY WARNINGS: PROBE inside KeyBow in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside KeyShaft in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth1 in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth2 in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth3 in KeyRing pct=0 -> DETACHED_CANDIDATE
+02:25:37 round 1 built OK dims=(0.099, 0.036, 0.007)
+02:25:53 round 1: verdict=FAIL most_wrong='KeyBow is a solid block with no hole/eyelet, causing SplitLink to clip directly into solid geometry.'
+02:26:02 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+02:26:19 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+02:26:46 GEOMETRY WARNINGS: PROBE inside KeyShaft in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth1 in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth2 in KeyRing pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth3 in KeyRing pct=0 -> DETACHED_CANDIDATE
+02:26:46 round 1: patch accepted, dims=(0.099, 0.036, 0.008)
+02:27:05 round 2: verdict=FAIL most_wrong='KeyBow lacks a through-hole, using an un-integrated sphere and rigid peg to connect to KeyRing instead of looping through an eyelet.'
+02:27:14 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+02:27:27 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+02:27:55 GEOMETRY WARNINGS: PROBE inside KeyBow in KeyShaft pct=0 -> SURFACE_ONLY_NO_ROOT (warn) | PROBE inside KeyRing in KeyShaft pct=1 -> BARELY_ROOTED (warn) | PROBE inside Tooth1 in KeyShaft pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth2 in KeyShaft pct=25 -> DETACHED_CANDIDATE | PROBE inside Tooth3 in KeyShaft pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+02:27:55 round 2: patch accepted, dims=(0.099, 0.036, 0.008)
+02:28:11 round 3: verdict=FAIL most_wrong='KeyRing does not thread through an eyelet hole on the key, but is rigidly plugged end-to-end into the tip of the shaft.'
+02:28:17 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+02:28:36 gemini-vision attempt 2 failed (gemini-flash-latest), retrying in 20s
+02:29:03 GEOMETRY WARNINGS: PROBE inside KeyRing in KeyShaft pct=4 -> BARELY_ROOTED (warn) | PROBE inside Tooth1 in KeyShaft pct=0 -> DETACHED_CANDIDATE | PROBE inside Tooth2 in KeyShaft pct=50 -> DETACHED_CANDIDATE | PROBE inside Tooth3 in KeyShaft pct=0 -> SURFACE_ONLY_NO_ROOT (warn)
+02:29:03 round 3: patch accepted, dims=(0.068, 0.036, 0.008)
+02:29:19 gemini-vision attempt 1 failed (gemini-flash-latest), retrying in 10s
+02:29:39 round 4: verdict=FAIL most_wrong='KeyRing forms an outer perimeter rim wrapped around the solid KeyBow instead of threading through a hole in the key.'
+02:29:51 GEOMETRY WARNINGS: PROBE inside KeyRing in KeyShaft pct=4 -> BARELY_ROOTED (warn)
+02:29:51 round 4: patch accepted, dims=(0.068, 0.036, 0.008)
+02:29:51 ROUND CAP reached without approval - staging last views for human review

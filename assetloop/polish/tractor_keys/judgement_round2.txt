@@ -1,0 +1,6 @@
+1. **Eyelet / KeyBow**: Instead of cutting an actual hole through the key bow for the keyring to thread through, a raw sphere primitive has been slapped onto the edge of the flat bow block. This directly violates the primitive integration standard and makes zero functional sense for key construction.
+2. **SplitLink**: The keyring is connected to the key via a rigid horizontal peg/rod welded between the keyring and the sphere, rather than having the split ring naturally loop through an eyelet hole in the bow.
+
+MOST_WRONG: KeyBow lacks a through-hole, using an un-integrated sphere and rigid peg to connect to KeyRing instead of looping through an eyelet.
+VERDICT: FAIL
+

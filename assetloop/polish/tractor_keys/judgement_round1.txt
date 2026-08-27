@@ -1,0 +1,9 @@
+Discrepancies identified:
+
+1. **KeyBow & SplitLink Integration**: The `KeyBow` is a solid rectangular block without an eyelet or hole. The `SplitLink` (curved pipe) simply clips directly into the solid top edge/face of the key bow rather than threading through a proper perforation.
+2. **KeyShaft and Teeth Primitive Read**: The `KeyShaft` and attached `Tooth` elements read as raw primitive cylinders and extruded blocks crudely welded together without realistic keyway milling, tapering, or integrated transitions.
+3. **KeyRing Scale and Connection**: The keyring assembly reads disproportionately thick and awkward compared to the tiny, solid key handle it is arbitrarily attached to via an unconvincing bent wire link.
+
+MOST_WRONG: KeyBow is a solid block with no hole/eyelet, causing SplitLink to clip directly into solid geometry.
+VERDICT: FAIL
+

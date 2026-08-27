@@ -1,0 +1,8 @@
+Discrepancies:
+
+1. **KeyRing / KeyBow Connection**: The steel keyring does not loop through a hole/eyelet in the key. Instead, the key shaft simply butts/plugs rigidly into the outer circumference of the torus ring. A keyring must physically loop through a perforation in the key's bow rather than being glued end-to-end like a lollipop stick or magnifying glass frame.
+2. **Key Anatomy / Silhouette**: What should be the key bow (grip) is represented as tiny rectangular wings slapped onto the middle of the shaft, resulting in a shape that fails to read as a recognizable tractor/ignition key.
+
+MOST_WRONG: KeyRing does not thread through an eyelet hole on the key, but is rigidly plugged end-to-end into the tip of the shaft.
+VERDICT: FAIL
+

@@ -1,0 +1,31 @@
+C:\crypto\wicked whiskers\assetloop\builders\build_asset.py:23: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  mat.use_nodes = True
+SWEEP_DEBUG rings=129 sides=24 faces=3120 failed=0
+SWEEP_DEBUG rings=17 sides=24 faces=432 failed=0
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+02:29:49 | INFO: Starting glTF 2.0 export
+02:29:49 | INFO: Extracting primitive: Eyelet
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: KeyBow
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: KeyRing
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: KeyShaft
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: SplitLink
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: Tooth1
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: Tooth2
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Extracting primitive: Tooth3
+02:29:49 | INFO: Primitives created: 1
+02:29:49 | INFO: Finished glTF 2.0 export in 0.0578460693359375 s
+
+DIMS (0.068, 0.036, 0.008)
+ASSET_BUILT
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit
+

@@ -1,0 +1,34 @@
+02:29:51 | INFO: Data are loaded, start creating Blender stuff
+02:29:51 | INFO: Blender create Mesh node Eyelet
+02:29:51 | INFO: Blender create Mesh node KeyBow
+02:29:51 | INFO: Blender create Mesh node KeyRing
+02:29:51 | INFO: Blender create Mesh node KeyShaft
+02:29:51 | INFO: Blender create Mesh node SplitLink
+02:29:51 | INFO: Blender create Mesh node Tooth1
+02:29:51 | INFO: Blender create Mesh node Tooth2
+02:29:51 | INFO: Blender create Mesh node Tooth3
+02:29:51 | INFO: glTF import finished in 0.02s
+PROBE parts=8 bbox=(0.068,0.036,0.008)
+PROBE pair Eyelet|KeyBow overlap=(0.008,0.008,0.003)
+PROBE pair Eyelet|KeyRing overlap=(0.008,0.008,0.004)
+PROBE pair Eyelet|KeyShaft overlap=(0.008,0.006,0.006)
+PROBE pair KeyBow|KeyRing overlap=(0.018,0.020,0.003)
+PROBE pair KeyBow|KeyShaft overlap=(0.018,0.006,0.003)
+PROBE pair KeyRing|KeyShaft overlap=(0.027,0.006,0.004)
+PROBE pair KeyRing|SplitLink overlap=(0.001,0.001,0.001)
+PROBE pair KeyShaft|Tooth1 overlap=(0.006,0.003,0.005)
+PROBE pair KeyShaft|Tooth2 overlap=(0.006,0.003,0.003)
+PROBE pair KeyShaft|Tooth3 overlap=(0.005,0.003,0.006)
+PROBE inside Eyelet in KeyShaft pct=27 -> ROOTED_VISIBLE (mean root depth 0.001m)
+PROBE inside KeyBow in KeyShaft pct=25 -> ROOTED_VISIBLE (mean root depth 0.000m)
+PROBE inside KeyRing in KeyShaft pct=4 -> BARELY_ROOTED (warn)
+PROBE inside SplitLink in KeyShaft pct=0 -> CHAIN_ROOTED via KeyRing -> SplitLink
+PROBE inside Tooth1 in KeyShaft pct=50 -> ROOTED_VISIBLE (mean root depth 0.000m)
+PROBE inside Tooth2 in KeyShaft pct=50 -> ROOTED_VISIBLE (mean root depth 0.001m)
+PROBE inside Tooth3 in KeyShaft pct=25 -> ROOTED_VISIBLE (mean root depth 0.000m)
+PROBE enclosed KeyBow by KeyRing -> check inside% above
+PROBE enclosed SplitLink by KeyRing -> check inside% above
+PROBE_DONE
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

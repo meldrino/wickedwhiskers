@@ -1365,3 +1365,49 @@ recovered from git log + worklog, zero loss):
 - **Tractor keys asset**: Created `builders/tractor_keys.json` (8 parts: keyring, split link, bow, shaft, 3 teeth). Ran through polish pipeline — 4 rounds, didn't get full approval (gemini wants eyelet threading through bow, hard with primitives). GLB staged in `assets/misc/tractor_keys.glb` — better than gold cylinder placeholder. Updated pickup.gd to load GLB.
 - **Shed interior overhaul**: Rewrote `_build_props()` in shed.gd. Added workbench with mallet/wire/hammer, left-wall shelf with seed packets/flower pot/sack, right-wall tool rack with spade+rake (4 teeth), metal bucket, folded tarpaulin. Fixed flat roof to gabled. Kept all existing loot/boot/hay/mousetrap/lantern/rope.
 - **GitHub setup for Mark**: Added scuba-hacker as collaborator with push access. Created branch ruleset `protect-master` requiring PR + 1 approval to merge into master. You bypass as admin. `mark` branch pushed to same commit as master. Mark can push to `mark` freely but needs PR for master.
+
+## 2026-08-26 (afternoon session)
+
+### Shed interior — floor PASSED (9/10)
+- Rewrote `_build_floor()` in shed.gd: flush planks (no physical gaps) with dark seam strips (0.008w) between them for visual separation. 8-colour wood palette randomly assigned per plank (pale pine → very dark). Floor at y=0.05 (no grass overlap). Base slab underneath. Dark seams are thin boxes at plank edges, slightly above plank surface.
+- Gemini score: 9/10 overall, 9/10 colour variation, 10/10 seams, 10/10 no grass → PASS.
+
+### Tractor keys PASSED (7/10)
+- Iterated through 4 rounds on tractor_keys.json: larger keyring (0.04 radius), small dark_steel jump rings, 2 brass keys with distinct bow (box, brass_dark), shaft (cylinder), and teeth (boxes). `auto_ground: false`.
+- Gemini score: 7/10 → PASS.
+
+### String ball — FAILED (best 6/10, latest 1/10)
+- ~10 iterations tried: bent_cylinder loops ("cage"), 55 straight cylinders on sphere ("spiky seed pod"), lumpy sphere with wraps ("two thin needles"). Gemini consistently demands textures/normal maps which builder pipeline can't provide.
+- User reviewed latest attempt (v10, lumpy sphere + 5 wraps) — agreed with 1/10 gemini verdict.
+- **Decision: switch to pre-made 3D model from Sketchfab.** Best candidate: "Ball of Yarn" by tornadre (2.4k tris, 1.1k verts, CC-BY, Blender procedural material, no attribution required). Requires free Sketchfab account login to download GLB.
+
+### Tractor keys — user also wants pre-made
+- User reviewed current keys in-game — said "no good at all".
+- Best candidate: "ps1 Keys pack Gold metal" (450 poly, CC-BY, free Sketchfab download).
+- Also found: "Old rusty key", "Metal Door Key" on Sketchfab.
+
+### Screenshot tooling
+- Created `tools/asset_screenshot.gd` + `tools/asset_shot.tscn` for viewing individual assets in Godot with proper lighting.
+- Created `tools/shed_screenshot.gd` + `tools/shed_screenshot.tscn` + `tools/shed_shot.tscn` for shed interior screenshots.
+- **Bug fixed**: `main.gd` lines 288-292 always took screenshot + quit on every game start. Wrapped in `if "--screenshot" in args:` guard. Game now stays open normally.
+- **Bug fixed**: `project.godot` main_scene was left pointing at `asset_shot.tscn` from screenshot work — restored to `scenes/main.tscn`.
+
+### Cleanup
+- Deleted 500+ old screenshot files (string iterations, keys iterations, paw iterations, diagnostic files, old renders). screenshots/ went from 541 → 10 items.
+- Deleted 20 old cat paw blend files from Desktop (`cartoon_cat_arm_paw_v16-v39.blend`).
+
+### User feedback on shed interior (in-game review)
+- Floor planks: "better, different colours look ok even without texture"
+- String ball: "no good at all"
+- Tractor keys: "no good at all"  
+- Tools (spade/rake): "recognisable but too basic"
+- Door: was locked (had to get key from tractor first)
+
+### Next steps
+1. User to download yarn ball GLB from Sketchfab (tornadre's "Ball of Yarn")
+2. User to download keys GLB from Sketchfab (PS1 keys pack or similar)
+3. Import into Blender, verify, render 4-view screenshots for gemini
+4. Replace `assets/misc/string.glb` and `assets/misc/tractor_keys.glb`
+5. Re-design shed tools (thicker geometry, better camera angles)
+6. Assemble full shed with improved assets and get final gemini approval
+7. Grass hscale=2.0 confirmation still pending

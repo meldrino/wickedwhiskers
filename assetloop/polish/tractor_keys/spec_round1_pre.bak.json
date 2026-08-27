@@ -1,0 +1,21 @@
+{
+  "materials": {
+    "brass": { "color": [0.79, 0.64, 0.15], "roughness": 0.35 },
+    "steel": { "color": [0.54, 0.54, 0.57], "roughness": 0.4 }
+  },
+  "parts": [
+    { "type": "bent_cylinder", "name": "KeyRing", "material": "steel", "waypoints": [
+      [0.0, 0.016, 0.0], [0.011, 0.011, 0.0], [0.016, 0.0, 0.0],
+      [0.011, -0.011, 0.0], [0.0, -0.016, 0.0], [-0.011, -0.011, 0.0],
+      [-0.016, 0.0, 0.0], [-0.011, 0.011, 0.0], [0.0, 0.016, 0.0]
+    ], "radii": [0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002, 0.002] },
+    { "type": "bent_cylinder", "name": "SplitLink", "material": "steel", "waypoints": [
+      [-0.016, 0.0, 0.0], [-0.022, 0.0, 0.003], [-0.027, 0.0, 0.0]
+    ], "radii": [0.0015, 0.0015, 0.0015] },
+    { "type": "box", "name": "KeyBow", "material": "brass", "size": [0.018, 0.02, 0.003], "center": [-0.037, 0.0, 0.0] },
+    { "type": "cylinder", "name": "KeyShaft", "material": "brass", "radius": 0.003, "from": [-0.046, 0.0, 0.0], "to": [-0.078, 0.0, 0.0] },
+    { "type": "box", "name": "Tooth1", "material": "brass", "size": [0.006, 0.003, 0.005], "center": [-0.072, -0.004, 0.0] },
+    { "type": "box", "name": "Tooth2", "material": "brass", "size": [0.006, 0.003, 0.003], "center": [-0.075, 0.004, 0.0] },
+    { "type": "box", "name": "Tooth3", "material": "brass", "size": [0.005, 0.003, 0.006], "center": [-0.078, -0.002, 0.0] }
+  ]
+}
