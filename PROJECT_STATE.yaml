@@ -491,8 +491,9 @@ grass_rendering:
   - Bug fixed: main.gd always quit on startup (screenshot code unconditionally ran).
   - Bug fixed: project.godot main_scene was left pointing at asset_shot.tscn.
   - Cleanup: 500+ old screenshots deleted (541 -> 10 items), 20 blend files from Desktop.
-  - GitHub: scuba-hacker (Mark) added as collaborator, master protected via branch
-    ruleset (PR + 1 approval required), mark branch unprotected for his experiments.
+  - GitHub: scuba-hacker (Mark) added as collaborator. Branch ruleset `protect-master`
+    (PR + 1 approval) REMOVED 2026-08-27 — GitHub can't restrict a collaborator to a
+    single branch, so Mark now has full access. Trusted, user's call.
 
 # =============================================================================
 # GRASS PLANE EXPERIMENT (Aug 2026) - verdict: REJECTED, blades read as blobs

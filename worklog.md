@@ -1365,6 +1365,7 @@ recovered from git log + worklog, zero loss):
 - **Tractor keys asset**: Created `builders/tractor_keys.json` (8 parts: keyring, split link, bow, shaft, 3 teeth). Ran through polish pipeline — 4 rounds, didn't get full approval (gemini wants eyelet threading through bow, hard with primitives). GLB staged in `assets/misc/tractor_keys.glb` — better than gold cylinder placeholder. Updated pickup.gd to load GLB.
 - **Shed interior overhaul**: Rewrote `_build_props()` in shed.gd. Added workbench with mallet/wire/hammer, left-wall shelf with seed packets/flower pot/sack, right-wall tool rack with spade+rake (4 teeth), metal bucket, folded tarpaulin. Fixed flat roof to gabled. Kept all existing loot/boot/hay/mousetrap/lantern/rope.
 - **GitHub setup for Mark**: Added scuba-hacker as collaborator with push access. Created branch ruleset `protect-master` requiring PR + 1 approval to merge into master. You bypass as admin. `mark` branch pushed to same commit as master. Mark can push to `mark` freely but needs PR for master.
+- **Ruleset `protect-master` REMOVED (2026-08-27)**: GitHub can't grant a collaborator access to only one branch (rulesets are repo-wide), so Mark would need repo-wide access + PR flow anyway. Removed the ruleset entirely — Mark has full push access now; he's a long-trusted collaborator and the PR flow was just friction. Push to master works directly again (583ebfd..a93999c pushed, temp branch shed-cleanup-aug26 deleted).
 
 ## 2026-08-26 (afternoon session)
 
